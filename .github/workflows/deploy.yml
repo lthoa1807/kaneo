@@ -1,0 +1,123 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Existing tag to redeploy (sha-<12 hex>). Leave empty to build the selected commit."
+        required: false
+        type: string
+
+concurrency:
+  group: kaneo-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build and push image
+    if: github.event_name == 'push' || inputs.image_tag == ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image_tag: ${{ steps.meta.outputs.image_tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate image tag
+        id: meta
+        run: echo "image_tag=sha-${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: .
+          file: ./Dockerfile.kaneo
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ steps.meta.outputs.image_tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy to VPS
+    needs: build
+    if: >-
+      always() &&
+      github.ref == 'refs/heads/main' &&
+      (
+        needs.build.result == 'success' ||
+        (github.event_name == 'workflow_dispatch' && inputs.image_tag != '')
+      )
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      IMAGE_TAG: ${{ inputs.image_tag || needs.build.outputs.image_tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Validate image tag
+        run: |
+          set -euo pipefail
+          if ! [[ "$IMAGE_TAG" =~ ^sha-[0-9a-f]{12}$ ]]; then
+            echo "::error::Invalid image tag '$IMAGE_TAG'; expected sha-<12 lowercase hex>."
+            exit 1
+          fi
+
+      - name: Configure SSH
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          install -m 700 -d "$HOME/.ssh"
+          printf '%s\n' "$VPS_SSH_KEY" > "$HOME/.ssh/deploy_key"
+          chmod 600 "$HOME/.ssh/deploy_key"
+          printf '%s\n' "$VPS_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
+
+      - name: Deploy over SSH
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+          VPS_PATH: ${{ secrets.VPS_PATH }}
+        run: |
+          set -euo pipefail
+          remote_cmd=$(printf 'KANEO_IMAGE_TAG=%q KANEO_COMPOSE_DIR=%q bash -s' "$IMAGE_TAG" "$VPS_PATH")
+          ssh -i "$HOME/.ssh/deploy_key" \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            -o BatchMode=yes \
+            -p "$VPS_PORT" \
+            "$VPS_USER@$VPS_HOST" \
+            "$remote_cmd" < scripts/deploy/vps-deploy.sh
+
+      - name: Remove SSH material
+        if: always()
+        run: rm -f "$HOME/.ssh/deploy_key" "$HOME/.ssh/known_hosts"
