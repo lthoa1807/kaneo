@@ -1,249 +1,320 @@
 # Deploy Kaneo lên VPS
 
-Tài liệu này hướng dẫn cấu hình một lần và cách vận hành pipeline:
+Tài liệu này mô tả cách `lthoa1807/kaneo` đưa một commit lên production.
+
+Mô hình tách đôi:
 
 ```
-push lên main
-  → GitHub Actions build Dockerfile.kaneo (linux/amd64)
+CI (GitHub Actions, tự động khi push main)
+  → build Dockerfile.kaneo (linux/amd64)
   → push ghcr.io/lthoa1807/kaneo:latest + :sha-<12 hex>
-  → SSH vào VPS
-  → scripts/deploy/vps-deploy.sh pull/up service kaneo
-  → chờ healthy tối đa 150 giây, fail kèm logs nếu không healthy
+  → ghi digest vào Summary của run
+  → KHÔNG SSH, KHÔNG deploy
+
+CD (trên VPS, người quản trị chạy)
+  → ./deploy sha-<12 hex>
+  → backup PostgreSQL, cập nhật .env, pull/up service kaneo, health check
 ```
 
-Deploy luôn dùng tag `sha-<12 hex>`, không dùng `latest`, để biết chính xác commit nào đang chạy.
+Không có SSH key hay mật khẩu VPS nào trong GitHub. Người vận hành là người
+quyết định thời điểm và phiên bản; script chỉ làm cho thay đổi đó an toàn.
 
-Thiết kế và kế hoạch triển khai: [`docs/deployment/2026-11-12-cicd-deploy-design.md`](../docs/deployment/2026-11-12-cicd-deploy-design.md) và [`docs/deployment/2026-11-12-cicd-deploy-plan.md`](../docs/deployment/2026-11-12-cicd-deploy-plan.md).
+Deploy luôn dùng tag `sha-<12 hex>`, không bao giờ dùng `latest`, để biết chính
+xác commit nào đang chạy.
+
+Thiết kế và kế hoạch: [`docs/deployment/2026-11-12-cicd-deploy-design.md`](../docs/deployment/2026-11-12-cicd-deploy-design.md)
+và [`docs/deployment/2026-11-12-cicd-deploy-plan.md`](../docs/deployment/2026-11-12-cicd-deploy-plan.md).
 
 ---
 
-## 1. Secret cần tạo trên GitHub
+## 1. Chuẩn bị VPS (một lần)
 
-Vào **Settings → Secrets and variables → Actions** hoặc dùng `gh secret set`:
-
-| Secret | Giá trị |
-|---|---|
-| `VPS_HOST` | IP hoặc domain VPS |
-| `VPS_USER` | User SSH dùng để deploy |
-| `VPS_PORT` | Cổng SSH, thường `22` |
-| `VPS_PATH` | Thư mục compose, thường `/opt/kaneo` |
-| `VPS_SSH_KEY` | Nội dung private key deploy (toàn bộ file, gồm cả dòng đầu và dòng cuối) |
-| `VPS_KNOWN_HOSTS` | Host key của VPS đã xác minh fingerprint |
-
-Không cần secret GHCR trong workflow: VPS tự đăng nhập GHCR một lần bằng PAT `read:packages`.
-
-### Tạo SSH key và xác minh host key
-
-Trên máy local:
-
-```bash
-ssh-keygen -t ed25519 -C "kaneo-deploy" -f ~/.ssh/kaneo_deploy -N ""
-cat ~/.ssh/kaneo_deploy.pub
-```
-
-Thêm public key vào VPS:
-
-```bash
-ssh-copy-id -i ~/.ssh/kaneo_deploy.pub <VPS_USER>@<VPS_HOST>
-ssh -i ~/.ssh/kaneo_deploy -p <VPS_PORT> <VPS_USER>@<VPS_HOST> 'docker compose version'
-```
-
-Lấy host key và **đối chiếu fingerprint với console/panel của VPS** trước khi lưu:
-
-```bash
-ssh-keyscan -p <VPS_PORT> <VPS_HOST> > /tmp/vps_known_hosts
-ssh-keygen -lf /tmp/vps_known_hosts
-# Trên VPS, in fingerprint để so sánh:
-# ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub
-```
-
-Khi hai fingerprint khớp:
-
-```bash
-gh secret set VPS_KNOWN_HOSTS -R lthoa1807/kaneo < /tmp/vps_known_hosts
-rm -f /tmp/vps_known_hosts
-```
-
-Các secret còn lại:
-
-```bash
-printf '%s' "<VPS_HOST>"   | gh secret set VPS_HOST   -R lthoa1807/kaneo
-printf '%s' "<VPS_USER>"   | gh secret set VPS_USER   -R lthoa1807/kaneo
-printf '%s' "<VPS_PORT>"   | gh secret set VPS_PORT   -R lthoa1807/kaneo
-printf '%s' "/opt/kaneo"   | gh secret set VPS_PATH   -R lthoa1807/kaneo
-gh secret set VPS_SSH_KEY -R lthoa1807/kaneo < ~/.ssh/kaneo_deploy
-```
-
-Khuyến nghị: tạo user riêng `kaneo-deploy`, chỉ có quyền vào `/opt/kaneo` và quyền dùng Docker. Lưu ý thành viên nhóm `docker` thực tế gần tương đương root, nên vẫn phải bảo vệ key cẩn thận.
-
----
-
-## 2. Chuẩn bị VPS (một lần)
-
-### 2.1. Đăng nhập GHCR
+### 1.1. Đăng nhập GHCR
 
 Tạo PAT (fine-grained hoặc classic) chỉ có quyền `read:packages`, sau đó trên VPS:
 
 ```bash
-echo "<PAT>" | docker login ghcr.io -u lthoa1807 --password-stdin
+read -rsp "GHCR PAT: " CR_PAT
+echo
+printf '%s' "$CR_PAT" | docker login ghcr.io -u lthoa1807 --password-stdin
+unset CR_PAT
 ```
 
-Expected: `Login Succeeded`. Chưa chạy `docker pull` ở bước này: image `ghcr.io/lthoa1807/kaneo:latest` chỉ tồn tại sau lần build đầu tiên của workflow, nên pull sẽ báo not found — bình thường.
+Expected: `Login Succeeded`. Đọc PAT bằng `read -s` để không lưu vào shell history.
+Chưa chạy `docker pull` ở bước này: image chỉ tồn tại sau lần build đầu tiên. Giữ
+đăng nhập này để `docker compose pull` hoạt động về sau. Nếu package để private,
+kiểm tra package `kaneo` đã cấp quyền cho PAT/tài khoản tương ứng.
 
-Giữ đăng nhập này để `docker compose pull` hoạt động về sau. Nếu package để private, kiểm tra package `kaneo` đã cấp quyền cho PAT/tài khoản tương ứng.
+Chạy `docker login` bằng đúng user sẽ chạy script deploy. Script không đọc
+credential; nó để `docker compose pull` xác thực lần cuối và chỉ đổi thông báo
+lỗi khi pull bị `unauthorized`/`denied`.
 
-### 2.2. Kiểm tra và backup trước khi đổi
+### 1.2. Compose
 
-```bash
-cd /opt/kaneo
-docker compose config --services
-docker compose config --images
-grep -n 'image:' compose.yml
-```
-
-Xác nhận:
-- service `kaneo` tồn tại, tên service database đúng (ví dụ `postgres`);
-- image của `kaneo` đúng repository hiện tại;
-- các service phụ thuộc không đổi.
-
-Backup database (dùng biến môi trường **bên trong container**, không phải shell ngoài):
-
-```bash
-docker compose exec -T postgres sh -c \
-  'exec pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB"' \
-  > "/root/kaneo-$(date +%F).sql"
-ls -lh "/root/kaneo-$(date +%F).sql"
-test -s "/root/kaneo-$(date +%F).sql" && echo 'backup looks non-empty'
-```
-
-Đổi `postgres` nếu service database của bạn tên khác. Nếu lần đầu deploy không kèm thay đổi schema, giữ nguyên database như hiện tại để rollback đơn giản.
-
-Sao lưu compose:
-
-```bash
-cp compose.yml compose.yml.bak
-```
-
-**Không chạy `docker compose down`** trong quá trình chuyển đổi; chỉ để pipeline `up -d --no-deps kaneo` thay container.
-
-### 2.3. Sửa compose để nhận tag
-
-Trong `/opt/kaneo/compose.yml`, đổi image của service `kaneo`:
+Trong `/opt/kaneo/compose.yml`, service `kaneo` phải tham chiếu tag bắt buộc:
 
 ```yaml
 services:
   kaneo:
-    image: ghcr.io/lthoa1807/kaneo:${KANEO_IMAGE_TAG:-latest}
+    image: ghcr.io/lthoa1807/kaneo:${KANEO_IMAGE_TAG:?KANEO_IMAGE_TAG is required}
 ```
 
-Sao lưu trước khi sửa:
+`:?` là cố ý: nếu thiếu biến, Compose dừng ngay thay vì lặng lẽ chạy một tag
+trôi nổi. Điền `KANEO_IMAGE_TAG` trong `/opt/kaneo/.env` (xem 1.4).
+
+### 1.3. Cài script deploy
+
+Copy `scripts/deploy/vps-deploy.sh` lên VPS và đặt tên `deploy` trong thư mục
+compose:
 
 ```bash
-cd /opt/kaneo
-cp compose.yml compose.yml.bak
+install -m 0755 scripts/deploy/vps-deploy.sh /opt/kaneo/deploy
 ```
 
-Kiểm tra compose đọc đúng tag:
+Script chạy bằng user sở hữu `/opt/kaneo` và có quyền dùng Docker. User thuộc
+group `docker` thực tế gần tương đương root, nên vẫn phải bảo vệ tài khoản đó.
+
+### 1.4. `.env`
+
+`/opt/kaneo/.env` là nguồn duy nhất của tag. Thêm dòng:
+
+```env
+KANEO_IMAGE_TAG=sha-<12 hex>
+```
+
+Lần đầu, xác định tag SHA tương ứng với image đang chạy thực tế và ghi vào
+`.env`. Không dùng `latest` làm tag bootstrap cho production. Sau đó script quản
+lý dòng này.
+
+Điều kiện script kiểm tra trước khi deploy:
+
+- `/opt/kaneo` tồn tại, ghi được, có `compose.yml` và `.env`;
+- `.env` không phải symlink, không dùng CRLF, ghi được;
+- Docker daemon truy cập được.
+
+### 1.5. Biến tuỳ chọn
+
+| Biến | Mặc định | Ý nghĩa |
+|---|---|---|
+| `KANEO_COMPOSE_DIR` | `/opt/kaneo` | Thư mục chứa `compose.yml`, `.env`, lock, tag file |
+| `KANEO_BACKUP_DIR` | `$HOME/kaneo-backups` | Nơi lưu dump PostgreSQL |
+| `KANEO_HEALTH_ATTEMPTS` | `45` | Số lần kiểm tra health |
+| `KANEO_HEALTH_INTERVAL` | `5` | Giây giữa hai lần kiểm tra |
+
+Hai biến health chỉ để rút ngắn test; production nên giữ mặc định (45 × 5s =
+225 giây, dài hơn mức tối đa 150 giây mà healthcheck của repo cần để báo
+`unhealthy`).
+
+---
+
+## 2. CI: build và publish
+
+Workflow `.github/workflows/publish-main.yml` chạy khi push lên `main` hoặc
+dispatch tay. Nó chỉ:
+
+1. build `Dockerfile.kaneo` cho `linux/amd64`;
+2. push `ghcr.io/lthoa1807/kaneo:latest` và `:sha-<12 hex>`;
+3. ghi tag + digest vào **Summary** của run.
+
+Workflow không có secret VPS, không SSH, không deploy. `concurrency:
+publish-main` với `cancel-in-progress: false` xếp hàng các lần build.
+
+Lấy tag vừa publish:
 
 ```bash
-KANEO_IMAGE_TAG=latest docker compose config | grep image:
-# image: ghcr.io/lthoa1807/kaneo:latest
+gh run list -R lthoa1807/kaneo --workflow publish-main.yml --limit 5
+gh run view -R lthoa1807/kaneo <run-id>   # xem digest trong Summary
 ```
 
-`vps-deploy.sh` sẽ tạo và quản lý hai file trong `/opt/kaneo`:
+Hoặc vào GitHub → **Actions** → **Publish main image**.
 
-- `.deploy.env` — tag đã áp dụng gần nhất (`KANEO_IMAGE_TAG=sha-...`). Nếu deploy fail, file này giữ tag vừa thử.
-- `.previous_image_tag` — tag của lần deploy **thành công** ngay trước đó; không bị ghi đè khi deploy fail.
-
-Cả hai được ghi atomic và có quyền `600`. Không commit chúng vào Git.
-
-Script dùng `docker compose --env-file .env --env-file .deploy.env` khi `.env` tồn tại, ngược lại chỉ dùng `.deploy.env`. Nhờ vậy các biến interpolate khác trong `.env` (mật khẩu Postgres, domain…) không bị mất. Khi chạy lệnh tay, dùng đúng thứ tự này; file sau override file trước.
+Tag cũng có thể lấy từ GitHub → **Packages** → `kaneo`.
 
 ---
 
 ## 3. Deploy
 
-Push commit lên `main`:
-
 ```bash
-git push origin main
+cd /opt/kaneo
+./deploy sha-a1b2c3d4e5f6
 ```
 
-Lần deploy đầu tiên:
-- build chưa có cache nên thường lâu hơn (10–20 phút);
-- chỉ container `kaneo` được thay (`up -d --no-deps kaneo`), database và các service khác giữ nguyên;
-- không kèm thay đổi schema/migration trong cùng lần đầu để rollback chỉ là đổi image.
+Script thực hiện, theo thứ tự:
 
-Theo dõi:
+1. **Lock** `.deploy.lock` bằng `flock -n`. Deploy thứ hai đang chạy sẽ bị từ chối.
+2. **Không làm gì** nếu `.env` đã đúng tag (trừ khi `--force`).
+3. **Backup PostgreSQL**:
+   - kiểm tra container `postgres` đang chạy và `pg_isready`;
+   - kiểm tra dung lượng trước dump (ước lượng `3 ×` bản backup gần nhất, tối
+     thiểu 256 MiB). Đây là kiểm tra dự phòng, không bảo đảm dump thành công —
+     exit code của `pg_dump` mới là điều kiện;
+   - `pg_dump -Fc` vào file tạm, kiểm tra không rỗng, kiểm tra `pg_restore --list`
+     đọc được, rồi mới promote thành
+     `$KANEO_BACKUP_DIR/kaneo-<UTC>-<tag>.dump` (mode 600, thư mục 700);
+   - backup fail → dừng, `.env` chưa bị đổi.
+4. **Cập nhật `.env` atomic**: giữ mọi biến khác, thay đúng dòng
+   `KANEO_IMAGE_TAG=`, tạo `.env` tạm rồi `mv`. Lần đầu tạo `.env.bak` (mode 600)
+   và không ghi đè về sau.
+5. **Pull** `docker compose pull kaneo`. Nếu bị `unauthorized`/`denied`, script
+   in hướng dẫn `docker login ghcr.io`.
+6. **Up** `docker compose up -d --no-deps kaneo`, để Postgres và service khác
+   không bị recreate.
+7. **Xác minh 3 lớp**:
+   - `Config.Image` của container khớp image reference lấy từ
+     `docker compose config --images`;
+   - image ID của container khớp image vừa pull;
+   - digest đọc được từ `RepoDigests`; rỗng thì dừng.
+8. **Health**: chờ tới khi `healthy`. Các trạng thái khác đều fail:
+   `unhealthy`, `no-healthcheck`, container không chạy, hoặc quá 225 giây.
+9. **Ghi `.last_good_image_tag`** bằng tag vừa deploy thành công.
 
-```bash
-gh run list -R lthoa1807/kaneo --workflow deploy.yml --limit 5
-gh run watch -R lthoa1807/kaneo <run-id> --exit-status
+Khi fail, script in block trạng thái và không tự rollback image, không tự
+restore database:
+
+```
+[deploy] configured      : sha-cccccccccccc
+[deploy] running         : ghcr.io/lthoa1807/kaneo:sha-cccccccccccc
+[deploy] last known good : sha-bbbbbbbbbbbb
+[deploy] rollback target : sha-bbbbbbbbbbbb
+[deploy] database backup : /home/user/kaneo-backups/kaneo-...dump
+[deploy] to roll back    : ./deploy sha-bbbbbbbbbbbb
+[deploy] ERROR: ...
 ```
 
-Job `deploy` sẽ fail nếu:
+### `--force`
 
-- tag không đúng định dạng `sha-<12 hex>`;
-- `docker pull` hoặc `docker compose up` lỗi;
-- container không healthy trong 150 giây;
-- container không có `HEALTHCHECK`;
-- container thoát hoặc biến mất.
+```bash
+./deploy --force sha-a1b2c3d4e5f6
+```
 
-Khi fail, workflow in 200 dòng log gần nhất, trạng thái service và `docker inspect`, rồi trả exit code khác 0. Không có “xanh giả”.
+Deploy lại đúng tag đang cấu hình (vẫn backup, pull, up, health).
 
-Kiểm tra trên VPS:
+### `--status`
+
+```bash
+./deploy --status
+```
+
+Chỉ đọc, không cần Compose hợp lệ và không đổi gì. In:
+
+```
+compose dir    : /opt/kaneo
+configured     : sha-bbbbbbbbbbbb
+last known good: sha-bbbbbbbbbbbb
+running        : ghcr.io/lthoa1807/kaneo:sha-bbbbbbbbbbbb
+running id     : sha256:...
+running digest : ghcr.io/lthoa1807/kaneo@sha256:...
+latest backup  : /home/user/kaneo-backups/kaneo-...dump
+rollback target: sha-bbbbbbbbbbbb
+```
+
+Nếu container đã dừng, `running` hiển thị `<stopped container ...>`; nếu chưa
+có container, `<no container>`.
+
+---
+
+## 4. Rollback
+
+Rollback target **luôn** là `.last_good_image_tag`, không phải tag cũ trong
+`.env`.
+
+Ví dụ:
+
+| Thao tác | `.env` | `.last_good_image_tag` |
+|---|---|---|
+| Deploy A thành công | A | A |
+| Deploy B bắt đầu | B | A |
+| Deploy B thất bại | B | A |
+| Deploy C thất bại | C | A |
+
+Lúc này rollback về B là sai; target đúng là A.
 
 ```bash
 cd /opt/kaneo
-cat .deploy.env
-docker compose --env-file .env --env-file .deploy.env ps kaneo
-docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}no-healthcheck{{end}}' \
-  "$(docker compose --env-file .env --env-file .deploy.env ps -q kaneo)"
+cat .last_good_image_tag
+./deploy "$(cat .last_good_image_tag)"
 ```
 
-Nếu `/opt/kaneo` không có `.env`, bỏ phần `--env-file .env`. Script deploy tự nạp `.env` (nếu có) trước `.deploy.env`, nên các biến interpolate khác như mật khẩu Postgres vẫn giữ nguyên.
+Nếu deploy fail, output cuối đã in sẵn dòng `to roll back: ./deploy <tag>`.
+Nếu chính lần rollback cũng fail, last good không đổi, nên có thể thử lại hoặc
+lùi xa hơn bằng một tag SHA cũ hơn trong GHCR.
+
+Rollback **không** tự khôi phục database. Nếu bản deploy lỗi đã chạy migration
+không tương thích, cần khôi phục backup theo một quy trình riêng.
+
+Các lệnh sau chỉ giúp **tìm và kiểm tra** backup, không thực hiện restore:
+
+```bash
+ls -lt "$HOME/kaneo-backups"/kaneo-*.dump | head
+docker compose exec -T postgres pg_restore --list < <backup>.dump
+```
+
+Việc khôi phục database là thao tác riêng biệt: phải xác định rõ database đích,
+chấp nhận mất dữ liệu phát sinh sau thời điểm backup, và có runbook restore
+riêng trước khi chạy `pg_restore`. Backup được tạo **trước** khi đổi `.env`, nên
+nó phản ánh trạng thái trước lần deploy đó.
 
 ---
 
-## 4. Rollback thủ công
+## 5. File trên VPS
 
-1. Xem tag cần quay lại:
+| Đường dẫn | Vai trò |
+|---|---|
+| `.env` | Nguồn duy nhất của `KANEO_IMAGE_TAG` và cấu hình ứng dụng |
+| `.env.bak` | Bản `.env` đầu tiên trước lần deploy đầu; tạo một lần, mode 600 |
+| `.last_good_image_tag` | Tag đã deploy thành công gần nhất; rollback target |
+| `.deploy.lock` | Lock chống deploy đồng thời |
+| `$KANEO_BACKUP_DIR/kaneo-*.dump` | Backup `-Fc`, giữ 14 bản mới nhất theo mtime |
 
-   ```bash
-   cat /opt/kaneo/.previous_image_tag
-   ```
+Retention chạy **sau** khi backup mới đã promote. Backup fail thì không xoá bản
+cũ nào.
 
-   Hoặc lấy tag `sha-...` trong GitHub → Packages → `kaneo`.
-
-2. GitHub → **Actions** → **Deploy** → **Run workflow**:
-   - Branch: `main` (bắt buộc).
-   - `image_tag`: nhập tag cũ, ví dụ `sha-a1b2c3d4e5f6`.
-
-3. Workflow bỏ qua bước build, deploy đúng tag đó và vẫn chạy health check.
-
-Nếu deploy fail, `.previous_image_tag` **không** bị ghi đè; `.deploy.env` giữ tag vừa thử. Fallback đúng là tag cũ được in ở dòng `Rollback target:` cuối log job. Nếu rollback cũng fail, log lại in rollback target hiện tại để bạn thử tiếp.
-
-`image_tag` chỉ chấp nhận `sha-<12 ký tự hex thường>`; nhập `latest` sẽ bị từ chối ở cả workflow và script.
+Không commit các file trên vào Git.
 
 ---
 
-## 5. Xử lý sự cố
+## 6. Xử lý sự cố
 
 | Triệu chứng | Kiểm tra |
 |---|---|
-| `Permission denied (publickey)` | `VPS_SSH_KEY` thiếu dòng cuối, sai user, hoặc public key chưa nằm trong `~/.ssh/authorized_keys` của user đó |
-| `Host key verification failed` | `VPS_KNOWN_HOSTS` sai host/port hoặc fingerprint chưa được cập nhật sau khi VPS đổi key |
-| `pull access denied` | Chưa `docker login ghcr.io` trên VPS, PAT hết hạn, hoặc thiếu quyền package |
-| `Invalid image tag` | Tag không khớp `sha-<12 hex>`; xem lại tag trong GHCR |
+| `another deployment is already running` | Có tiến trình deploy khác đang giữ lock; kiểm tra tiến trình dùng file bằng `fuser .deploy.lock`. File `.deploy.lock` còn lại sau deployment là bình thường, không cần xóa |
+| `cannot open lock file` | User chạy script không ghi được `/opt/kaneo` |
+| `image pull was denied` | Chưa `docker login ghcr.io` bằng đúng user, PAT hết hạn, hoặc thiếu quyền package |
+| `invalid image tag` | Tag không khớp `sha-<12 hex thường>`; lấy lại từ Summary của workflow |
+| `postgres container not found` | Tên service database khác `postgres`; script giả định service tên `postgres` |
+| `pg_dump failed` | Xem log; `.env` chưa bị đổi, có thể sửa rồi chạy lại |
+| `backup archive is not readable` | Dump hỏng hoặc `pg_restore` lỗi; `.env` chưa bị đổi |
 | `container has no healthcheck` | Image không có `HEALTHCHECK`; không deploy image đó |
-| Container `unhealthy` | Xem log trong job hoặc `docker compose logs --tail=200 kaneo` |
-| Deploy treo lâu | Chờ tối đa 150 giây; sau đó workflow tự fail và in logs |
+| container `unhealthy` | `docker compose logs --tail=200 kaneo`; rollback bằng tag trong output |
+| `image digest unavailable` | Docker không có `RepoDigests` (image build local); chỉ deploy image pull từ registry |
+| Deploy treo | Tối đa 225 giây rồi fail; giảm bằng `KANEO_HEALTH_*` chỉ khi test |
+| `docker compose config failed` | `.env` thiếu biến bắt buộc hoặc compose sai cú pháp |
 
 ---
 
-## 6. Ghi chú vận hành
+## 7. Ghi chú vận hành
 
-- `concurrency: kaneo-production` đảm bảo không có hai lần deploy chạy song song. Các run đang chờ có thể bị run mới hơn thay thế, nên không phải mọi commit đều được deploy tuần tự — bản mới nhất vẫn thắng.
-- Build chỉ chạy trên `ubuntu-latest`, không phụ thuộc runner hay secret của upstream.
-- Workflow không chạy test upstream; cổng chặn duy nhất là build thành công + health check trên VPS.
-- Muốn build lại một commit cũ: chạy `Deploy` với branch `main` và để trống `image_tag` (build từ commit hiện tại của `main`), hoặc checkout commit đó rồi dispatch từ nhánh tương ứng — nhưng deploy chỉ được phép từ `main`.
+- Không có deploy tự động: push `main` chỉ tạo image. VPS đổi phiên bản khi
+  người quản trị chạy `./deploy`.
+- Không có SSH credential của VPS trong GitHub.
+- `docker compose up -d --no-deps kaneo` chỉ thay container `kaneo`; Postgres
+  không bị recreate.
+- Script không tự rollback và không tự restore database; đó là quyết định thủ
+  công vì cả hai đều có thể mất dữ liệu.
+- Build chỉ chạy trên `ubuntu-latest`, platform `linux/amd64`.
+- Không gate bằng `ci.yml` upstream; chốt chặn là build thành công, xác minh
+  image và health check trên VPS. Build và health check **không** thay thế việc
+  review commit/diff trước khi người quản trị quyết định deploy.
+
+## 8. Test script
+
+Harness chạy toàn bộ logic với Docker giả, kiểm cả exit code và side effect:
+
+```bash
+bash scripts/deploy/test/run.sh
+```
+
+`KEEP=1` giữ thư mục làm việc để xem output. Harness **không** thay thế kiểm
+chứng trên Docker thật: `pg_dump -Fc`, `pg_restore --list`, image ID/digest,
+health và việc Postgres không bị recreate vẫn nên xác nhận trên VPS trước khi
+tin tưởng hoàn toàn.

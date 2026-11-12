@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Deterministic stand-in for `df` used by the deploy test harness.
+set -u
+
+STATE=${FAKE_STATE:?FAKE_STATE must point at a state directory}
+
+if [ -f "$STATE/avail_bytes" ]; then
+  cat "$STATE/avail_bytes"
+  exit 0
+fi
+
+printf '%s\n' 10737418240

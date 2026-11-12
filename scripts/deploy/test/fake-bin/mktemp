@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Delegates to the real mktemp, unless FAKE_STATE/mktemp_fail names a template
+# to reject. Used to exercise a state write failure after a healthy deploy.
+set -u
+
+REAL=/usr/bin/mktemp
+if [ ! -x "$REAL" ]; then
+  REAL=/bin/mktemp
+fi
+
+if [ -n "${FAKE_STATE:-}" ] && [ -f "$FAKE_STATE/mktemp_fail" ]; then
+  pattern=$(cat "$FAKE_STATE/mktemp_fail")
+  for arg in "$@"; do
+    case "$arg" in
+      *"$pattern"*)
+        echo "fake-mktemp: injected failure for template $arg" >&2
+        exit 1
+        ;;
+    esac
+  done
+fi
+
+exec "$REAL" "$@"

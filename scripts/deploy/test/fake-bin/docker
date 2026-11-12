@@ -1,0 +1,155 @@
+#!/usr/bin/env bash
+# Minimal Docker stand-in for scripts/deploy/test/run.sh.
+#
+# It answers the exact commands vps-deploy.sh issues and is steered by files in
+# $FAKE_STATE, so every failure branch can be exercised without a daemon.
+set -u
+
+STATE=${FAKE_STATE:?FAKE_STATE must point at a state directory}
+mkdir -p "$STATE"
+
+get() {
+  if [ -f "$STATE/$1" ]; then
+    cat "$STATE/$1"
+  else
+    printf '%s' "$2"
+  fi
+}
+
+tag_from_env() {
+  sed -n 's/^KANEO_IMAGE_TAG=//p' .env 2>/dev/null | head -n1
+}
+
+cmd=${1:-}
+shift || true
+
+case "$cmd" in
+  info)
+    exit 0
+    ;;
+
+  inspect)
+    fmt=""
+    while [ $# -gt 0 ]; do
+      case "$1" in
+        --format) fmt=$2; shift 2 ;;
+        *) shift ;;
+      esac
+    done
+    case "$fmt" in
+      *".State.Status"*) get status running ;;
+      *".State.Health"*) get health healthy ;;
+      *"json .State"*) echo '{"Status":"running","Health":{"Status":"healthy"}}' ;;
+      *".Config.Image"*)
+        override=$(get config_image "")
+        if [ -n "$override" ]; then
+          printf '%s\n' "$override"
+        else
+          printf 'ghcr.io/lthoa1807/kaneo:%s\n' "$(tag_from_env)"
+        fi
+        ;;
+      *".Image"*)
+        fallback=$(get image_id "sha256:aaaa")
+        get container_image_id "$fallback"
+        ;;
+      *)
+        echo "fake-docker: unhandled inspect format: $fmt" >&2
+        exit 2
+        ;;
+    esac
+    ;;
+
+  image)
+    sub=${1:-}
+    shift || true
+    [ "$sub" = "inspect" ] || { echo "fake-docker: unhandled image subcommand: $sub" >&2; exit 2; }
+    fmt=""
+    while [ $# -gt 0 ]; do
+      case "$1" in
+        --format) fmt=$2; shift 2 ;;
+        *) shift ;;
+      esac
+    done
+    case "$fmt" in
+      *"RepoDigests"*) get digest "ghcr.io/lthoa1807/kaneo@sha256:bbbb" ;;
+      *".Id"*) get image_id "sha256:aaaa" ;;
+      *) echo "fake-docker: unhandled image format: $fmt" >&2; exit 2 ;;
+    esac
+    ;;
+
+  compose)
+    sub=${1:-}
+    shift || true
+    case "$sub" in
+      ps)
+        args=" $* "
+        case "$args" in
+          *" -q postgres "*) get pg_id pgcid ;;
+          *" -aq kaneo "*) get app_id appcid ;;
+          *" -q kaneo "*)
+            if [ "$(get app_running 1)" = "1" ]; then get app_id appcid; fi
+            ;;
+          *) echo "NAME STATUS" ;;
+        esac
+        ;;
+      exec)
+        shift || true # -T
+        service=${1:-}
+        shift || true
+        [ "$service" = "postgres" ] || { echo "fake-docker: exec on $service" >&2; exit 2; }
+        joined=" $* "
+        case "$joined" in
+          *pg_isready*)
+            [ "$(get pg_ready 1)" = "1" ]
+            ;;
+          *pg_dump*)
+            [ "$(get dump_fail 0)" = "1" ] && exit 1
+            printf 'FAKE-DUMP\n'
+            ;;
+          *pg_restore*)
+            [ "$(get archive_bad 0)" = "1" ] && exit 1
+            cat >/dev/null
+            ;;
+          *)
+            echo "fake-docker: unhandled exec: $joined" >&2
+            exit 2
+            ;;
+        esac
+        ;;
+      config)
+        case "${1:-}" in
+          --quiet) exit 0 ;;
+          --images)
+            printf 'ghcr.io/lthoa1807/kaneo:%s\n' "$(tag_from_env)"
+            printf 'postgres:16-alpine\n'
+            ;;
+          *) exit 2 ;;
+        esac
+        ;;
+      pull)
+        delay=$(get pull_delay 0)
+        if [ "$delay" != "0" ]; then sleep "$delay"; fi
+        if [ "$(get pull_result ok)" != "ok" ]; then
+          echo "Error response from daemon: denied: denied"
+          exit 1
+        fi
+        ;;
+      up)
+        if [ "$(get up_fail 0)" = "1" ]; then exit 1; fi
+        echo 1 > "$STATE/app_running"
+        ;;
+      logs)
+        echo "fake log line"
+        ;;
+      *)
+        echo "fake-docker: unhandled compose subcommand: $sub" >&2
+        exit 2
+        ;;
+    esac
+    ;;
+
+  *)
+    echo "fake-docker: unhandled command: $cmd" >&2
+    exit 2
+    ;;
+esac

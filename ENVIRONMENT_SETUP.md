@@ -53,6 +53,19 @@ curl --fail http://localhost:1337/api/health
 
 The first non-guest account completes instance setup. Keep this local instance private until you have created it.
 
+## Run with Docker Compose
+
+The bundled `compose.yml` requires `KANEO_IMAGE_TAG`; it never falls back to a floating tag:
+
+```env
+# Add to the .env file Compose reads
+KANEO_IMAGE_TAG=latest
+```
+
+Use `latest` to follow the newest published image, or pin a release or a commit tag when you want a fixed version. `docker compose up` fails with `KANEO_IMAGE_TAG is required` until the variable is set. Pulling a newer image does not restart Kaneo; recreate the service to apply it.
+
+If you operate a fork that publishes commit tags, set the `sha-<12 hex>` tag produced by its image workflow instead.
+
 ## Optional features
 
 Use the [environment reference](https://kaneo.app/docs/core/installation/environment-variables) for server settings and defaults.
