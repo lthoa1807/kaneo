@@ -44,11 +44,27 @@ move the request.
    `viewer`/`member`/`admin` (added to `DEFAULT_ROLE_NAMES` and
    `defaultRolePayloads` in `@kaneo/permissions`; boot-time backfill covers
    existing workspaces).
+
+   Stored `workspace_role` rows **replace** the compiled role definitions,
+   and the seeder only inserts missing rows — so new workspaces alone
+   would never grant intake permissions to existing staff. Migration
+   policy (implementer's call, add-only and non-destructive): for the
+   three default-named roles (`viewer`, `member`, `admin`) in every
+   workspace, merge the new `intakeRequest` actions into the stored
+   payload in place (write back old actions plus the added ones). Rows for
+   non-default role names are never touched. This keeps intake functional
+   in every existing workspace and cannot remove anything an admin added.
 2. Guests join via the existing workspace invitation flow with project
    access mode `selected`. No `all` access, no new auth flows.
-3. Guests do **not** count toward seats; `syncWorkspaceSeats` /
-   `workspaceUserTable`-based billing stays untouched. Revisit only if
-   Kaneo ships SaaS seat limits (open item, not MVP).
+3. Guests and seats: billing logic (`syncWorkspaceSeats` and friends) is
+   left untouched in MVP, per the self-host-first posture. Consequence,
+   stated plainly: seat limits **exist today** on billing-enabled (Creem
+   team plan) instances, and because seats count all `workspaceUserTable`
+   rows, guests will consume seats there. Self-hosted instances with
+   billing disabled are unaffected. Excluding guests from seat counts is a
+   small, isolated follow-up (`sync-seats.ts`, billing overview, and the
+   reconciliation query), deliberately deferred — not treated as "future
+   SaaS only".
 4. `intake_request` is a new table; `task.intakeRequestId` is a new nullable
    FK. No junction table.
 5. Tasks are created only for approved requests; rejected requests are kept
@@ -90,7 +106,19 @@ intakeRequest: ["create", "read", "update", "delete", "manage"]
 not exercised in MVP (requests are never deleted — see section 9).
 
 `guest` gets **no** `project:*`, `task:*`, `label:*`, `workspace:*`
-actions. `viewer` gets `intakeRequest: ["read"]` so internal read-only
+actions, and — mirroring how `viewer` is built — its better-auth
+organization surface is exactly `memberAc` statements (no organization,
+member, invitation, or team actions beyond `ac: ["read"]`), so guests
+cannot list members, see emails, or invite anyone. Concrete guest payload:
+
+```ts
+export const guest = ac.newRole({
+  ...memberAc.statements,
+  intakeRequest: ["create", "read", "update"],
+});
+```
+
+`viewer` gets `intakeRequest: ["read"]` so internal read-only
 users can see the intake list of projects they can access.
 
 ### Ownership enforcement (the one new primitive)
@@ -212,9 +240,10 @@ Changes to existing tables:
   flag accept new requests. Independent from project access: access grants
   visibility, the flag gates submission.
 
-Numbering: `number` is per-project, generated like `task.number`
-(max+1 inside the same transaction as insert), surfaced as the human
-identifier (display form `REQ-<number>`).
+Numbering: `number` is per-project, using the same counter pattern as
+tasks (`project.lastTaskNumber`): a `project.lastIntakeRequestNumber`
+column, incremented inside the same transaction as insert, surfaced as
+the human identifier (display form `REQ-<number>`).
 
 Deliberately **not** denormalized: no `workspaceId` column — requests
 resolve their workspace through the project join, exactly like tasks do
@@ -321,12 +350,19 @@ All copy through i18n keys with `i18n/en-US.json` as the source.
 ## 11. Notifications and audit
 
 Event → recipient matrix (architecture fixed now; MVP implements the
-bold rows):
+bold rows). The notification pipeline is resource-typed
+(`task` | `workspace` today): intake adds an `intake_request` resourceType
+threaded through `notificationResourceAccess`, `resolveNotificationContext`,
+and the preference gates — staff notifications go through the existing
+preference machinery unchanged. Guest-facing emails are treated as
+**transactional** (like invitation emails today): not preference-gated,
+since the portal has no notification-settings UI. Guests receive in-app
+notifications in the portal without a preferences surface.
 
 | Event | Recipients | Channel |
 |---|---|---|
 | **request created (by guest)** | staff with `manage` + project access on that project | in-app notification, existing notification service |
-| **status changed to `REJECTED` / `DELIVERED` / revision reopened `IN_PROGRESS`** | request owner | in-app + email (`@kaneo/email` template) |
+| **status changed to `REJECTED` / `DELIVERED` / revision reopened `IN_PROGRESS`** | request owner | in-app + email (transactional, `@kaneo/email` template) |
 | **revision requested / delivery confirmed (by guest)** | staff with `manage` + project access | in-app |
 | reminder: request sits in `NEW` for N days | staff with `manage` | later phase (scheduler pattern exists) |
 
