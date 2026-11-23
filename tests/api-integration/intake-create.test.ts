@@ -120,3 +120,46 @@ describe("intake request creation", () => {
     expect((await response.json()).code).toBe("MISSING_PERMISSION");
   });
 });
+
+describe("intake project picker", () => {
+  it("lists only intake-enabled projects the actor can access", async () => {
+    const guest = await createWorkspaceMember({ role: "guest" });
+    const alpha = await createProjectFixture({
+      workspaceId: guest.workspace.id,
+      name: "Alpha",
+    });
+    const beta = await createProjectFixture({
+      workspaceId: guest.workspace.id,
+      name: "Beta",
+    });
+    const gamma = await createProjectFixture({
+      workspaceId: guest.workspace.id,
+      name: "Gamma",
+    });
+    await enableIntake(alpha.project.id);
+    await enableIntake(gamma.project.id);
+    await restrictToProjects(guest.workspace.id, guest.user.id, [
+      alpha.project.id,
+      beta.project.id,
+    ]);
+    mockAuthenticatedSession(guest.user);
+
+    const response = await createApp().app.request(
+      `/api/intake/workspaces/${guest.workspace.id}/intake-projects`,
+    );
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body).toEqual([{ id: alpha.project.id, name: "Alpha" }]);
+  });
+
+  it("requires intakeRequest:create", async () => {
+    const viewer = await createWorkspaceMember({ role: "viewer" });
+    mockAuthenticatedSession(viewer.user);
+
+    const response = await createApp().app.request(
+      `/api/intake/workspaces/${viewer.workspace.id}/intake-projects`,
+    );
+    expect(response.status).toBe(403);
+    expect((await response.json()).code).toBe("MISSING_PERMISSION");
+  });
+});

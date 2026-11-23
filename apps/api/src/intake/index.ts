@@ -8,11 +8,13 @@ import {
   createRoute,
   errorResponse,
   jsonResponse,
+  z,
 } from "../openapi";
 import { requireWorkspacePermission } from "../utils/require-workspace-permission";
 import { workspaceAccess } from "../utils/workspace-access-middleware";
 import { workspaceIdParam } from "../workspace/schema";
 import createIntakeRequest from "./controllers/create-intake-request";
+import listIntakeProjects from "./controllers/list-intake-projects";
 import { intakeRequestSchema } from "./response";
 import { createIntakeRequestBody } from "./schema";
 
@@ -46,9 +48,40 @@ const createIntakeRequestRoute = createRoute({
   },
 });
 
-const intake = apiRouter<BaseVariables & { workspaceId: string }>().openapi(
-  createIntakeRequestRoute,
-  async (c) => {
+const listIntakeProjectsRoute = createRoute({
+  method: "get",
+  operationId: "listIntakeProjects",
+  path: "/workspaces/{workspaceId}/intake-projects",
+  tags: ["Intake"],
+  summary: "List intake projects",
+  description:
+    "The guest submission picker: id and name of every intake-enabled project the caller can access.",
+  middleware: [
+    workspaceAccess.fromParam("workspaceId"),
+    requireWorkspacePermission({ intakeRequest: ["create"] }),
+  ] as const,
+  request: { params: workspaceIdParam },
+  responses: {
+    200: jsonResponse(
+      "Intake-enabled accessible projects",
+      z.array(z.object({ id: z.string(), name: z.string() })),
+    ),
+    403: errorResponse("Missing intakeRequest:create permission"),
+    404: errorResponse("Workspace not found"),
+  },
+});
+
+const intake = apiRouter<BaseVariables & { workspaceId: string }>()
+  .openapi(listIntakeProjectsRoute, async (c) =>
+    c.json(
+      await listIntakeProjects(
+        c.req.valid("param").workspaceId,
+        c.get("userId"),
+      ),
+      200,
+    ),
+  )
+  .openapi(createIntakeRequestRoute, async (c) => {
     const { workspaceId } = c.req.valid("param");
     const { projectId, title, description } = c.req.valid("json");
     const row = await createIntakeRequest(
@@ -68,7 +101,6 @@ const intake = apiRouter<BaseVariables & { workspaceId: string }>().openapi(
       },
       200,
     );
-  },
-);
+  });
 
 export default intake;
