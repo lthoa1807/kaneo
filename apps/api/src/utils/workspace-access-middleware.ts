@@ -8,6 +8,7 @@ import { validateWorkspaceAccess } from "./validate-workspace-access";
 type LookupResource =
   | "project"
   | "task"
+  | "intakeRequest"
   | "label"
   | "timeEntry"
   | "activity"
@@ -38,6 +39,7 @@ const TASKS_NOT_FOUND = "No tasks found";
 const RESOURCE_NOT_FOUND: Record<LookupResource, string> = {
   project: "Project not found",
   task: "Task not found",
+  intakeRequest: "Intake request not found",
   label: "Label not found",
   timeEntry: "Time entry not found",
   activity: "Activity not found",
@@ -198,6 +200,22 @@ async function lookupScope(
         .where(eq(schema.taskTable.id, id))
         .limit(1);
       return task ?? null;
+    }
+
+    case "intakeRequest": {
+      const [row] = await db
+        .select({
+          workspaceId: schema.projectTable.workspaceId,
+          projectId: schema.intakeRequestTable.projectId,
+        })
+        .from(schema.intakeRequestTable)
+        .innerJoin(
+          schema.projectTable,
+          eq(schema.intakeRequestTable.projectId, schema.projectTable.id),
+        )
+        .where(eq(schema.intakeRequestTable.id, id))
+        .limit(1);
+      return row ?? null;
     }
 
     case "label": {
@@ -379,6 +397,14 @@ export const workspaceAccess = {
     workspaceAccessMiddleware({
       sources: [
         { type: "lookup", resource: "task", idKey },
+        { type: "query", key: "workspaceId" },
+      ],
+    }),
+
+  fromIntakeRequest: (idKey = "requestId") =>
+    workspaceAccessMiddleware({
+      sources: [
+        { type: "lookup", resource: "intakeRequest", idKey },
         { type: "query", key: "workspaceId" },
       ],
     }),

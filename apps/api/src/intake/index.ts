@@ -14,10 +14,19 @@ import { requireWorkspacePermission } from "../utils/require-workspace-permissio
 import { workspaceAccess } from "../utils/workspace-access-middleware";
 import { workspaceIdParam } from "../workspace/schema";
 import createIntakeRequest from "./controllers/create-intake-request";
+import getIntakeRequest from "./controllers/get-intake-request";
 import listIntakeProjects from "./controllers/list-intake-projects";
 import listIntakeRequests from "./controllers/list-intake-requests";
-import { intakeRequestListSchema, intakeRequestSchema } from "./response";
-import { createIntakeRequestBody, listIntakeRequestsQuery } from "./schema";
+import {
+  intakeRequestDetailSchema,
+  intakeRequestListSchema,
+  intakeRequestSchema,
+} from "./response";
+import {
+  createIntakeRequestBody,
+  listIntakeRequestsQuery,
+  requestIdParam,
+} from "./schema";
 
 const createIntakeRequestRoute = createRoute({
   method: "post",
@@ -92,6 +101,28 @@ const listIntakeRequestsRoute = createRoute({
   },
 });
 
+const getIntakeRequestRoute = createRoute({
+  method: "get",
+  operationId: "getIntakeRequest",
+  path: "/requests/{requestId}",
+  tags: ["Intake"],
+  summary: "Get intake request",
+  description:
+    "Manage holders see linked tasks and progress; guests (owners only) see the progress counts without task internals. A non-owner guest gets a 404.",
+  middleware: [
+    workspaceAccess.fromIntakeRequest("requestId"),
+    requireWorkspacePermission({ intakeRequest: ["read"] }),
+  ] as const,
+  request: { params: requestIdParam },
+  responses: {
+    200: jsonResponse("The intake request", intakeRequestDetailSchema),
+    403: errorResponse(
+      "Missing intakeRequest:read permission, or no access to the request's project",
+    ),
+    404: errorResponse("Intake request not found"),
+  },
+});
+
 const intake = apiRouter<BaseVariables & { workspaceId: string }>()
   .openapi(listIntakeProjectsRoute, async (c) =>
     c.json(
@@ -115,6 +146,9 @@ const intake = apiRouter<BaseVariables & { workspaceId: string }>()
       200,
     );
   })
+  .openapi(getIntakeRequestRoute, async (c) =>
+    c.json(await getIntakeRequest(c, c.req.valid("param").requestId), 200),
+  )
   .openapi(createIntakeRequestRoute, async (c) => {
     const { workspaceId } = c.req.valid("param");
     const { projectId, title, description } = c.req.valid("json");

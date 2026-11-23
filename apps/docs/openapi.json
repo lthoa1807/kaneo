@@ -15606,6 +15606,217 @@
         }
       }
     },
+    "/intake/requests/{requestId}": {
+      "get": {
+        "operationId": "getIntakeRequest",
+        "tags": [
+          "Intake"
+        ],
+        "summary": "Get intake request",
+        "description": "Manage holders see linked tasks and progress; guests (owners only) see the progress counts without task internals. A non-owner guest gets a 404.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "requestId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The intake request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "projectId": {
+                      "type": "string"
+                    },
+                    "projectName": {
+                      "type": "string",
+                      "description": "Display-only project name, embedded so guests need no project:* permission."
+                    },
+                    "number": {
+                      "type": "number"
+                    },
+                    "displayId": {
+                      "type": "string",
+                      "description": "Human identifier, `REQ-<number>`."
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "new",
+                        "triaged",
+                        "rejected",
+                        "approved",
+                        "in_progress",
+                        "delivered",
+                        "needs_revision",
+                        "confirmed"
+                      ],
+                      "description": "The intake request lifecycle status."
+                    },
+                    "createdById": {
+                      "type": "string"
+                    },
+                    "requesterName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "requesterEmail": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "sourceType": {
+                      "type": "string"
+                    },
+                    "sourceId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "externalReference": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "confirmedAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "date-time"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "taskCount": {
+                      "type": "number",
+                      "description": "Linked tasks, across all statuses."
+                    },
+                    "completedTaskCount": {
+                      "type": "number",
+                      "description": "Linked tasks whose status is done or archived."
+                    },
+                    "linkedTasks": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "number": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "number",
+                          "title",
+                          "status"
+                        ]
+                      },
+                      "description": "Linked tasks for manage holders; omitted for guests, who only see the progress counts."
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "projectId",
+                    "projectName",
+                    "number",
+                    "displayId",
+                    "title",
+                    "description",
+                    "status",
+                    "createdById",
+                    "requesterName",
+                    "requesterEmail",
+                    "sourceType",
+                    "sourceId",
+                    "externalReference",
+                    "confirmedAt",
+                    "createdAt",
+                    "updatedAt",
+                    "taskCount",
+                    "completedTaskCount"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing intakeRequest:read permission, or no access to the request's project",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Intake request not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
     "/column/{projectId}": {
       "get": {
         "operationId": "getColumns",

@@ -1,6 +1,8 @@
 import { pagingNumber, z } from "../openapi";
 import { intakeStatusSchema } from "./response";
 
+export const requestIdParam = z.object({ requestId: z.string() });
+
 export const createIntakeRequestBody = z.object({
   projectId: z.string(),
   title: z.string().min(1).max(200),

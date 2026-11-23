@@ -172,3 +172,117 @@ describe("intake request list", () => {
     ).toBe(false);
   });
 });
+
+describe("intake request detail", () => {
+  async function setupWithTasks() {
+    const guest = await createWorkspaceMember({ role: "guest" });
+    const { project } = await createProjectFixture({
+      workspaceId: guest.workspace.id,
+      name: "Alpha",
+    });
+    await enableIntake(project.id);
+    const request = await createIntakeRequestRow(project.id, guest.user.id);
+    await db.insert(schema.taskTable).values([
+      {
+        projectId: project.id,
+        title: "A",
+        status: "done",
+        number: 1,
+        intakeRequestId: request.id,
+      },
+      {
+        projectId: project.id,
+        title: "B",
+        status: "to-do",
+        number: 2,
+        intakeRequestId: request.id,
+      },
+    ]);
+    return { guest, project, request };
+  }
+
+  it("shows manage actors linked tasks and progress", async () => {
+    const member = await createWorkspaceMember();
+    const { guest, request } = await setupWithTasks();
+    await db.insert(schema.workspaceUserTable).values({
+      workspaceId: guest.workspace.id,
+      userId: member.user.id,
+      role: "member",
+      joinedAt: new Date(),
+    });
+    mockAuthenticatedSession(member.user);
+
+    const response = await createApp().app.request(
+      `/api/intake/requests/${request.id}`,
+    );
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.projectName).toBe("Alpha");
+    expect(body.taskCount).toBe(2);
+    expect(body.completedTaskCount).toBe(1);
+    expect(body.linkedTasks).toEqual([
+      { id: expect.any(String), number: 1, title: "A", status: "done" },
+      { id: expect.any(String), number: 2, title: "B", status: "to-do" },
+    ]);
+  });
+
+  it("shows guests progress only, never task internals", async () => {
+    const { guest, request } = await setupWithTasks();
+    mockAuthenticatedSession(guest.user);
+
+    const response = await createApp().app.request(
+      `/api/intake/requests/${request.id}`,
+    );
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.taskCount).toBe(2);
+    expect(body.completedTaskCount).toBe(1);
+    expect(body.linkedTasks).toBeUndefined();
+  });
+
+  it("denies a non-owner guest on every request route with 404", async () => {
+    const guestA = await createWorkspaceMember({ role: "guest" });
+    const guestB = await createWorkspaceMember({ role: "guest" });
+    const { project } = await createProjectFixture({
+      workspaceId: guestA.workspace.id,
+    });
+    const request = await createIntakeRequestRow(project.id, guestA.user.id);
+    mockAuthenticatedSession(guestB.user);
+
+    const app = createApp().app;
+    const detail = await app.request(`/api/intake/requests/${request.id}`);
+    expect(detail.status).toBe(404);
+
+    const patch = await app.request(`/api/intake/requests/${request.id}`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ title: "hijack" }),
+    });
+    expect(patch.status).toBe(404);
+
+    const transition = await app.request(
+      `/api/intake/requests/${request.id}/transition`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ to: "triaged" }),
+      },
+    );
+    expect(transition.status).toBe(404);
+
+    const activity = await app.request(
+      `/api/intake/requests/${request.id}/activity`,
+    );
+    expect(activity.status).toBe(404);
+
+    const attach = await app.request(
+      `/api/intake/requests/${request.id}/tasks`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ title: "t" }),
+      },
+    );
+    expect(attach.status).toBe(404);
+  });
+});

@@ -54,3 +54,20 @@ export const intakeRequestListSchema = z.object({
   pageSize: z.number(),
   totalPages: z.number(),
 });
+
+export const intakeRequestDetailSchema = intakeRequestListItemSchema.extend({
+  linkedTasks: z
+    .array(
+      z.object({
+        id: z.string(),
+        number: z.number().nullable(),
+        title: z.string(),
+        status: z.string(),
+      }),
+    )
+    .optional()
+    .openapi({
+      description:
+        "Linked tasks for manage holders; omitted for guests, who only see the progress counts.",
+    }),
+});
