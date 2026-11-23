@@ -2,6 +2,11 @@
 
 - **Status:** Draft (pending review)
 - **Date:** 2026-11-24
+- **Branch:** `feature/intake-portal`
+- **Delivery:** three stacked PRs on this branch, in section 12 order —
+  (1) foundation: migration + permissions, (2) API + realtime, (3) UI +
+  notifications. Each phase lands green (typecheck + focused tests) and is
+  reviewed before the next starts; repo-wide checks run on the final PR.
 - **Area:** API, web, database migration, permissions package, docs, OpenAPI
 - **Terminology:** External requesters are **Guests** everywhere (role name
   `guest`, UI "Guest", i18n keys). Never "customer".
