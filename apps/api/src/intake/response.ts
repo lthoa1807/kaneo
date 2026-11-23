@@ -55,6 +55,21 @@ export const intakeRequestListSchema = z.object({
   totalPages: z.number(),
 });
 
+export const intakeActivitySchema = z.object({
+  id: z.string(),
+  type: z.string(),
+  userId: z.string().nullable(),
+  content: z.string().nullable(),
+  eventData: z.record(z.string(), z.unknown()).nullable().openapi({
+    description: "Structured payload, e.g. { from, to } for status changes.",
+  }),
+  createdAt: responseTimestamp,
+});
+
+export const intakeActivityListSchema = z.object({
+  items: z.array(intakeActivitySchema),
+});
+
 export const intakeRequestDetailSchema = intakeRequestListItemSchema.extend({
   linkedTasks: z
     .array(

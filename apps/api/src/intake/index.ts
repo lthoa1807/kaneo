@@ -15,11 +15,13 @@ import { workspaceAccess } from "../utils/workspace-access-middleware";
 import { workspaceIdParam } from "../workspace/schema";
 import createIntakeRequest from "./controllers/create-intake-request";
 import getIntakeRequest from "./controllers/get-intake-request";
+import listIntakeActivity from "./controllers/list-intake-activity";
 import listIntakeProjects from "./controllers/list-intake-projects";
 import listIntakeRequests from "./controllers/list-intake-requests";
 import updateIntakeRequest from "./controllers/update-intake-request";
 import transitionIntakeRequest from "./controllers/transition-intake-request";
 import {
+  intakeActivityListSchema,
   intakeRequestDetailSchema,
   intakeRequestListSchema,
   intakeRequestSchema,
@@ -187,6 +189,26 @@ const transitionIntakeRequestRoute = createRoute({
   },
 });
 
+const listIntakeActivityRoute = createRoute({
+  method: "get",
+  operationId: "listIntakeActivity",
+  path: "/requests/{requestId}/activity",
+  tags: ["Intake"],
+  summary: "List intake request activity",
+  description:
+    "The activity trail, newest first. Guests (owners only) see lifecycle entries; manage holders see everything including task links.",
+  middleware: [
+    workspaceAccess.fromIntakeRequest("requestId"),
+    requireWorkspacePermission({ intakeRequest: ["read"] }),
+  ] as const,
+  request: { params: requestIdParam },
+  responses: {
+    200: jsonResponse("The activity trail", intakeActivityListSchema),
+    403: errorResponse("Missing intakeRequest:read permission"),
+    404: errorResponse("Intake request not found"),
+  },
+});
+
 const intake = apiRouter<BaseVariables & { workspaceId: string }>()
   .openapi(listIntakeProjectsRoute, async (c) =>
     c.json(
@@ -212,6 +234,9 @@ const intake = apiRouter<BaseVariables & { workspaceId: string }>()
   })
   .openapi(getIntakeRequestRoute, async (c) =>
     c.json(await getIntakeRequest(c, c.req.valid("param").requestId), 200),
+  )
+  .openapi(listIntakeActivityRoute, async (c) =>
+    c.json(await listIntakeActivity(c, c.req.valid("param").requestId), 200),
   )
   .openapi(updateIntakeRequestRoute, async (c) => {
     const { requestId } = c.req.valid("param");

@@ -183,3 +183,74 @@ describe("intake request transitions", () => {
     expect(body.status).toBe("triaged");
   });
 });
+
+describe("intake request activity", () => {
+  async function seedTrail() {
+    const { owner, request } = await seedTransition("new", "manage");
+    await db.insert(schema.intakeActivityTable).values([
+      {
+        intakeRequestId: request.id,
+        type: "created",
+        userId: owner.user.id,
+        createdAt: new Date("2026-01-01T00:00:00Z"),
+      },
+      {
+        intakeRequestId: request.id,
+        type: "status_changed",
+        content: "ok",
+        eventData: { from: "new", to: "triaged" },
+        createdAt: new Date("2026-01-02T00:00:00Z"),
+      },
+      {
+        intakeRequestId: request.id,
+        type: "task_linked",
+        eventData: { taskId: "t1" },
+        createdAt: new Date("2026-01-03T00:00:00Z"),
+      },
+    ]);
+    return { owner, request };
+  }
+
+  function listActivity(requestId: string) {
+    return createApp().app.request(
+      `/api/intake/requests/${requestId}/activity`,
+    );
+  }
+
+  it("returns the full trail newest-first for manage actors", async () => {
+    const { request } = await seedTrail();
+
+    const response = await listActivity(request.id);
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.items.map((item: { type: string }) => item.type)).toEqual([
+      "task_linked",
+      "status_changed",
+      "created",
+    ]);
+    expect(body.items[1].content).toBe("ok");
+    expect(body.items[1].eventData).toEqual({ from: "new", to: "triaged" });
+  });
+
+  it("hides task-linked and internal entries from the guest owner", async () => {
+    const { owner, request } = await seedTrail();
+    mockAuthenticatedSession(owner.user);
+
+    const response = await listActivity(request.id);
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.items.map((item: { type: string }) => item.type)).toEqual([
+      "status_changed",
+      "created",
+    ]);
+  });
+
+  it("404s a non-owner guest", async () => {
+    const { request } = await seedTrail();
+    const outsider = await createWorkspaceMember({ role: "guest" });
+    mockAuthenticatedSession(outsider.user);
+
+    const response = await listActivity(request.id);
+    expect(response.status).toBe(404);
+  });
+});
