@@ -13,7 +13,14 @@ import {
 import { requireWorkspacePermission } from "../utils/require-workspace-permission";
 import { workspaceAccess } from "../utils/workspace-access-middleware";
 import { workspaceIdParam } from "../workspace/schema";
+import {
+  validateAndParseDate,
+  validateDateRange,
+} from "../utils/validate-dates";
+import { createTaskBody } from "../task/schema";
+import { taskSchema } from "../task/response";
 import createIntakeRequest from "./controllers/create-intake-request";
+import attachIntakeTask from "./controllers/attach-intake-task";
 import getIntakeRequest from "./controllers/get-intake-request";
 import listIntakeActivity from "./controllers/list-intake-activity";
 import listIntakeProjects from "./controllers/list-intake-projects";
@@ -209,6 +216,39 @@ const listIntakeActivityRoute = createRoute({
   },
 });
 
+const attachIntakeTaskRoute = createRoute({
+  method: "post",
+  operationId: "attachIntakeTask",
+  path: "/requests/{requestId}/tasks",
+  tags: ["Intake"],
+  summary: "Attach task to intake request",
+  description:
+    "Create the task that fulfils an intake request — same body as task creation — and link it to the request. Only while the request is approved, in progress, or needs revision.",
+  middleware: [
+    workspaceAccess.fromIntakeRequest("requestId"),
+    requireWorkspacePermission({ intakeRequest: ["manage"], task: ["create"] }),
+    requireEntitlement,
+  ] as const,
+  request: {
+    params: requestIdParam,
+    body: {
+      required: true,
+      content: { "application/json": { schema: createTaskBody } },
+    },
+  },
+  responses: {
+    200: jsonResponse("The created task", taskSchema),
+    400: errorResponse("Invalid body"),
+    403: errorResponse(
+      "Missing intakeRequest:manage or task:create permission",
+    ),
+    404: errorResponse("Intake request not found"),
+    409: errorResponse(
+      "Tasks can only be attached while approved, in progress, or needs revision",
+    ),
+  },
+});
+
 const intake = apiRouter<BaseVariables & { workspaceId: string }>()
   .openapi(listIntakeProjectsRoute, async (c) =>
     c.json(
@@ -250,6 +290,25 @@ const intake = apiRouter<BaseVariables & { workspaceId: string }>()
       await transitionIntakeRequest(c, requestId, { to, note }),
       200,
     );
+  })
+  .openapi(attachIntakeTaskRoute, async (c) => {
+    const { requestId } = c.req.valid("param");
+    const body = c.req.valid("json");
+    const startDate =
+      body.startDate !== undefined
+        ? validateAndParseDate(body.startDate, "startDate")
+        : undefined;
+    const dueDate =
+      body.dueDate !== undefined
+        ? validateAndParseDate(body.dueDate, "dueDate")
+        : undefined;
+    validateDateRange(startDate, dueDate);
+    const task = await attachIntakeTask(c, requestId, {
+      ...body,
+      startDate,
+      dueDate,
+    });
+    return c.json(task, 200);
   })
   .openapi(createIntakeRequestRoute, async (c) => {
     const { workspaceId } = c.req.valid("param");
