@@ -10,6 +10,8 @@ import {
   customFieldValueTable,
   externalLinkTable,
   githubIntegrationTable,
+  intakeActivityTable,
+  intakeRequestTable,
   integrationTable,
   invitationTable,
   labelTable,
@@ -163,6 +165,36 @@ export const taskTableRelations = relations(taskTable, ({ one, many }) => ({
   remindersSent: many(taskReminderSentTable),
   customFieldValues: many(customFieldValueTable),
 }));
+
+export const intakeRequestTableRelations = relations(
+  intakeRequestTable,
+  ({ one, many }) => ({
+    project: one(projectTable, {
+      fields: [intakeRequestTable.projectId],
+      references: [projectTable.id],
+    }),
+    creator: one(userTable, {
+      fields: [intakeRequestTable.createdById],
+      references: [userTable.id],
+    }),
+    activities: many(intakeActivityTable),
+    tasks: many(taskTable),
+  }),
+);
+
+export const intakeActivityTableRelations = relations(
+  intakeActivityTable,
+  ({ one }) => ({
+    intakeRequest: one(intakeRequestTable, {
+      fields: [intakeActivityTable.intakeRequestId],
+      references: [intakeRequestTable.id],
+    }),
+    user: one(userTable, {
+      fields: [intakeActivityTable.userId],
+      references: [userTable.id],
+    }),
+  }),
+);
 
 export const timeEntryTableRelations = relations(timeEntryTable, ({ one }) => ({
   task: one(taskTable, {
