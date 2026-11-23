@@ -88,7 +88,7 @@ bypass).
 New permission vocabulary in `@kaneo/permissions`:
 
 ```ts
-intakeRequest: ["create", "read", "update", "delete", "manage"]
+intakeRequest: ["create", "read", "update", "manage"]
 ```
 
 | Capability | guest | viewer | member | admin | owner |
@@ -101,9 +101,6 @@ intakeRequest: ["create", "read", "update", "delete", "manage"]
 | Deliver (`DELIVERED`), reopen revision to `IN_PROGRESS` | — | — | ✅ | ✅ | ✅ |
 | Create / link tasks for a request | — | — | ✅ | ✅ | ✅ |
 | Read internal tasks/projects | — | ✅ (unchanged) | ✅ | ✅ | ✅ |
-
-`delete` exists in the vocabulary for API-key scopes but has no UI and is
-not exercised in MVP (requests are never deleted — see section 9).
 
 `guest` gets **no** `project:*`, `task:*`, `label:*`, `workspace:*`
 actions, and — mirroring how `viewer` is built — its better-auth
@@ -203,15 +200,16 @@ export const intakeRequestTable = pgTable("intake_request", {
   updatedAt: timestamp("updated_at", { mode: "date" }).default(utcNow)
     .$onUpdate(() => new Date()).notNull(),
 }, (table) => [
-  index("intake_request_projectId_idx").on(table.projectId),
   index("intake_request_createdById_idx").on(table.createdById),
   index("intake_request_projectId_status_idx").on(table.projectId, table.status),
   unique("intake_request_project_number_unique").on(table.projectId, table.number),
-  // idempotency / dedup for future external channels
-  unique("intake_request_project_source_external_unique")
-    .on(table.projectId, table.sourceType, table.externalReference)
-    .where(sql`external_reference is not null`),
 ]);
+```
+
+No standalone `projectId` index (the composite's left prefix covers it) and
+no dedup index in MVP: nothing writes `externalReference` yet. The future
+API channel adds its own partial-unique index with its real dedup
+semantics when it lands.
 
 export const intakeActivityTable = pgTable("intake_activity", {
   id: text("id").$defaultFn(() => createId()).primaryKey(),
@@ -262,24 +260,27 @@ accurate (`pnpm openapi:check:fix` after changes). Middleware order on
 
 | Method & path | Actor | Notes |
 |---|---|---|
-| `GET /api/v1/workspaces/{wsId}/intake-requests?projectId=&status=` | guest: own only; manage: all in accessible projects | paginated; guest response embeds display-only `projectName` |
+| `GET /api/v1/workspaces/{wsId}/intake-projects` | guest, manage | `id` + `name` of intake-enabled projects where the actor has access; the guest project picker — no `project:*` needed, gated by `intakeRequest: ["create"]` |
+| `GET /api/v1/workspaces/{wsId}/intake-requests?projectId=&status=` | guest: own only; manage: all in accessible projects | paginated; embeds linked-task progress counts (one grouped query) and display-only `projectName` for guests |
 | `POST /api/v1/workspaces/{wsId}/intake-requests` | guest, manage | body: `projectId`, `title`, `description`; validates `project.intakeEnabled` + project access; sets `createdById` |
 | `GET /api/v1/intake-requests/{id}` | ownership path as above | includes linked tasks (id, number, title, status — staff view) and task progress summary; guest view omits task internals, shows only the progress count |
-| `PATCH /api/v1/intake-requests/{id}` | guest: own, `NEW` only (fix typos); manage: title/description | status changes are not done via PATCH |
+| `PATCH /api/v1/intake-requests/{id}` | guest: own, `NEW` only (fix typos) | status changes are not done via PATCH; manage-side text edits are not in MVP |
 | `POST /api/v1/intake-requests/{id}/transition` | manage or guest per transition map | body: `to`, optional `note`; service enforces map + ownership |
 | `GET /api/v1/intake-requests/{id}/activity` | ownership path | audit trail |
 | `POST /api/v1/intake-requests/{id}/tasks` | manage | body: existing task-create payload; wraps current task creation in the same transaction with the `intakeRequestId` link and attach-window validation |
-| `GET /api/v1/projects/{id}/intake-progress` (or embedded in list) | manage | triage board support |
 
-Events (realtime): `intake_request.created`, `intake_request.updated`
-(status, edits) via the existing `publishEvent`. Recipient resolution in
-`ws/` gains an intake rule: deliver to actors holding `manage` with project
-access **plus** the request's `createdById` owner. Guests cannot subscribe
-to project channels (unchanged — they hold no `PROJECT_READ_PERMISSIONS`);
-this is a payload-recipient rule on intake events, not a new channel type.
-If the ws extension proves larger than estimated, the MVP fallback is
-guest-portal polling (`refetchInterval` on TanStack Query) — decided at
-implementation, both fit the service boundary.
+Triage-board progress comes embedded in the list/detail responses, not a
+separate route.
+
+Events `intake_request.created` / `intake_request.updated` (status, edits)
+still fire via the existing `publishEvent`, so the WebSocket layer can hook
+in later without touching the service. MVP delivery is **polling only**:
+TanStack Query `refetchInterval` (~30s) on portal and triage lists, plus
+cache invalidation after each action.
+
+`shortcut:` live intake updates can lag up to ~30s — add the ws recipient
+rule (deliver intake events to `manage` holders with project access plus
+the request owner) when a client actually notices the lag.
 
 ## 8. UI/UX flow
 
@@ -323,8 +324,8 @@ All copy through i18n keys with `i18n/en-US.json` as the source.
   guest can no longer act. `user` deletion is blocked while their requests
   exist (`restrict`), surfaced as a clear error.
 - **Duplicate submission** — no dedup in MVP for the portal (the guest
-  intent is explicit); the `externalReference` unique index exists for the
-  future API channel.
+  intent is explicit); the future API channel brings its own dedup index
+  when it lands.
 - **Concurrent transitions** — status update runs in a transaction with a
   `WHERE status = <expected>` guard; zero rows → `409` with current status
   in the error payload.
@@ -349,7 +350,7 @@ All copy through i18n keys with `i18n/en-US.json` as the source.
 | Task APIs | guests must not read/write tasks | already enforced: guests hold no `task:*` permissions → 403/404 via `requireWorkspacePermission` |
 | Project APIs | guests must not read project internals | guests hold no `project:*`; intake responses embed display-only `projectName` server-side |
 | Global search | guests must not surface internal data | search is access-filtered already; guests additionally hold no `task:*` — verify with one integration test, no change expected |
-| WebSocket | guests must not join project channels | unchanged; intake events get the recipient rule in section 7 |
+| WebSocket | guests must not join project channels | unchanged; intake updates ride polling (section 7), no ws change in MVP |
 | Notifications | guest + PM touchpoints | section 11 |
 | Billing/seats | none in MVP | decision recorded (section 3.3) |
 | Audit logs | intake actions auditable | `intake_activity` is the domain trail; instance audit log unchanged |
@@ -390,8 +391,8 @@ the confirmation fact redundantly for cheap queries.
 4. Guest portal UI (list, create, detail, confirm/revision).
 5. Staff intake tab (triage, deliver, task linking, activity).
 6. "Invite guests" settings entry (role `guest`, `selected` access only).
-7. Realtime delivery per section 7 (ws recipient rule or the polling
-   fallback).
+7. Realtime: polling only per section 7 (events publish now, ws rule
+   deferred).
 8. Bold notification rows in section 11, including the
    `intake_request` notification resourceType.
 9. Members-table guest badge + assignee filtering.
@@ -413,7 +414,8 @@ authentication and in how they fill `source*`/requester fields.
 **Data model** (already in section 6, built in MVP even though only
 `guest_portal` is used): `sourceType` (default `guest_portal`; future
 `api`, `slack`, `telegram`, `ai_agent`), `sourceId`, `externalReference`
-(partial-unique for idempotency), `requesterName`/`requesterEmail` kept
+(its dedup index arrives with the API channel, not the MVP migration),
+`requesterName`/`requesterEmail` kept
 separate from `createdById` — the *creator* is the authenticated actor,
 the *requester* is who asked.
 
@@ -448,8 +450,6 @@ same `intake_activity` trail with its actor.
 
 - Exact drizzle migration SQL review (generated, then inspected).
 - Task-number generation reuse for request `number`.
-- ws recipient-rule implementation detail vs the polling fallback
-  (decision point recorded in section 7).
 - Component placement/naming inside `apps/web` following existing
   project-page tab patterns.
 - i18n key names; test file placement per existing conventions.
