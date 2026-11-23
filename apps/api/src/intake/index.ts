@@ -17,6 +17,7 @@ import createIntakeRequest from "./controllers/create-intake-request";
 import getIntakeRequest from "./controllers/get-intake-request";
 import listIntakeProjects from "./controllers/list-intake-projects";
 import listIntakeRequests from "./controllers/list-intake-requests";
+import updateIntakeRequest from "./controllers/update-intake-request";
 import {
   intakeRequestDetailSchema,
   intakeRequestListSchema,
@@ -26,6 +27,7 @@ import {
   createIntakeRequestBody,
   listIntakeRequestsQuery,
   requestIdParam,
+  updateIntakeRequestBody,
 } from "./schema";
 
 const createIntakeRequestRoute = createRoute({
@@ -123,6 +125,35 @@ const getIntakeRequestRoute = createRoute({
   },
 });
 
+const updateIntakeRequestRoute = createRoute({
+  method: "patch",
+  operationId: "updateIntakeRequest",
+  path: "/requests/{requestId}",
+  tags: ["Intake"],
+  summary: "Update intake request",
+  description:
+    "Owner-only edits while the request is new: fix title and description typos. Status is not patchable; later stages go through transitions.",
+  middleware: [
+    workspaceAccess.fromIntakeRequest("requestId"),
+    requireWorkspacePermission({ intakeRequest: ["update"] }),
+    requireEntitlement,
+  ] as const,
+  request: {
+    params: requestIdParam,
+    body: {
+      required: true,
+      content: { "application/json": { schema: updateIntakeRequestBody } },
+    },
+  },
+  responses: {
+    200: jsonResponse("The updated intake request", intakeRequestSchema),
+    400: errorResponse("Invalid body"),
+    403: errorResponse("Missing intakeRequest:update permission"),
+    404: errorResponse("Intake request not found"),
+    409: errorResponse("Only new requests can be edited"),
+  },
+});
+
 const intake = apiRouter<BaseVariables & { workspaceId: string }>()
   .openapi(listIntakeProjectsRoute, async (c) =>
     c.json(
@@ -149,6 +180,11 @@ const intake = apiRouter<BaseVariables & { workspaceId: string }>()
   .openapi(getIntakeRequestRoute, async (c) =>
     c.json(await getIntakeRequest(c, c.req.valid("param").requestId), 200),
   )
+  .openapi(updateIntakeRequestRoute, async (c) => {
+    const { requestId } = c.req.valid("param");
+    const body = c.req.valid("json");
+    return c.json(await updateIntakeRequest(c, requestId, body), 200);
+  })
   .openapi(createIntakeRequestRoute, async (c) => {
     const { workspaceId } = c.req.valid("param");
     const { projectId, title, description } = c.req.valid("json");

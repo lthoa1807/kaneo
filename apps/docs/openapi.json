@@ -15815,6 +15815,219 @@
             "$ref": "#/components/responses/ApiKeyRateLimited"
           }
         }
+      },
+      "patch": {
+        "operationId": "updateIntakeRequest",
+        "tags": [
+          "Intake"
+        ],
+        "summary": "Update intake request",
+        "description": "Owner-only edits while the request is new: fix title and description typos. Status is not patchable; later stages go through transitions.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "requestId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 10000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated intake request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "projectId": {
+                      "type": "string"
+                    },
+                    "projectName": {
+                      "type": "string",
+                      "description": "Display-only project name, embedded so guests need no project:* permission."
+                    },
+                    "number": {
+                      "type": "number"
+                    },
+                    "displayId": {
+                      "type": "string",
+                      "description": "Human identifier, `REQ-<number>`."
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "new",
+                        "triaged",
+                        "rejected",
+                        "approved",
+                        "in_progress",
+                        "delivered",
+                        "needs_revision",
+                        "confirmed"
+                      ],
+                      "description": "The intake request lifecycle status."
+                    },
+                    "createdById": {
+                      "type": "string"
+                    },
+                    "requesterName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "requesterEmail": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "sourceType": {
+                      "type": "string"
+                    },
+                    "sourceId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "externalReference": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "confirmedAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "date-time"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "projectId",
+                    "projectName",
+                    "number",
+                    "displayId",
+                    "title",
+                    "description",
+                    "status",
+                    "createdById",
+                    "requesterName",
+                    "requesterEmail",
+                    "sourceType",
+                    "sourceId",
+                    "externalReference",
+                    "confirmedAt",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing intakeRequest:update permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Intake request not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Only new requests can be edited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
       }
     },
     "/column/{projectId}": {

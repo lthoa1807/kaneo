@@ -286,3 +286,88 @@ describe("intake request detail", () => {
     expect(attach.status).toBe(404);
   });
 });
+
+describe("intake request patch", () => {
+  it("lets the owner edit title/description while new", async () => {
+    const guest = await createWorkspaceMember({ role: "guest" });
+    const { project } = await createProjectFixture({
+      workspaceId: guest.workspace.id,
+    });
+    const request = await createIntakeRequestRow(project.id, guest.user.id);
+    mockAuthenticatedSession(guest.user);
+
+    const response = await createApp().app.request(
+      `/api/intake/requests/${request.id}`,
+      {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          title: "Fixed typo",
+          description: "Now clearer",
+        }),
+      },
+    );
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.title).toBe("Fixed typo");
+    expect(body.description).toBe("Now clearer");
+    const [row] = await db
+      .select()
+      .from(schema.intakeRequestTable)
+      .where(eq(schema.intakeRequestTable.id, request.id));
+    expect(row?.title).toBe("Fixed typo");
+    expect(row?.description).toBe("Now clearer");
+  });
+
+  it("rejects edits once triaged with 409 REQUEST_NOT_EDITABLE", async () => {
+    const guest = await createWorkspaceMember({ role: "guest" });
+    const { project } = await createProjectFixture({
+      workspaceId: guest.workspace.id,
+    });
+    const request = await createIntakeRequestRow(project.id, guest.user.id);
+    await db
+      .update(schema.intakeRequestTable)
+      .set({ status: "triaged" })
+      .where(eq(schema.intakeRequestTable.id, request.id));
+    mockAuthenticatedSession(guest.user);
+
+    const response = await createApp().app.request(
+      `/api/intake/requests/${request.id}`,
+      {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ title: "nope" }),
+      },
+    );
+    expect(response.status).toBe(409);
+    expect((await response.json()).code).toBe("REQUEST_NOT_EDITABLE");
+  });
+
+  it("rejects non-owners with 404, even manage holders", async () => {
+    const guest = await createWorkspaceMember({ role: "guest" });
+    const manager = await createWorkspaceMember({
+      workspaceName: "other workspace",
+    });
+    const { project } = await createProjectFixture({
+      workspaceId: guest.workspace.id,
+    });
+    const request = await createIntakeRequestRow(project.id, guest.user.id);
+    await db.insert(schema.workspaceUserTable).values({
+      workspaceId: guest.workspace.id,
+      userId: manager.user.id,
+      role: "member",
+      joinedAt: new Date(),
+    });
+    mockAuthenticatedSession(manager.user);
+
+    const response = await createApp().app.request(
+      `/api/intake/requests/${request.id}`,
+      {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ title: "managed edit" }),
+      },
+    );
+    expect(response.status).toBe(404);
+  });
+});

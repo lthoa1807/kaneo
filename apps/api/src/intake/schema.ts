@@ -15,3 +15,13 @@ export const listIntakeRequestsQuery = z.object({
   page: pagingNumber(1, 1_000_000, 1),
   limit: pagingNumber(1, 100, 20),
 });
+
+export const updateIntakeRequestBody = z
+  .object({
+    title: z.string().min(1).max(200).optional(),
+    description: z.string().max(10_000).nullable().optional(),
+  })
+  .refine(
+    (body) => body.title !== undefined || body.description !== undefined,
+    "Nothing to update",
+  );
