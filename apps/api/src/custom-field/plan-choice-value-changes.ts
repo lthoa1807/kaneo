@@ -15,6 +15,7 @@ type PlanInput = {
   from: ChoiceType;
   to: ChoiceType;
   removedOptions: string[];
+  entityLabel?: string;
 };
 
 function quote(options: string[]) {
@@ -26,11 +27,12 @@ export function planChoiceValueChanges({
   from,
   to,
   removedOptions,
+  entityLabel = "tasks",
 }: PlanInput): ChoiceValueChange[] {
   const used = findUsedOptions(values, from, removedOptions);
   if (used.length > 0) {
     throw new HTTPException(400, {
-      message: `Can't remove ${quote(used)} because tasks still use ${used.length === 1 ? "it" : "them"}. Pick a different option on those tasks first, or hide it instead.`,
+      message: `Can't remove ${quote(used)} because ${entityLabel} still use ${used.length === 1 ? "it" : "them"}. Pick a different option on those ${entityLabel} first, or hide it instead.`,
     });
   }
 
@@ -43,8 +45,7 @@ export function planChoiceValueChanges({
     const converted = convertChoiceValue(value, from, to);
     if (converted === undefined) {
       throw new HTTPException(400, {
-        message:
-          "Some tasks have more than one option picked. Leave one option on those tasks first.",
+        message: `Some ${entityLabel} have more than one option picked. Leave one option on those ${entityLabel} first.`,
       });
     }
     if (converted !== value) changes.push({ from: value, to: converted });

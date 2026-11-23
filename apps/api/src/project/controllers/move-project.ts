@@ -15,6 +15,10 @@ import {
   workspaceUserTable,
 } from "../../database/schema";
 import { publishEvent } from "../../events";
+import {
+  deleteProjectFieldValuesForProject,
+  seedProjectFieldDefaults,
+} from "../../project-field/project-field-defaults";
 import { grantProjectToRestrictedMember } from "../../project-access/grant-project-to-restricted-member";
 import { filterUsersWithProjectAccess } from "../../project-access/filter-users-with-project-access";
 import { closeProjectConnections } from "../../ws";
@@ -114,6 +118,11 @@ async function moveProject(
       .delete(workspaceMemberProjectTable)
       .where(eq(workspaceMemberProjectTable.projectId, id));
 
+    // Source-workspace fields stop applying the moment the project moves, so
+    // clear their values before the workspace id changes and start the project
+    // in the destination workspace's defaults afterwards.
+    await deleteProjectFieldValuesForProject(tx, id);
+
     const [{ maxPosition } = { maxPosition: null }] = await tx
       .select({ maxPosition: max(projectTable.position) })
       .from(projectTable)
@@ -140,6 +149,11 @@ async function moveProject(
     await grantProjectToRestrictedMember(tx, {
       workspaceId: targetWorkspaceId,
       userId: currentUserId,
+      projectId: id,
+    });
+
+    await seedProjectFieldDefaults(tx, {
+      workspaceId: targetWorkspaceId,
       projectId: id,
     });
 
@@ -264,6 +278,13 @@ async function moveProject(
 
   await publishEvent("integration.sync_labels_changed", { projectId: id });
   await publishEvent("project.updated", { projectId: id });
+  // Both ends of the move reseed or clear values.
+  await publishEvent("project-field.value_changed", {
+    workspaceId: sourceWorkspaceId,
+  });
+  await publishEvent("project-field.value_changed", {
+    workspaceId: targetWorkspaceId,
+  });
 
   if (unassignedTasks.length > 0) {
     await publishEvent("task.bulk_unassigned", {

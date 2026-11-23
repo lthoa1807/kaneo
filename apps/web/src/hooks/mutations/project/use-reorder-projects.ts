@@ -6,6 +6,7 @@ import {
 import { useCallback } from "react";
 import type getProjects from "@/fetchers/project/get-projects";
 import reorderProjects from "@/fetchers/project/reorder-projects";
+import { projectFieldKeys } from "@/lib/project-field-query-keys";
 
 type ProjectList = NonNullable<Awaited<ReturnType<typeof getProjects>>>;
 
@@ -31,6 +32,9 @@ function useReorderProjects() {
     },
     onSettled: (_data, _error, { workspaceId }) => {
       queryClient.invalidateQueries({ queryKey: ["projects", workspaceId] });
+      queryClient.invalidateQueries({
+        queryKey: projectFieldKeys.tableAll(workspaceId),
+      });
     },
   });
 

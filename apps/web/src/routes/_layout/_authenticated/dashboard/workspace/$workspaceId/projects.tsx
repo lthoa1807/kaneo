@@ -14,22 +14,22 @@ import {
 import {
   arrayMove,
   SortableContext,
-  useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Import, LayoutGrid, Plus } from "lucide-react";
-import {
-  type CSSProperties,
-  type ReactNode,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { TrialExpiredCallout } from "@/components/billing/trial-expired-callout";
 import WorkspaceLayout from "@/components/common/workspace-layout";
+import { SortableProjectRow } from "@/components/project-list/sortable-project-row";
+import { ProjectFieldsTable } from "@/components/project-table/project-fields-table";
+import { ProjectsViewSwitch } from "@/components/project-table/projects-view-switch";
+import {
+  encodeProjectTableSearch,
+  type ProjectTableSearchState,
+  type ProjectsSearch,
+} from "@/components/project-table/project-table-search";
 import PageTitle from "@/components/page-title";
 import CreateProjectModal from "@/components/shared/modals/create-project-modal";
 import { Badge } from "@/components/ui/badge";
@@ -55,82 +55,46 @@ import {
 import icons from "@/constants/project-icons";
 import useReorderProjects from "@/hooks/mutations/project/use-reorder-projects";
 import useGetProjects from "@/hooks/queries/project/use-get-projects";
+import useProjectFields from "@/hooks/queries/project-field/use-project-fields";
 import { useCanImport } from "@/hooks/use-can-import";
 import { useShortcut } from "@/lib/shortcuts/use-shortcut";
 import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
 import { formatDateMedium } from "@/lib/format";
-import { EASE_OUT_CSS } from "@/lib/motion";
 import { toast } from "@/lib/toast";
-import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute(
   "/_layout/_authenticated/dashboard/workspace/$workspaceId/projects",
 )({
+  validateSearch: (search: Record<string, unknown>): ProjectsSearch => ({
+    view: search.view === "fields" ? "fields" : undefined,
+    filters: typeof search.filters === "string" ? search.filters : undefined,
+    sort: typeof search.sort === "string" ? search.sort : undefined,
+    page:
+      typeof search.page === "number" &&
+      Number.isInteger(search.page) &&
+      search.page >= 0
+        ? search.page
+        : undefined,
+    includeArchived:
+      search.includeArchived === true || search.includeArchived === "true"
+        ? true
+        : undefined,
+  }),
   component: RouteComponent,
 });
-
-function SortableProjectRow({
-  id,
-  canReorder,
-  onClick,
-  children,
-}: {
-  id: string;
-  canReorder: boolean;
-  onClick: () => void;
-  children: ReactNode;
-}) {
-  const {
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-    isSorting,
-  } = useSortable({
-    id,
-    disabled: !canReorder,
-    // The reorder already moves the row; animating the index change too
-    // replays the same move from a stale offset.
-    animateLayoutChanges: () => false,
-    // dnd-kit defaults to `ease`; this is the app's curve.
-    transition: { duration: 200, easing: EASE_OUT_CSS },
-  });
-
-  const style: CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    // Only while a drag is live, or the dropped row eases back from the drop
-    // point over a list that has already reordered.
-    transition: isSorting ? transition : undefined,
-  };
-
-  return (
-    // `listeners` without `attributes`: the latter puts role="button" and a tab
-    // stop on the row.
-    <TableRow
-      ref={setNodeRef}
-      style={style}
-      data-kaneo-sortable=""
-      className={cn(
-        "group/row cursor-pointer",
-        isDragging && "relative z-10 bg-muted shadow-md",
-      )}
-      onClick={onClick}
-      {...(canReorder ? listeners : {})}
-    >
-      {children}
-    </TableRow>
-  );
-}
 
 function RouteComponent() {
   const { t } = useTranslation();
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
   const { workspaceId } = Route.useParams();
+  const search = Route.useSearch();
+  const view = search.view ?? "overview";
   const navigate = useNavigate();
   const { data: projects, isLoading } = useGetProjects({
     workspaceId,
+    enabled: view === "overview",
   });
+  const { data: projectFields } = useProjectFields(workspaceId);
   const reorderProjects = useReorderProjects();
 
   // React state, not the query cache: dnd-kit clears its transforms with a
@@ -161,6 +125,26 @@ function RouteComponent() {
   const { canCreateProjects, canUpdateProjects } = useWorkspacePermission();
   const canCreate = canCreateProjects();
   const { canImport } = useCanImport();
+
+  const switchView = (next: "overview" | "fields") => {
+    void navigate({
+      to: ".",
+      search: (previous: ProjectsSearch) => ({
+        ...previous,
+        view: next === "fields" ? "fields" : undefined,
+      }),
+      replace: true,
+    });
+  };
+
+  const changeTableSearch = (next: ProjectTableSearchState) => {
+    void navigate({
+      to: ".",
+      search: { ...encodeProjectTableSearch(next), view: "fields" },
+      replace: true,
+    });
+  };
+
   // Matches the API, which gates /project/reorder on `project: ["update"]`
   // alone — not the create+update+delete bundle.
   const canReorder = canUpdateProjects();
@@ -222,25 +206,34 @@ function RouteComponent() {
     });
   };
 
-  if (isLoading) {
+  const headerActions = (
+    <div className="flex items-center gap-2">
+      <ProjectsViewSwitch
+        view={view}
+        fieldCount={projectFields?.length ?? 0}
+        onChange={switchView}
+      />
+      {canCreate ? (
+        <Button
+          variant="outline"
+          size="xs"
+          onClick={handleCreateProject}
+          className="gap-1"
+        >
+          <Plus className="w-3 h-3" />
+          {t("workspace:projects.createProject")}
+        </Button>
+      ) : null}
+    </div>
+  );
+
+  if (view === "overview" && isLoading) {
     return (
       <>
         <PageTitle title={t("workspace:projects.pageTitle")} />
         <WorkspaceLayout
           title={t("workspace:projects.pageTitle")}
-          headerActions={
-            canCreate ? (
-              <Button
-                variant="outline"
-                size="xs"
-                onClick={handleCreateProject}
-                className="gap-1"
-              >
-                <Plus className="w-3 h-3" />
-                {t("workspace:projects.createProject")}
-              </Button>
-            ) : null
-          }
+          headerActions={headerActions}
         >
           <Table>
             <TableHeader>
@@ -286,25 +279,13 @@ function RouteComponent() {
     );
   }
 
-  if (!projects || projects.length === 0) {
+  if (view === "overview" && (!projects || projects.length === 0)) {
     return (
       <>
         <PageTitle title={t("workspace:projects.pageTitle")} />
         <WorkspaceLayout
           title={t("workspace:projects.pageTitle")}
-          headerActions={
-            canCreate ? (
-              <Button
-                variant="outline"
-                size="xs"
-                onClick={handleCreateProject}
-                className="gap-1"
-              >
-                <Plus className="w-3 h-3" />
-                {t("workspace:projects.createProject")}
-              </Button>
-            ) : null
-          }
+          headerActions={headerActions}
         >
           <TrialExpiredCallout workspaceId={workspaceId} className="m-4" />
           <Empty className="min-h-[60vh]">
@@ -352,115 +333,114 @@ function RouteComponent() {
       <PageTitle title={t("workspace:projects.pageTitle")} />
       <WorkspaceLayout
         title={t("workspace:projects.pageTitle")}
-        headerActions={
-          canCreate ? (
-            <Button
-              variant="outline"
-              size="xs"
-              onClick={handleCreateProject}
-              className="gap-1"
-            >
-              <Plus className="w-3 h-3" />
-              {t("workspace:projects.createProject")}
-            </Button>
-          ) : null
-        }
+        headerActions={headerActions}
       >
         <TrialExpiredCallout workspaceId={workspaceId} className="m-4" />
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          modifiers={[restrictToVerticalAxis, restrictToParentElement]}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-          onDragCancel={() => document.body.classList.remove("kaneo-dragging")}
-        >
-          <Table>
-            <TableHeader className="p-4">
-              <TableRow>
-                <TableHead className="text-foreground font-medium">
-                  {t("workspace:projects.title")}
-                </TableHead>
-                <TableHead className="text-foreground font-medium">
-                  {t("workspace:projects.progress")}
-                </TableHead>
-                <TableHead className="text-foreground font-medium">
-                  {t("workspace:projects.dueDate")}
-                </TableHead>
-                <TableHead className="text-foreground font-medium">
-                  {t("workspace:projects.status")}
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <SortableContext
-                items={orderedProjects?.map((project) => project.id) ?? []}
-                strategy={verticalListSortingStrategy}
-              >
-                {orderedProjects?.map((project) => {
-                  if (!project?.id || !project.statistics) return null;
+        {view === "fields" ? (
+          <ProjectFieldsTable
+            workspaceId={workspaceId}
+            search={search}
+            onSearchChange={changeTableSearch}
+          />
+        ) : (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            onDragCancel={() =>
+              document.body.classList.remove("kaneo-dragging")
+            }
+          >
+            <Table>
+              <TableHeader className="p-4">
+                <TableRow>
+                  <TableHead className="text-foreground font-medium">
+                    {t("workspace:projects.title")}
+                  </TableHead>
+                  <TableHead className="text-foreground font-medium">
+                    {t("workspace:projects.progress")}
+                  </TableHead>
+                  <TableHead className="text-foreground font-medium">
+                    {t("workspace:projects.dueDate")}
+                  </TableHead>
+                  <TableHead className="text-foreground font-medium">
+                    {t("workspace:projects.status")}
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <SortableContext
+                  items={orderedProjects?.map((project) => project.id) ?? []}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {orderedProjects?.map((project) => {
+                    if (!project?.id || !project.statistics) return null;
 
-                  const IconComponent =
-                    icons[project.icon as keyof typeof icons] || icons.Layout;
+                    const IconComponent =
+                      icons[project.icon as keyof typeof icons] || icons.Layout;
 
-                  const getStatusText = () => {
-                    if (project.statistics.totalTasks === 0)
-                      return t("workspace:projects.projectStatus.notStarted");
-                    if (project.statistics.completionPercentage === 100)
-                      return t("workspace:projects.projectStatus.complete");
-                    return t("workspace:projects.projectStatus.inProgress");
-                  };
+                    const getStatusText = () => {
+                      if (project.statistics.totalTasks === 0)
+                        return t("workspace:projects.projectStatus.notStarted");
+                      if (project.statistics.completionPercentage === 100)
+                        return t("workspace:projects.projectStatus.complete");
+                      return t("workspace:projects.projectStatus.inProgress");
+                    };
 
-                  const getStatusVariant = () => {
-                    if (project.statistics.totalTasks === 0) return "secondary";
-                    if (project.statistics.completionPercentage === 100)
-                      return "default";
-                    return "outline";
-                  };
+                    const getStatusVariant = () => {
+                      if (project.statistics.totalTasks === 0)
+                        return "secondary";
+                      if (project.statistics.completionPercentage === 100)
+                        return "default";
+                      return "outline";
+                    };
 
-                  return (
-                    <SortableProjectRow
-                      key={project.id}
-                      id={project.id}
-                      canReorder={canReorder}
-                      onClick={() => handleProjectClick(project.id)}
-                    >
-                      <TableCell className="py-3">
-                        <div className="flex items-center gap-3">
-                          <IconComponent className="w-5 h-5 text-muted-foreground" />
-                          <span className="font-medium">{project.name}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="py-3">
-                        <div className="flex items-center gap-2">
-                          <Progress
-                            value={project.statistics.completionPercentage}
-                            className="w-16 h-2"
-                          />
+                    return (
+                      <SortableProjectRow
+                        key={project.id}
+                        id={project.id}
+                        canReorder={canReorder}
+                        onClick={() => handleProjectClick(project.id)}
+                      >
+                        <TableCell className="py-3">
+                          <div className="flex items-center gap-3">
+                            <IconComponent className="w-5 h-5 text-muted-foreground" />
+                            <span className="font-medium">{project.name}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="py-3">
+                          <div className="flex items-center gap-2">
+                            <Progress
+                              value={project.statistics.completionPercentage}
+                              className="w-16 h-2"
+                            />
+                            <span className="text-sm text-muted-foreground">
+                              {project.statistics.completionPercentage}%
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="py-3">
                           <span className="text-sm text-muted-foreground">
-                            {project.statistics.completionPercentage}%
+                            {project.statistics.dueDate
+                              ? formatDateMedium(project.statistics.dueDate)
+                              : t("workspace:projects.noDueDate")}
                           </span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="py-3">
-                        <span className="text-sm text-muted-foreground">
-                          {project.statistics.dueDate
-                            ? formatDateMedium(project.statistics.dueDate)
-                            : t("workspace:projects.noDueDate")}
-                        </span>
-                      </TableCell>
-                      <TableCell className="py-3">
-                        <Badge variant={getStatusVariant()}>
-                          {getStatusText()}
-                        </Badge>
-                      </TableCell>
-                    </SortableProjectRow>
-                  );
-                })}
-              </SortableContext>
-            </TableBody>
-          </Table>
-        </DndContext>
+                        </TableCell>
+                        <TableCell className="py-3">
+                          <Badge variant={getStatusVariant()}>
+                            {getStatusText()}
+                          </Badge>
+                        </TableCell>
+                      </SortableProjectRow>
+                    );
+                  })}
+                </SortableContext>
+              </TableBody>
+            </Table>
+          </DndContext>
+        )}
       </WorkspaceLayout>
 
       <CreateProjectModal

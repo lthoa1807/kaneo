@@ -1645,6 +1645,86 @@ export const customFieldValueTable = pgTable(
   ],
 );
 
+export const workspaceCustomFieldDefinitionTable = pgTable(
+  "workspace_custom_field_definition",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaceTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    name: text("name").notNull(),
+    type: text("type").notNull(),
+    required: boolean("required").default(false).notNull(),
+    defaultValue: text("default_value"),
+    options: jsonb("options"),
+    hiddenOptions: jsonb("hidden_options")
+      .$type<string[]>()
+      .default([])
+      .notNull(),
+    formula: jsonb("formula"),
+    position: integer("position").default(0).notNull(),
+    createdAt: timestamp("created_at", { mode: "date" })
+      .default(utcNow)
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .default(utcNow)
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("workspace_custom_field_def_workspaceId_idx").on(table.workspaceId),
+    unique("workspace_custom_field_def_workspace_name_unique").on(
+      table.workspaceId,
+      table.name,
+    ),
+  ],
+);
+
+export const projectCustomFieldValueTable = pgTable(
+  "project_custom_field_value",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projectTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    fieldId: text("field_id")
+      .notNull()
+      .references(() => workspaceCustomFieldDefinitionTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    value: text("value"),
+    createdAt: timestamp("created_at", { mode: "date" })
+      .default(utcNow)
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .default(utcNow)
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("project_custom_field_value_projectId_idx").on(table.projectId),
+    index("project_custom_field_value_field_project_idx").on(
+      table.fieldId,
+      table.projectId,
+    ),
+    unique("project_custom_field_value_project_field_unique").on(
+      table.projectId,
+      table.fieldId,
+    ),
+  ],
+);
+
 // These records outlive their original owner so failed object deletion can retry.
 export const storageCleanupTable = pgTable("storage_cleanup", {
   objectKey: text("object_key").primaryKey(),

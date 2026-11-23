@@ -195,6 +195,12 @@ export function buildSettingsNav({
           icon: Shield,
         },
         {
+          id: "workspace-project-fields",
+          label: t("settings:workspaceProjectFields.title"),
+          to: "/dashboard/settings/workspace/project-fields",
+          icon: SlidersHorizontal,
+        },
+        {
           id: "workspace-labels",
           label: t("settings:workspaceLabels.title"),
           to: "/dashboard/settings/workspace/labels",

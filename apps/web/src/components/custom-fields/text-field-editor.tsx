@@ -1,9 +1,9 @@
 import { useTranslation } from "react-i18next";
-import type { CustomFieldDefinition } from "@/components/project/custom-fields/types";
+import type { EditableFieldDefinition } from "@/components/custom-fields/editable-field";
 import { Kbd } from "@/components/ui/kbd";
 
 type TextFieldEditorProps = {
-  field: CustomFieldDefinition;
+  field: EditableFieldDefinition;
   draft: string;
   onDraftChange: (value: string) => void;
   onSubmit: () => void;
