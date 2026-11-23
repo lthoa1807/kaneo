@@ -304,6 +304,13 @@ permissions):
 - Request detail mirrors guest view plus task creation (existing task
   create flow, pre-linked) and full activity trail.
 
+**Inviting guests** (workspace settings): a dedicated **"Invite guests"**
+entry, separate from the member invite modal. It posts to the existing
+better-auth invitation API with role `guest`, always uses `selected`
+project access, and reuses the existing project-access selection UI. The
+member modal stays untouched. The API rejects guest invitations with `all`
+access (`400`) regardless of which UI called it.
+
 All copy through i18n keys with `i18n/en-US.json` as the source.
 
 ## 9. Edge cases and validation
@@ -376,17 +383,19 @@ the confirmation fact redundantly for cheap queries.
 **In MVP (this spec's build):**
 
 1. Migration: `intake_request`, `intake_activity`, `task.intakeRequestId`,
-   `project.intakeEnabled`.
+   `project.intakeEnabled`, `project.lastIntakeRequestNumber`.
 2. `@kaneo/permissions`: `intakeRequest` vocabulary, `guest` default role +
-   seeding/backfill.
+   seeding/backfill + add-only merge into existing default-role rows.
 3. Intake service + routes + ownership enforcement + transition map.
 4. Guest portal UI (list, create, detail, confirm/revision).
 5. Staff intake tab (triage, deliver, task linking, activity).
-6. Realtime delivery per section 7 (ws recipient rule or the polling
+6. "Invite guests" settings entry (role `guest`, `selected` access only).
+7. Realtime delivery per section 7 (ws recipient rule or the polling
    fallback).
-7. Bold notification rows in section 11.
-8. Members-table guest badge + assignee filtering.
-9. OpenAPI + docs (`apps/docs`) + integration tests
+8. Bold notification rows in section 11, including the
+   `intake_request` notification resourceType.
+9. Members-table guest badge + assignee filtering.
+10. OpenAPI + docs (`apps/docs`) + integration tests
    (`tests/api-integration`) covering ownership isolation, transition map,
    task attach window, and guest 404 behavior.
 
