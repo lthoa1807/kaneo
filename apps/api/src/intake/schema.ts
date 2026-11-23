@@ -25,3 +25,16 @@ export const updateIntakeRequestBody = z
     (body) => body.title !== undefined || body.description !== undefined,
     "Nothing to update",
   );
+
+export const transitionIntakeRequestBody = z.object({
+  to: z.enum([
+    "triaged",
+    "rejected",
+    "approved",
+    "in_progress",
+    "delivered",
+    "needs_revision",
+    "confirmed",
+  ]),
+  note: z.string().max(10_000).optional(),
+});

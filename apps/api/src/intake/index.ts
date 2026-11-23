@@ -18,6 +18,7 @@ import getIntakeRequest from "./controllers/get-intake-request";
 import listIntakeProjects from "./controllers/list-intake-projects";
 import listIntakeRequests from "./controllers/list-intake-requests";
 import updateIntakeRequest from "./controllers/update-intake-request";
+import transitionIntakeRequest from "./controllers/transition-intake-request";
 import {
   intakeRequestDetailSchema,
   intakeRequestListSchema,
@@ -27,6 +28,7 @@ import {
   createIntakeRequestBody,
   listIntakeRequestsQuery,
   requestIdParam,
+  transitionIntakeRequestBody,
   updateIntakeRequestBody,
 } from "./schema";
 
@@ -154,6 +156,37 @@ const updateIntakeRequestRoute = createRoute({
   },
 });
 
+const transitionIntakeRequestRoute = createRoute({
+  method: "post",
+  operationId: "transitionIntakeRequest",
+  path: "/requests/{requestId}/transition",
+  tags: ["Intake"],
+  summary: "Transition intake request",
+  description:
+    "Move an intake request through its lifecycle: staff triage and work it, the guest owner confirms or requests revision. Illegal moves, terminal states, and lost races return 409 with the current status.",
+  middleware: [
+    workspaceAccess.fromIntakeRequest("requestId"),
+    requireWorkspacePermission({ intakeRequest: ["update"] }),
+    requireEntitlement,
+  ] as const,
+  request: {
+    params: requestIdParam,
+    body: {
+      required: true,
+      content: { "application/json": { schema: transitionIntakeRequestBody } },
+    },
+  },
+  responses: {
+    200: jsonResponse("The updated intake request", intakeRequestSchema),
+    400: errorResponse("Invalid body, or a required note is missing"),
+    403: errorResponse("Missing intakeRequest:update permission"),
+    404: errorResponse("Intake request not found"),
+    409: errorResponse(
+      "Transition not allowed from the current status, or it was changed concurrently",
+    ),
+  },
+});
+
 const intake = apiRouter<BaseVariables & { workspaceId: string }>()
   .openapi(listIntakeProjectsRoute, async (c) =>
     c.json(
@@ -184,6 +217,14 @@ const intake = apiRouter<BaseVariables & { workspaceId: string }>()
     const { requestId } = c.req.valid("param");
     const body = c.req.valid("json");
     return c.json(await updateIntakeRequest(c, requestId, body), 200);
+  })
+  .openapi(transitionIntakeRequestRoute, async (c) => {
+    const { requestId } = c.req.valid("param");
+    const { to, note } = c.req.valid("json");
+    return c.json(
+      await transitionIntakeRequest(c, requestId, { to, note }),
+      200,
+    );
   })
   .openapi(createIntakeRequestRoute, async (c) => {
     const { workspaceId } = c.req.valid("param");

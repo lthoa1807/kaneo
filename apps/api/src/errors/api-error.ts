@@ -8,17 +8,21 @@ export type ApiErrorBody = {
   code: string;
   issues?: ApiErrorIssue[];
   missingPermissions?: string[];
+  /** Current resource state carried on conflict errors (HTTP body key: "status"). */
+  currentStatus?: string;
 };
 
 export class ApiError extends HTTPException {
   readonly code: string;
   readonly issues?: ApiErrorIssue[];
   readonly missingPermissions?: string[];
+  readonly currentStatus?: string;
 
   constructor(status: ContentfulStatusCode, body: ApiErrorBody) {
     super(status, { message: body.message });
     this.code = body.code;
     this.issues = body.issues;
     this.missingPermissions = body.missingPermissions;
+    this.currentStatus = body.currentStatus;
   }
 }

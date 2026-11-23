@@ -16030,6 +16030,228 @@
         }
       }
     },
+    "/intake/requests/{requestId}/transition": {
+      "post": {
+        "operationId": "transitionIntakeRequest",
+        "tags": [
+          "Intake"
+        ],
+        "summary": "Transition intake request",
+        "description": "Move an intake request through its lifecycle: staff triage and work it, the guest owner confirms or requests revision. Illegal moves, terminal states, and lost races return 409 with the current status.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "requestId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "to": {
+                    "type": "string",
+                    "enum": [
+                      "triaged",
+                      "rejected",
+                      "approved",
+                      "in_progress",
+                      "delivered",
+                      "needs_revision",
+                      "confirmed"
+                    ]
+                  },
+                  "note": {
+                    "type": "string",
+                    "maxLength": 10000
+                  }
+                },
+                "required": [
+                  "to"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated intake request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "projectId": {
+                      "type": "string"
+                    },
+                    "projectName": {
+                      "type": "string",
+                      "description": "Display-only project name, embedded so guests need no project:* permission."
+                    },
+                    "number": {
+                      "type": "number"
+                    },
+                    "displayId": {
+                      "type": "string",
+                      "description": "Human identifier, `REQ-<number>`."
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "new",
+                        "triaged",
+                        "rejected",
+                        "approved",
+                        "in_progress",
+                        "delivered",
+                        "needs_revision",
+                        "confirmed"
+                      ],
+                      "description": "The intake request lifecycle status."
+                    },
+                    "createdById": {
+                      "type": "string"
+                    },
+                    "requesterName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "requesterEmail": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "sourceType": {
+                      "type": "string"
+                    },
+                    "sourceId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "externalReference": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "confirmedAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "date-time"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "projectId",
+                    "projectName",
+                    "number",
+                    "displayId",
+                    "title",
+                    "description",
+                    "status",
+                    "createdById",
+                    "requesterName",
+                    "requesterEmail",
+                    "sourceType",
+                    "sourceId",
+                    "externalReference",
+                    "confirmedAt",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid body, or a required note is missing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing intakeRequest:update permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Intake request not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Transition not allowed from the current status, or it was changed concurrently",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
     "/column/{projectId}": {
       "get": {
         "operationId": "getColumns",

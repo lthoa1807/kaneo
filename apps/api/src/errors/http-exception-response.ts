@@ -32,6 +32,7 @@ function errorBody(
       ...(error.missingPermissions
         ? { missingPermissions: error.missingPermissions }
         : {}),
+      ...(error.currentStatus ? { status: error.currentStatus } : {}),
     };
   }
   return {
