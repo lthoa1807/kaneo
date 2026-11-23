@@ -32,7 +32,7 @@ async function createField(
 describe("project field value security", () => {
   it("lets workspace viewers read values but not write them", async () => {
     const owner = await createWorkspaceMember({ role: "owner" });
-    await createProjectFixture({
+    const { project } = await createProjectFixture({
       workspaceId: owner.workspace.id,
     });
     mockAuthenticatedSession(owner.user);
