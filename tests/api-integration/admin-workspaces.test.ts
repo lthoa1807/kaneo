@@ -140,6 +140,7 @@ describe("instance admin workspace management", () => {
       "viewer",
       "member",
       "admin",
+      "guest",
       "reviewer",
     ]);
   });
