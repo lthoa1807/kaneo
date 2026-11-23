@@ -14,6 +14,7 @@ import {
   invitationTable,
   labelTable,
   notificationTable,
+  projectCustomFieldValueTable,
   projectTable,
   sessionTable,
   taskRelationTable,
@@ -29,6 +30,7 @@ import {
   verificationTable,
   workflowRuleTable,
   workspaceRoleTable,
+  workspaceCustomFieldDefinitionTable,
   workspaceTable,
   workspaceUserTable,
 } from "./schema";
@@ -78,6 +80,7 @@ export const workspaceTableRelations = relations(
     assets: many(assetTable),
     invitations: many(invitationTable),
     notificationWorkspaceRules: many(userNotificationWorkspaceRuleTable),
+    projectFields: many(workspaceCustomFieldDefinitionTable),
   }),
 );
 
@@ -109,6 +112,7 @@ export const projectTableRelations = relations(
     githubIntegration: many(githubIntegrationTable),
     integrations: many(integrationTable),
     notificationWorkspaceProjects: many(userNotificationWorkspaceProjectTable),
+    projectFieldValues: many(projectCustomFieldValueTable),
   }),
 );
 
@@ -416,6 +420,31 @@ export const customFieldValueTableRelations = relations(
     task: one(taskTable, {
       fields: [customFieldValueTable.taskId],
       references: [taskTable.id],
+    }),
+  }),
+);
+
+export const workspaceCustomFieldDefinitionTableRelations = relations(
+  workspaceCustomFieldDefinitionTable,
+  ({ one, many }) => ({
+    workspace: one(workspaceTable, {
+      fields: [workspaceCustomFieldDefinitionTable.workspaceId],
+      references: [workspaceTable.id],
+    }),
+    values: many(projectCustomFieldValueTable),
+  }),
+);
+
+export const projectCustomFieldValueTableRelations = relations(
+  projectCustomFieldValueTable,
+  ({ one }) => ({
+    project: one(projectTable, {
+      fields: [projectCustomFieldValueTable.projectId],
+      references: [projectTable.id],
+    }),
+    field: one(workspaceCustomFieldDefinitionTable, {
+      fields: [projectCustomFieldValueTable.fieldId],
+      references: [workspaceCustomFieldDefinitionTable.id],
     }),
   }),
 );

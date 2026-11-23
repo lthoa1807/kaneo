@@ -70,6 +70,7 @@ import { createRoute, errorResponse, jsonResponse, z } from "./openapi";
 import { initializePlugins, integrationPlugins } from "./plugins";
 import { migrateGitHubIntegration } from "./plugins/github/migration";
 import project from "./project";
+import projectField from "./project-field";
 import { assertProjectAccess } from "./project-access/assert-project-access";
 import { getPublicProject } from "./project/controllers/get-public-project";
 import { initializeScheduler, shutdownScheduler } from "./scheduler";
@@ -251,6 +252,7 @@ export function createApp() {
         "X-RateLimit-Limit",
         "X-RateLimit-Remaining",
         "X-RateLimit-Reset",
+        "Content-Disposition",
       ],
       origin: (origin) => {
         // Reflecting an arbitrary origin alongside credentials lets any site
@@ -872,6 +874,7 @@ export function createApp() {
   const invitationApi = api.route("/invitation", invitation);
   const workspaceApi = api.route("/workspace", workspace);
   const customFieldApi = api.route("/custom-field", customField);
+  const projectFieldApi = api.route("/project-field", projectField);
   const importApi = api.route("/import", importRoutes);
   const userApi = api.route("/user", user);
   const adminApi = api.route("/admin", admin);
@@ -1014,6 +1017,7 @@ export function createApp() {
     workflowRuleApi,
     workspaceApi,
     customFieldApi,
+    projectFieldApi,
     importApi,
     oauthApi,
   };
@@ -1149,6 +1153,7 @@ const {
   workflowRuleApi,
   workspaceApi,
   customFieldApi,
+  projectFieldApi,
   importApi,
   oauthApi,
 } = createdApp;
@@ -1192,6 +1197,7 @@ export type AppType =
   | typeof invitationApi
   | typeof workspaceApi
   | typeof customFieldApi
+  | typeof projectFieldApi
   | typeof importApi
   | typeof userApi
   | typeof adminApi

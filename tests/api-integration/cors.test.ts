@@ -57,7 +57,7 @@ describe("API integration: CORS origin policy", () => {
     expect(await originHeaderFor("https://attacker.example")).toBeNull();
   });
 
-  it("lets browser clients read the rate limit headers", async () => {
+  it("lets browser clients read the rate limit and download headers", async () => {
     process.env.NODE_ENV = "production";
     process.env.KANEO_CLIENT_URL = "https://kaneo.example";
     delete process.env.CORS_ORIGINS;
@@ -77,6 +77,7 @@ describe("API integration: CORS origin policy", () => {
         "x-ratelimit-limit",
         "x-ratelimit-remaining",
         "x-ratelimit-reset",
+        "content-disposition",
       ]),
     );
   });

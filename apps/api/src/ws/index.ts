@@ -35,6 +35,7 @@ import type {
 } from "./broadcast-adapter";
 import { InMemoryBroadcastAdapter } from "./in-memory-broadcast-adapter";
 import { RedisBroadcastAdapter } from "./redis-broadcast-adapter";
+import { listProjectFieldRecipients } from "../project-field/project-field-recipients";
 import { getProjectReadAccess } from "./project-read-access";
 
 const INSTANCE_ID = randomUUID();
@@ -1026,6 +1027,30 @@ subscribeToEvent<{
   );
   refreshParentBoards(await getSubtaskParentProjects([taskId]), toProjectId);
 });
+
+async function broadcastProjectFieldChange(
+  eventType:
+    | "PROJECT_FIELD_DEFINITIONS_CHANGED"
+    | "PROJECT_FIELD_VALUES_CHANGED",
+  data: { workspaceId?: unknown },
+) {
+  if (typeof data.workspaceId !== "string") return;
+  const recipients = await listProjectFieldRecipients(data.workspaceId);
+  for (const userId of recipients) {
+    // Only the workspace id travels: the client refetches access-scoped data.
+    broadcastToUser(userId, { type: eventType, workspaceId: data.workspaceId });
+  }
+}
+
+subscribeToEvent<{ workspaceId: string }>(
+  "project-field.definition_changed",
+  (data) =>
+    broadcastProjectFieldChange("PROJECT_FIELD_DEFINITIONS_CHANGED", data),
+);
+subscribeToEvent<{ workspaceId: string }>(
+  "project-field.value_changed",
+  (data) => broadcastProjectFieldChange("PROJECT_FIELD_VALUES_CHANGED", data),
+);
 
 subscribeToEvent<{
   projectId: string;

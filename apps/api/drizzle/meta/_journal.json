@@ -519,6 +519,20 @@
       "when": 1793798733016,
       "tag": "0073_thick_talisman",
       "breakpoints": true
+    },
+    {
+      "idx": 74,
+      "version": "7",
+      "when": 1795378355235,
+      "tag": "0074_project_custom_fields",
+      "breakpoints": true
+    },
+    {
+      "idx": 75,
+      "version": "7",
+      "when": 1795378400000,
+      "tag": "0075_repair_project_include_subtasks",
+      "breakpoints": true
     }
   ]
 }

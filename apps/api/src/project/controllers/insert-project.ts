@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import type db from "../../database";
 import { columnTable, projectTable } from "../../database/schema";
 import { grantProjectToRestrictedMember } from "../../project-access/grant-project-to-restricted-member";
+import { seedProjectFieldDefaults } from "../../project-field/project-field-defaults";
 import {
   assertProjectKeyAvailable,
   lockProjectOrdering,
@@ -69,6 +70,10 @@ export async function insertProject(
       userId,
       projectId: createdProject.id,
     });
+    await seedProjectFieldDefaults(tx, {
+      workspaceId,
+      projectId: createdProject.id,
+    });
   }
 
   return createdProject;
@@ -78,6 +83,10 @@ export async function insertUnplacedProject(
   tx: Transaction,
   { workspaceId, name, icon, slug, userId }: NewProject,
 ) {
+  // Imported projects join the same lock as create/reorder so a definition
+  // backfill running concurrently can't miss this project's defaults.
+  await lockProjectOrdering(tx, workspaceId);
+
   const [createdProject] = await tx
     .insert(projectTable)
     .values({ workspaceId, name, icon, slug, position: 0 })
@@ -88,6 +97,10 @@ export async function insertUnplacedProject(
     await grantProjectToRestrictedMember(tx, {
       workspaceId,
       userId,
+      projectId: createdProject.id,
+    });
+    await seedProjectFieldDefaults(tx, {
+      workspaceId,
       projectId: createdProject.id,
     });
   }
