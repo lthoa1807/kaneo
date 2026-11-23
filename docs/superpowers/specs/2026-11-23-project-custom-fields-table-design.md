@@ -4,6 +4,7 @@
 - **Date:** 2026-11-23
 - **Branch:** `feature/project-custom-fields`
 - **Area:** API, web, database migration, docs, OpenAPI
+- **Implementation notes:** `docs/superpowers/notes/project-field-data-flow.md`
 - **Supersedes:** `2026-11-21-workspace-custom-fields-design.md`. This document
   incorporates the retained storage, lifecycle, and permission decisions and
   adds formula fields, the aggregate table, inline editing, and export. Use
