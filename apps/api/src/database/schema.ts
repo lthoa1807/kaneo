@@ -758,7 +758,19 @@ export const intakeRequestTable = pgTable(
     number: integer("number").default(1).notNull(),
     title: text("title").notNull(),
     description: text("description"),
-    status: text("status").notNull().default("new"), // new|triaged|rejected|approved|in_progress|delivered|needs_revision|confirmed
+    status: text("status")
+      .notNull()
+      .default("new")
+      .$type<
+        | "new"
+        | "triaged"
+        | "rejected"
+        | "approved"
+        | "in_progress"
+        | "delivered"
+        | "needs_revision"
+        | "confirmed"
+      >(), // new|triaged|rejected|approved|in_progress|delivered|needs_revision|confirmed
     createdById: text("created_by_id")
       .notNull()
       .references(() => userTable.id, {

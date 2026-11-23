@@ -1,0 +1,39 @@
+import { nullableResponseTimestamp, responseTimestamp, z } from "../openapi";
+
+export const intakeStatusSchema = z
+  .enum([
+    "new",
+    "triaged",
+    "rejected",
+    "approved",
+    "in_progress",
+    "delivered",
+    "needs_revision",
+    "confirmed",
+  ])
+  .openapi({ description: "The intake request lifecycle status." });
+
+export const intakeRequestSchema = z.object({
+  id: z.string(),
+  projectId: z.string(),
+  projectName: z.string().openapi({
+    description:
+      "Display-only project name, embedded so guests need no project:* permission.",
+  }),
+  number: z.number(),
+  displayId: z.string().openapi({
+    description: "Human identifier, `REQ-<number>`.",
+  }),
+  title: z.string(),
+  description: z.string().nullable(),
+  status: intakeStatusSchema,
+  createdById: z.string(),
+  requesterName: z.string().nullable(),
+  requesterEmail: z.string().nullable(),
+  sourceType: z.string(),
+  sourceId: z.string().nullable(),
+  externalReference: z.string().nullable(),
+  confirmedAt: nullableResponseTimestamp,
+  createdAt: responseTimestamp,
+  updatedAt: responseTimestamp,
+});

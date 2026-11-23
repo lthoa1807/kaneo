@@ -15061,6 +15061,215 @@
         }
       }
     },
+    "/intake/workspaces/{workspaceId}/intake-requests": {
+      "post": {
+        "operationId": "createIntakeRequest",
+        "tags": [
+          "Intake"
+        ],
+        "summary": "Create intake request",
+        "description": "Submit an intake request into an intake-enabled project the caller can access. The creator is the requester on the guest portal.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "description": {
+                    "type": "string",
+                    "maxLength": 10000
+                  }
+                },
+                "required": [
+                  "projectId",
+                  "title"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The created intake request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "projectId": {
+                      "type": "string"
+                    },
+                    "projectName": {
+                      "type": "string",
+                      "description": "Display-only project name, embedded so guests need no project:* permission."
+                    },
+                    "number": {
+                      "type": "number"
+                    },
+                    "displayId": {
+                      "type": "string",
+                      "description": "Human identifier, `REQ-<number>`."
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "new",
+                        "triaged",
+                        "rejected",
+                        "approved",
+                        "in_progress",
+                        "delivered",
+                        "needs_revision",
+                        "confirmed"
+                      ],
+                      "description": "The intake request lifecycle status."
+                    },
+                    "createdById": {
+                      "type": "string"
+                    },
+                    "requesterName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "requesterEmail": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "sourceType": {
+                      "type": "string"
+                    },
+                    "sourceId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "externalReference": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "confirmedAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "date-time"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "projectId",
+                    "projectName",
+                    "number",
+                    "displayId",
+                    "title",
+                    "description",
+                    "status",
+                    "createdById",
+                    "requesterName",
+                    "requesterEmail",
+                    "sourceType",
+                    "sourceId",
+                    "externalReference",
+                    "confirmedAt",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing intakeRequest:create, no access to the project, or intake is disabled for the project",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workspace or project not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
     "/column/{projectId}": {
       "get": {
         "operationId": "getColumns",
