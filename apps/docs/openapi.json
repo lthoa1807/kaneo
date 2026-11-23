@@ -15142,6 +15142,262 @@
       }
     },
     "/intake/workspaces/{workspaceId}/intake-requests": {
+      "get": {
+        "operationId": "listIntakeRequests",
+        "tags": [
+          "Intake"
+        ],
+        "summary": "List intake requests",
+        "description": "Guests see their own requests; manage holders see every request in projects they can access. Each item embeds display-only projectName and linked-task progress counts.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "projectId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "new",
+                "triaged",
+                "rejected",
+                "approved",
+                "in_progress",
+                "delivered",
+                "needs_revision",
+                "confirmed"
+              ],
+              "description": "The intake request lifecycle status."
+            },
+            "required": false,
+            "description": "The intake request lifecycle status.",
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000000,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of intake requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "projectId": {
+                            "type": "string"
+                          },
+                          "projectName": {
+                            "type": "string",
+                            "description": "Display-only project name, embedded so guests need no project:* permission."
+                          },
+                          "number": {
+                            "type": "number"
+                          },
+                          "displayId": {
+                            "type": "string",
+                            "description": "Human identifier, `REQ-<number>`."
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "new",
+                              "triaged",
+                              "rejected",
+                              "approved",
+                              "in_progress",
+                              "delivered",
+                              "needs_revision",
+                              "confirmed"
+                            ],
+                            "description": "The intake request lifecycle status."
+                          },
+                          "createdById": {
+                            "type": "string"
+                          },
+                          "requesterName": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "requesterEmail": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "sourceType": {
+                            "type": "string"
+                          },
+                          "sourceId": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "externalReference": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "confirmedAt": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "format": "date-time"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "taskCount": {
+                            "type": "number",
+                            "description": "Linked tasks, across all statuses."
+                          },
+                          "completedTaskCount": {
+                            "type": "number",
+                            "description": "Linked tasks whose status is done or archived."
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "projectId",
+                          "projectName",
+                          "number",
+                          "displayId",
+                          "title",
+                          "description",
+                          "status",
+                          "createdById",
+                          "requesterName",
+                          "requesterEmail",
+                          "sourceType",
+                          "sourceId",
+                          "externalReference",
+                          "confirmedAt",
+                          "createdAt",
+                          "updatedAt",
+                          "taskCount",
+                          "completedTaskCount"
+                        ]
+                      }
+                    },
+                    "total": {
+                      "type": "number"
+                    },
+                    "page": {
+                      "type": "number"
+                    },
+                    "pageSize": {
+                      "type": "number"
+                    },
+                    "totalPages": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "items",
+                    "total",
+                    "page",
+                    "pageSize",
+                    "totalPages"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing intakeRequest:read permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workspace not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      },
       "post": {
         "operationId": "createIntakeRequest",
         "tags": [

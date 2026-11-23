@@ -37,3 +37,20 @@ export const intakeRequestSchema = z.object({
   createdAt: responseTimestamp,
   updatedAt: responseTimestamp,
 });
+
+export const intakeRequestListItemSchema = intakeRequestSchema.extend({
+  taskCount: z.number().openapi({
+    description: "Linked tasks, across all statuses.",
+  }),
+  completedTaskCount: z.number().openapi({
+    description: "Linked tasks whose status is done or archived.",
+  }),
+});
+
+export const intakeRequestListSchema = z.object({
+  items: z.array(intakeRequestListItemSchema),
+  total: z.number(),
+  page: z.number(),
+  pageSize: z.number(),
+  totalPages: z.number(),
+});
