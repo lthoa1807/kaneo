@@ -10,6 +10,7 @@ import {
 } from "@/lib/evict-workspace-cache";
 import { authClient } from "@/lib/auth-client";
 import { reconcileProjectAccess } from "@/lib/reconcile-project-access";
+import { projectFieldKeys } from "@/lib/project-field-query-keys";
 
 export function getUserWsUrl() {
   const base = getApiUrl("ws");
@@ -192,6 +193,31 @@ export function useUserWebSocket() {
           }
           if (message.type === "NOTIFICATION_CREATED") {
             queryClient.invalidateQueries({ queryKey: ["notifications"] });
+          }
+          if (
+            message.type === "PROJECT_FIELD_DEFINITIONS_CHANGED" &&
+            message.workspaceId
+          ) {
+            queryClient.invalidateQueries({
+              queryKey: projectFieldKeys.definitions(message.workspaceId),
+            });
+            queryClient.invalidateQueries({
+              queryKey: projectFieldKeys.tableAll(message.workspaceId),
+            });
+            queryClient.invalidateQueries({
+              queryKey: projectFieldKeys.valuesAll,
+            });
+          }
+          if (
+            message.type === "PROJECT_FIELD_VALUES_CHANGED" &&
+            message.workspaceId
+          ) {
+            queryClient.invalidateQueries({
+              queryKey: projectFieldKeys.valuesAll,
+            });
+            queryClient.invalidateQueries({
+              queryKey: projectFieldKeys.tableAll(message.workspaceId),
+            });
           }
         } catch {
           // Ignore malformed messages

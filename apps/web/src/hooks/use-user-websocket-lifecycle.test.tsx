@@ -355,6 +355,38 @@ describe("user WebSocket lifecycle", () => {
     expect(auth.notify).toHaveBeenCalledWith("$sessionSignal");
   });
 
+  it("refreshes project fields and table values after a field change", () => {
+    renderHook(useUserWebSocket);
+    act(() =>
+      TestSocket.instances[0].onmessage?.({
+        data: JSON.stringify({
+          type: "PROJECT_FIELD_DEFINITIONS_CHANGED",
+          workspaceId: "workspace",
+        }),
+      }),
+    );
+    for (const queryKey of [
+      ["project-fields", "workspace"],
+      ["project-field-table", "workspace"],
+      ["project-field-values"],
+    ])
+      expect(client.invalidateQueries).toHaveBeenCalledWith({ queryKey });
+    client.invalidateQueries.mockClear();
+    act(() =>
+      TestSocket.instances[0].onmessage?.({
+        data: JSON.stringify({
+          type: "PROJECT_FIELD_VALUES_CHANGED",
+          workspaceId: "workspace",
+        }),
+      }),
+    );
+    for (const queryKey of [
+      ["project-field-values"],
+      ["project-field-table", "workspace"],
+    ])
+      expect(client.invalidateQueries).toHaveBeenCalledWith({ queryKey });
+  });
+
   it("refreshes project lists in every tab after a project access change", () => {
     renderHook(useUserWebSocket);
     act(() => projectAccessChanged(TestSocket.instances[0]));

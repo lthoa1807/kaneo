@@ -46,6 +46,7 @@ describe("buildSettingsNav", () => {
     expect(links(build({ canImport: true, billingEnabled: true }))).toEqual([
       "/dashboard/settings/workspace/general",
       "/dashboard/settings/workspace/roles",
+      "/dashboard/settings/workspace/project-fields",
       "/dashboard/settings/workspace/labels",
       "/dashboard/settings/workspace/import",
       "/dashboard/settings/workspace/billing",

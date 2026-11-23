@@ -2,12 +2,12 @@ import { Autocomplete } from "@base-ui/react/autocomplete";
 import { Check, X } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { CustomFieldDefinition } from "@/components/project/custom-fields/types";
+import type { EditableFieldDefinition } from "@/components/custom-fields/editable-field";
 import { cn } from "@/lib/cn";
 import { CheckboxMark } from "./checkbox-mark";
 
 type OptionFieldEditorProps = {
-  field: CustomFieldDefinition;
+  field: EditableFieldDefinition;
   selected: string[];
   onToggle: (option: string) => void;
   onClear: () => void;

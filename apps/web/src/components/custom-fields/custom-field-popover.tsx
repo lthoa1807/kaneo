@@ -1,5 +1,5 @@
 import { type ReactElement, useState } from "react";
-import type { CustomFieldDefinition } from "@/components/project/custom-fields/types";
+import type { EditableFieldDefinition } from "@/components/custom-fields/editable-field";
 import {
   Popover,
   PopoverContent,
@@ -12,7 +12,7 @@ import { parseMultiselect } from "./parse-multiselect";
 import { TextFieldEditor } from "./text-field-editor";
 
 type CustomFieldPopoverProps = {
-  field: CustomFieldDefinition;
+  field: EditableFieldDefinition;
   value: string;
   onChange: (value: string) => void;
   side?: "bottom" | "left";
