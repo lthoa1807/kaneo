@@ -39,11 +39,11 @@ async function createTask(projectId: string, status: string) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-        title: "Ticket",
-        description: "",
-        priority: "low",
-        status,
-      }),
+      title: "Ticket",
+      description: "",
+      priority: "low",
+      status,
+    }),
   });
   expect(response.status).toBe(200);
   return (await response.json()) as { id: string };

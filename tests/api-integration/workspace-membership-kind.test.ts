@@ -125,9 +125,7 @@ it("hides guests from an assignable member query", async () => {
   );
   expect(assignable.status).toBe(200);
   expect(
-    ((await assignable.json()) as { id: string }[])
-      .map((row) => row.id)
-      .sort(),
+    ((await assignable.json()) as { id: string }[]).map((row) => row.id).sort(),
   ).toEqual([owner.user.id, member.user.id].sort());
 
   const unfiltered = await app.request(
