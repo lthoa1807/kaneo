@@ -538,6 +538,10 @@
           "includeSubtasks": {
             "type": "boolean"
           },
+          "intakeEnabled": {
+            "type": "boolean",
+            "description": "When true the project accepts guest intake requests."
+          },
           "workspaceId": {
             "type": "string"
           },
@@ -573,6 +577,7 @@
           "icon",
           "description",
           "isPublic",
+          "intakeEnabled",
           "workspaceId",
           "backgroundVersion",
           "columns",
