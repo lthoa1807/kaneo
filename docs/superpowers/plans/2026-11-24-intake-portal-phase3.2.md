@@ -29,11 +29,11 @@ The spec defines the flag and its "toggled off" edge case but never says how a p
 
 **Files:** `apps/api/src/project/schema.ts`, `apps/api/src/project/controllers/update-project.ts`, `apps/api/src/project/index.ts`, `apps/api/src/project/response.ts`, `tests/api-integration/project-intake-flag.test.ts`
 
-- [ ] **Step 1: Write the failing integration test.** New file `project-intake-flag.test.ts`: create a project through the API, assert `intakeEnabled` is `false` in the create/GET response; `PUT /project/{id}` with `intakeEnabled: true`; assert the response and a fresh `GET /project/{id}` both say `true`. Then flip it back with `false` and assert again.
-- [ ] **Step 2: Declare the field on the response.** `projectSchema` gains `intakeEnabled: z.boolean()`. `toPublicProject` already passes every non-background column through, so no mapping change is needed.
-- [ ] **Step 3: Accept it on update.** `updateProjectBody` gains `intakeEnabled: z.boolean().optional()`; the controller takes it as a trailing optional argument and spreads it into the update exactly like `includeSubtasks`; the route handler destructures and forwards it.
-- [ ] **Step 4: Run the test.** `pnpm --filter @kaneo/api exec vp test run --config vitest.integration.config.ts ../../tests/api-integration/project-intake-flag.test.ts` — passes.
-- [ ] **Step 5: Commit.** `feat(api): let a project turn intake on`
+- [x] **Step 1: Write the failing integration test.** New file `project-intake-flag.test.ts`: create a project through the API, assert `intakeEnabled` is `false` in the create/GET response; `PUT /project/{id}` with `intakeEnabled: true`; assert the response and a fresh `GET /project/{id}` both say `true`. Then flip it back with `false` and assert again.
+- [x] **Step 2: Declare the field on the response.** `projectSchema` gains `intakeEnabled: z.boolean()`. `toPublicProject` already passes every non-background column through, so no mapping change is needed.
+- [x] **Step 3: Accept it on update.** `updateProjectBody` gains `intakeEnabled: z.boolean().optional()`; the controller takes it as a trailing optional argument and spreads it into the update exactly like `includeSubtasks`; the route handler destructures and forwards it.
+- [x] **Step 4: Run the test.** `pnpm --filter @kaneo/api exec vp test run --config vitest.integration.config.ts ../../tests/api-integration/project-intake-flag.test.ts` — passes.
+- [x] **Step 5: Commit.** `feat(api): let a project turn intake on`
 
 ## Task 2: The project settings switch
 
@@ -41,18 +41,18 @@ The spec defines the flag and its "toggled off" edge case but never says how a p
 
 The switch follows the `includeSubtasks` precedent, so it rides the existing autosave: one field in the form values, one dirty check, one payload key.
 
-- [ ] **Step 1: Carry the value through the form.** `ProjectFormValues` and `NormalizedProjectValues` gain `intakeEnabled?: boolean`; `normalizeProjectValues` maps `data.intakeEnabled ?? false`; `getProjectFieldChanges` compares `(last?.intakeEnabled ?? false) !== (next.intakeEnabled ?? false)`.
-- [ ] **Step 2: Send it.** `use-project-autosave.ts` seeds the form from `project.intakeEnabled ?? false`, includes it in the reset values and in the `updateProject` payload only when it changed, and lists it in the callback dependencies. `update-project.ts` forwards `intakeEnabled`.
-- [ ] **Step 3: Render the row.** In `project-details-section.tsx`, a `SettingsFormRow` above "include subtasks": label `settings:projectGeneral.acceptIntake`, description `settings:projectGeneral.acceptIntakeHint`, `Switch` bound to the field, `disabled={!canEdit}`.
-- [ ] **Step 4: Add the two keys** by editing `i18n/en-US.json` in place, then `pnpm i18n:check:fix && pnpm i18n:schema && pnpm i18n:check`.
-- [ ] **Step 5: Commit.** `feat(web): enable intake from project settings`
+- [x] **Step 1: Carry the value through the form.** `ProjectFormValues` and `NormalizedProjectValues` gain `intakeEnabled?: boolean`; `normalizeProjectValues` maps `data.intakeEnabled ?? false`; `getProjectFieldChanges` compares `(last?.intakeEnabled ?? false) !== (next.intakeEnabled ?? false)`.
+- [x] **Step 2: Send it.** `use-project-autosave.ts` seeds the form from `project.intakeEnabled ?? false`, includes it in the reset values and in the `updateProject` payload only when it changed, and lists it in the callback dependencies. `update-project.ts` forwards `intakeEnabled`.
+- [x] **Step 3: Render the row.** In `project-details-section.tsx`, a `SettingsFormRow` above "include subtasks": label `settings:projectGeneral.acceptIntake`, description `settings:projectGeneral.acceptIntakeHint`, `Switch` bound to the field, `disabled={!canEdit}`.
+- [x] **Step 4: Add the two keys** by editing `i18n/en-US.json` in place, then `pnpm i18n:check:fix && pnpm i18n:schema && pnpm i18n:check`.
+- [x] **Step 5: Commit.** `feat(web): enable intake from project settings`
 
 ## Task 3: Guest-facing copy
 
 **Files:** `i18n/en-US.json`
 
-- [ ] **Step 1: Stop calling a guest a team member.** `invitations:toast.acceptSuccess` and `auth:invitation.toast.acceptSuccess` currently read "Invitation accepted! Welcome to the team." A guest joins no team and reaches no board. Replace both with "Invitation accepted — you can start from the sidebar." so the wording is true for every role.
-- [ ] **Step 2: Sync and commit.** `pnpm i18n:check:fix && pnpm i18n:schema && pnpm i18n:check`, then `fix(i18n): neutral invitation-accepted copy`.
+- [x] **Step 1: Stop calling a guest a team member.** `invitations:toast.acceptSuccess` and `auth:invitation.toast.acceptSuccess` currently read "Invitation accepted! Welcome to the team." A guest joins no team and reaches no board. Replace both with "Invitation accepted — you can start from the sidebar." so the wording is true for every role.
+- [x] **Step 2: Sync and commit.** `pnpm i18n:check:fix && pnpm i18n:schema && pnpm i18n:check`, then `fix(i18n): neutral invitation-accepted copy`.
 
 ## Verification
 
