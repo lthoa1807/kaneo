@@ -43,6 +43,9 @@ import ProjectAccessFields from "./project-access-fields";
 type Props = {
   open: boolean;
   onClose: () => void;
+  // Guests are always bounded to selected projects; a separate entry opens this
+  // dialog in guest mode rather than duplicating the whole form.
+  mode?: "member" | "guest";
 };
 
 const teamMemberSchema = z.object({
@@ -51,7 +54,8 @@ const teamMemberSchema = z.object({
 
 type TeamMemberFormValues = z.infer<typeof teamMemberSchema>;
 
-function InviteTeamMemberModal({ open, onClose }: Props) {
+function InviteTeamMemberModal({ open, onClose, mode = "member" }: Props) {
+  const isGuest = mode === "guest";
   const { t } = useTranslation();
   const { mutateAsync } = useInviteWorkspaceUser();
   const queryClient = useQueryClient();
@@ -72,7 +76,9 @@ function InviteTeamMemberModal({ open, onClose }: Props) {
   );
   const projectAccess =
     chosenAccess ??
-    (inviterLimited ? SELECTED_PROJECTS_ACCESS : ALL_PROJECTS_ACCESS);
+    (isGuest || inviterLimited
+      ? SELECTED_PROJECTS_ACCESS
+      : ALL_PROJECTS_ACCESS);
   const [showProjectAccessError, setShowProjectAccessError] = useState(false);
   const { data: projects, isLoading: isLoadingProjects } = useGetProjects({
     workspaceId: workspaceId ?? "",
@@ -111,9 +117,9 @@ function InviteTeamMemberModal({ open, onClose }: Props) {
       const invitation = await mutateAsync({
         email,
         workspaceId,
-        role: "member",
+        role: isGuest ? "guest" : "member",
         ...access,
-      }); // TODO: role and email
+      });
       await queryClient.refetchQueries({
         queryKey: ["workspace-users", workspaceId],
       });
@@ -168,7 +174,9 @@ function InviteTeamMemberModal({ open, onClose }: Props) {
           <DialogTitle>
             {createdInvitation
               ? t("team:inviteModal.createdTitle")
-              : t("team:inviteModal.title")}
+              : t(
+                  isGuest ? "team:inviteGuest.title" : "team:inviteModal.title",
+                )}
           </DialogTitle>
         </DialogHeader>
 
@@ -210,7 +218,7 @@ function InviteTeamMemberModal({ open, onClose }: Props) {
                   )}
                 />
                 <ProjectAccessFields
-                  allowAll={!inviterLimited}
+                  allowAll={!isGuest && !inviterLimited}
                   value={projectAccess}
                   onChange={(next) => {
                     setProjectAccess(next);

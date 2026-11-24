@@ -125,6 +125,74 @@ describe("invitation email delivery errors", () => {
   });
 });
 
+describe("guest invitations", () => {
+  beforeEach(() => {
+    inviteMember.mockResolvedValue({ data: { id: "invite-1" }, error: null });
+  });
+
+  async function fillEmail() {
+    fireEvent.change(
+      await screen.findByPlaceholderText("team:inviteModal.emailPlaceholder"),
+      { target: { value: "guest@example.com" } },
+    );
+  }
+
+  function submit() {
+    fireEvent.click(
+      screen.getByRole("button", { name: "team:inviteModal.sendInvitation" }),
+    );
+  }
+
+  it("starts on selected projects and cannot grant every project", async () => {
+    render(<InviteTeamMemberModal mode="guest" open onClose={vi.fn()} />, {
+      wrapper,
+    });
+    await fillEmail();
+
+    expect(
+      screen.getByRole("radio", { name: /team:projectAccess.allProjects/ }),
+    ).toHaveAttribute("aria-disabled", "true");
+    expect(
+      screen.getByRole("radio", {
+        name: /team:projectAccess.selectedProjects/,
+      }),
+    ).toHaveAttribute("aria-checked", "true");
+  });
+
+  it("refuses to invite a guest before a project is chosen", async () => {
+    render(<InviteTeamMemberModal mode="guest" open onClose={vi.fn()} />, {
+      wrapper,
+    });
+    await fillEmail();
+    submit();
+
+    expect(
+      await screen.findByText("team:projectAccess.selectAtLeastOne"),
+    ).toBeVisible();
+    expect(inviteMember).not.toHaveBeenCalled();
+  });
+
+  it("invites with the guest role and the chosen projects", async () => {
+    render(<InviteTeamMemberModal mode="guest" open onClose={vi.fn()} />, {
+      wrapper,
+    });
+    await fillEmail();
+    fireEvent.click(screen.getByRole("checkbox", { name: "Beta" }));
+    submit();
+
+    await waitFor(() =>
+      expect(inviteMember).toHaveBeenCalledWith(
+        expect.objectContaining({
+          email: "guest@example.com",
+          role: "guest",
+          projectAccess: "selected",
+          projectIds: ["project-b"],
+        }),
+      ),
+    );
+  });
+});
+
 describe("invitation project access", () => {
   beforeEach(() => {
     inviteMember.mockResolvedValue({ data: { id: "invite-1" }, error: null });
