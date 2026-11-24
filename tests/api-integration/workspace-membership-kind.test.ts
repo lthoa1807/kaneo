@@ -56,6 +56,7 @@ it("answers staff for a custom role that has intake but no task permissions", as
   const response = await getMembership(staff.workspace.id);
   expect(response.status).toBe(200);
   expect(await response.json()).toEqual({
+    workspaceName: expect.any(String),
     kind: "staff",
     role: "intake-only",
   });
@@ -65,6 +66,7 @@ it("answers staff for the owner and for an instance admin without a membership",
   const owner = await createWorkspaceMember({ role: "owner" });
   mockAuthenticatedSession(owner.user);
   expect(await (await getMembership(owner.workspace.id)).json()).toEqual({
+    workspaceName: expect.any(String),
     kind: "staff",
     role: "owner",
   });
@@ -76,6 +78,7 @@ it("answers staff for the owner and for an instance admin without a membership",
     .where(eq(schema.userTable.id, outsider.user.id));
   mockAuthenticatedSession({ ...outsider.user, role: "admin" });
   expect(await (await getMembership(owner.workspace.id)).json()).toEqual({
+    workspaceName: expect.any(String),
     kind: "staff",
     role: null,
   });
