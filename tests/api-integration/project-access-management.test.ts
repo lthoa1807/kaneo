@@ -619,7 +619,11 @@ describe("guest invitations", () => {
     expect(accepted.status).toBe(200);
     expect(
       await (await request(`/workspace/${ctx.workspaceId}/membership`)).json(),
-    ).toEqual({ kind: "guest", role: "guest" });
+    ).toEqual({
+      workspaceName: expect.any(String),
+      kind: "guest",
+      role: "guest",
+    });
     const rows = await readMemberAccessRows(ctx.workspaceId, invitee.userId);
     expect(rows.rules.map((rule) => rule.projectAccess)).toEqual(["selected"]);
     expect(rows.grants.map((grant) => grant.projectId)).toEqual([ctx.alpha.id]);

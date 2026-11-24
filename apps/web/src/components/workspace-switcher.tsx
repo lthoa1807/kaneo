@@ -27,6 +27,7 @@ import { Kbd } from "@/components/ui/kbd";
 import { getModifierKeyText } from "@/lib/shortcuts/platform";
 import { useShortcut } from "@/lib/shortcuts/use-shortcut";
 import { authClient } from "@/lib/auth-client";
+import { navForSurfaces } from "@/components/intake/intake-surfaces";
 import { useIntakeSurfaces } from "@/hooks/use-intake-surfaces";
 import { hasInstanceAdminRole } from "@/lib/instance-admin";
 import type { Workspace } from "@/types/workspace";
@@ -194,7 +195,7 @@ export function WorkspaceSwitcher() {
 
         <div className="flex items-center gap-0.5">
           {/* Search reads the workspace list and projects, both closed to guests. */}
-          {surfaces.staffNav ? <Search /> : null}
+          {navForSurfaces(surfaces).staffNav ? <Search /> : null}
           <div className="h-8 w-8 shrink-0">
             <UserAvatar />
           </div>

@@ -42,7 +42,11 @@ it("answers guest for a guest member with no task permissions", async () => {
 
   const response = await getMembership(guest.workspace.id);
   expect(response.status).toBe(200);
-  expect(await response.json()).toEqual({ kind: "guest", role: "guest" });
+  expect(await response.json()).toEqual({
+    workspaceName: expect.any(String),
+    kind: "guest",
+    role: "guest",
+  });
 });
 
 it("answers staff for a custom role that has intake but no task permissions", async () => {

@@ -16,6 +16,7 @@ const request: IntakeRequest = {
   id: "request-1",
   projectId: "project-1",
   projectName: "Portal",
+  projectSlug: "PE",
   number: 1,
   displayId: "REQ-1",
   title: "Export invoices",
