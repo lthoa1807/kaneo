@@ -303,7 +303,7 @@
 			"signIn": "Sign in",
 			"toast": {
 				"acceptFailed": "Failed to accept invitation",
-				"acceptSuccess": "Invitation accepted! Welcome to the team."
+				"acceptSuccess": "Invitation accepted — you can start from the sidebar."
 			},
 			"description": "{{inviterName}} invited you to this workspace on Kaneo.",
 			"invitedBy": "Invited by",
@@ -1820,6 +1820,8 @@
 			"title": "General",
 			"subtitle": "The name, key, and look of {{name}}.",
 			"projectInfoTitle": "Project",
+			"acceptIntake": "Accept guest requests",
+			"acceptIntakeHint": "Guests with access to this project can submit requests. Turning it off keeps the requests already made.",
 			"iconLabel": "Icon",
 			"iconHint": "Shown in the sidebar and project lists.",
 			"pickIconTitle": "Pick icon",
@@ -3982,7 +3984,7 @@
 		},
 		"toast": {
 			"acceptError": "Failed to accept invitation",
-			"acceptSuccess": "Invitation accepted! Welcome to the team.",
+			"acceptSuccess": "Invitation accepted — you can start from the sidebar.",
 			"rejectError": "Failed to reject invitation",
 			"rejectSuccess": "Invitation rejected"
 		}
@@ -4180,16 +4182,109 @@
 			"manage": "Manage workspaces"
 		}
 	},
+	"intake": {
+		"status": {
+			"new": "New",
+			"triaged": "Triaged",
+			"rejected": "Rejected",
+			"approved": "Approved",
+			"in_progress": "In progress",
+			"delivered": "Delivered",
+			"needs_revision": "Needs revision",
+			"confirmed": "Confirmed"
+		},
+		"list": {
+			"empty": "No requests yet",
+			"loadError": "Could not load requests",
+			"retry": "Try again"
+		},
+		"portal": {
+			"nav": "My requests",
+			"title": "My requests",
+			"all": "All",
+			"newRequest": "New request"
+		},
+		"detail": {
+			"descriptionEmpty": "No description",
+			"action": {
+				"confirmed": "Looks good, confirm",
+				"needs_revision": "Request changes",
+				"triaged": "Mark triaged",
+				"approved": "Approve",
+				"rejected": "Reject",
+				"in_progress": "Start work",
+				"delivered": "Mark delivered"
+			},
+			"revisionTitle": "Request changes",
+			"revisionDescription": "Tell us what needs to change. We will pick the request up again.",
+			"confirmedOn": "Confirmed on {{date}}",
+			"created": "Request created",
+			"status_changed": "Status changed",
+			"task_linked": "Task linked",
+			"confirmed": "Confirmed",
+			"tasksProgress": "{{done}} of {{total}} tasks done",
+			"activity": "Activity",
+			"activityEmpty": "No activity yet"
+		},
+		"form": {
+			"title": "New request",
+			"description": "Tell us what you need. We will review it and reply here.",
+			"titleLabel": "Title",
+			"titlePlaceholder": "What do you need?",
+			"descriptionLabel": "Details",
+			"descriptionPlaceholder": "Add any detail that helps us understand the request",
+			"projectLabel": "Project",
+			"projectPlaceholder": "Choose a project",
+			"submit": "Send request",
+			"submitting": "Sending…",
+			"success": "Request sent",
+			"error": "Could not send the request"
+		},
+		"note": {
+			"placeholder": "Add a note",
+			"confirm": "Confirm"
+		},
+		"errors": {
+			"loadFailed": "Could not load this request",
+			"transitionFailed": "Could not change the status",
+			"transitionConflict": "Someone else just changed this request. Reloading."
+		},
+		"staff": {
+			"tab": "Intake",
+			"title": "Intake requests",
+			"group": {
+				"triage": "Needs triage",
+				"progress": "In progress",
+				"awaiting": "Awaiting guest",
+				"closed": "Closed"
+			},
+			"truncated": "Showing {{shown}} of {{total}} requests — filter by status to narrow",
+			"linkedTasks": "Linked tasks",
+			"attachTask": "Attach task",
+			"attachTitle": "Attach a task",
+			"attachDescription": "Create the task that fulfils this request. It stays linked to the request.",
+			"attachSubmit": "Create and link",
+			"attachSuccess": "Task attached",
+			"attachError": "Could not attach the task",
+			"taskTitle": "Task title",
+			"status": "Status",
+			"priority": "Priority",
+			"rejectTitle": "Reject request",
+			"rejectDescription": "Tell the guest why this request is rejected. The note appears in their activity."
+		}
+	},
 	"team": {
 		"roles": {
 			"owner": "Owner",
 			"admin": "Admin",
 			"member": "Member",
-			"viewer": "Viewer"
+			"viewer": "Viewer",
+			"guest": "Guest"
 		},
 		"members": {
 			"pageTitle": "Members",
 			"inviteMember": "Invite member",
+			"inviteGuest": "Invite guest",
 			"you": "You"
 		},
 		"invitations": {
@@ -4199,6 +4294,9 @@
 			"copyLink": "Copy link",
 			"linkCopied": "Invitation link copied",
 			"copyFailed": "Couldn't copy automatically. Select the link and press Ctrl+C."
+		},
+		"inviteGuest": {
+			"title": "Invite a guest"
 		},
 		"inviteModal": {
 			"title": "Invite Team Member",
@@ -4244,6 +4342,7 @@
 			"allProjects": "All projects",
 			"allProjectsDescription": "Access every project in this workspace, including new ones.",
 			"allProjectsUnavailable": "Your own access is limited, so you can only give access to selected projects.",
+			"allProjectsUnavailableGuest": "Guests only get access to the projects you choose.",
 			"selectedProjects": "Selected projects",
 			"selectedProjectsDescription": "Only access the projects you choose.",
 			"projectsLabel": "Projects",

@@ -25,6 +25,10 @@ export const updateProjectBody = z.object({
   description: z.string(),
   isPublic: z.boolean(),
   includeSubtasks: z.boolean().optional(),
+  intakeEnabled: z.boolean().optional().openapi({
+    description:
+      "When true the project accepts guest intake requests. Access grants visibility; this flag gates submission.",
+  }),
 });
 
 export const reorderProjectsBody = z.object({

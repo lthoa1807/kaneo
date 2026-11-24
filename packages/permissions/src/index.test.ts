@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vite-plus/test";
+import { memberAc } from "better-auth/plugins/organization/access";
 import {
   ac,
   admin,
   builtInRoles,
   DEFAULT_ROLE_NAMES,
   defaultRolePayloads,
+  guest,
   member,
   owner,
   statement,
@@ -85,9 +87,10 @@ describe("built-in role privileges", () => {
     );
   });
 
-  it("groups all four roles under builtInRoles by name", () => {
+  it("groups all built-in roles under builtInRoles by name", () => {
     expect(Object.keys(builtInRoles).sort()).toEqual([
       "admin",
+      "guest",
       "member",
       "owner",
       "viewer",
@@ -101,10 +104,11 @@ describe("built-in role privileges", () => {
 
 describe("default-role seed payloads", () => {
   it("names the seedable defaults but excludes owner (kept as static role)", () => {
-    expect(DEFAULT_ROLE_NAMES).toEqual(["viewer", "member", "admin"]);
+    expect(DEFAULT_ROLE_NAMES).toEqual(["viewer", "member", "admin", "guest"]);
     expect(DEFAULT_ROLE_NAMES).not.toContain("owner");
     expect(Object.keys(defaultRolePayloads).sort()).toEqual([
       "admin",
+      "guest",
       "member",
       "viewer",
     ]);
@@ -136,5 +140,56 @@ describe("default-role seed payloads", () => {
     // role object's statements are decoupled (we only mutated the copy).
     expect(memberPayload.task).toContain("__test_marker");
     expect(member.statements.task).not.toContain("__test_marker");
+  });
+});
+
+describe("intake permission vocabulary", () => {
+  it("adds intakeRequest to the statement surface", () => {
+    expect(statement.intakeRequest).toEqual([
+      "create",
+      "read",
+      "update",
+      "manage",
+    ]);
+  });
+
+  it("gives staff roles the manage set and viewer read-only", () => {
+    expect(viewer.statements.intakeRequest).toEqual(["read"]);
+    expect(member.statements.intakeRequest).toEqual([
+      "create",
+      "read",
+      "update",
+      "manage",
+    ]);
+    expect(admin.statements.intakeRequest).toEqual([
+      "create",
+      "read",
+      "update",
+      "manage",
+    ]);
+    expect(owner.statements.intakeRequest).toEqual([
+      "create",
+      "read",
+      "update",
+      "manage",
+    ]);
+  });
+
+  it("seeds a guest role with no internal surface", () => {
+    expect(guest.statements).toEqual({
+      ...memberAc.statements,
+      intakeRequest: ["create", "read", "update"],
+    });
+    expect(builtInRoles.guest).toBe(guest);
+    expect(DEFAULT_ROLE_NAMES).toContain("guest");
+    expect(defaultRolePayloads.guest.intakeRequest).toEqual([
+      "create",
+      "read",
+      "update",
+    ]);
+    // No Kaneo internal surface: memberAc has no project/task keys, so the
+    // payload omits them entirely (absent key === no actions granted).
+    expect(defaultRolePayloads.guest.project).toBeUndefined();
+    expect(defaultRolePayloads.guest.task).toBeUndefined();
   });
 });

@@ -65,6 +65,8 @@ async function createTask({
   recurrence,
   customFields,
   draftAssetIds,
+  intakeRequestId,
+  withinTransaction,
 }: {
   projectId: string;
   currentUserId: string;
@@ -78,6 +80,11 @@ async function createTask({
   recurrence?: TaskRecurrence;
   customFields?: CustomFieldInput[];
   draftAssetIds?: string[];
+  intakeRequestId?: string;
+  withinTransaction?: (
+    tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
+    task: typeof taskTable.$inferSelect,
+  ) => Promise<unknown>;
 }) {
   const resolvedStatus = status || "to-do";
   const resolvedPriority = priority || "no-priority";
@@ -184,6 +191,7 @@ async function createTask({
         recurrence: recurrence ?? null,
         number: taskNumber,
         position: nextPosition,
+        intakeRequestId: intakeRequestId ?? null,
       })
       .returning();
 
@@ -233,6 +241,10 @@ async function createTask({
           value: value.trim(),
         })),
       );
+    }
+
+    if (task && withinTransaction) {
+      await withinTransaction(tx, task);
     }
 
     return task;

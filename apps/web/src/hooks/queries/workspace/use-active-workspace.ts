@@ -1,5 +1,6 @@
 import { useParams } from "@tanstack/react-router";
 import { authClient } from "@/lib/auth-client";
+import useGetWorkspaceMembership from "./use-get-workspace-membership";
 
 function useActiveWorkspace() {
   const { data: activeOrganization, error } =
@@ -16,10 +17,22 @@ function useActiveWorkspace() {
     }),
   });
 
+  const membership = useGetWorkspaceMembership(workspaceId);
   const workspaceFromRoute = workspaceId
     ? organizations?.find((organization) => organization.id === workspaceId)
     : undefined;
-  const workspace = workspaceFromRoute ?? activeOrganization;
+  // A guest holds no workspace:read, so /organization/list omits the workspace
+  // they were invited to. The route names it and membership carries the display
+  // name; every other field would 403 anyway.
+  const workspaceFromGuestRoute =
+    workspaceId && !workspaceFromRoute && organizations
+      ? ({
+          id: workspaceId,
+          name: membership.data?.workspaceName ?? workspaceId,
+        } as NonNullable<typeof organizations>[number])
+      : undefined;
+  const workspace =
+    workspaceFromRoute ?? workspaceFromGuestRoute ?? activeOrganization;
   const isLoading =
     (!!workspaceId && isOrganizationsPending && !workspaceFromRoute) ||
     (!workspace && !error);

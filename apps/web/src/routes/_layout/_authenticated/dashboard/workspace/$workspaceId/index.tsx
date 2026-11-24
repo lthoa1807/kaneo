@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -15,6 +15,8 @@ import CreateTaskModal from "@/components/shared/modals/create-task-modal";
 import { Button } from "@/components/ui/button";
 import useGetProjects from "@/hooks/queries/project/use-get-projects";
 import useGetAssignedTasks from "@/hooks/queries/task/use-get-assigned-tasks";
+import { useIntakeSurfaces } from "@/hooks/use-intake-surfaces";
+import { navForSurfaces } from "@/components/intake/intake-surfaces";
 import { useLocalDay } from "@/hooks/use-local-day";
 import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
 import { formatDate } from "@/lib/format";
@@ -29,12 +31,19 @@ function RouteComponent() {
   const { t } = useTranslation();
   const day = useLocalDay();
   const { workspaceId } = Route.useParams();
+  const { surfaces, ready } = useIntakeSurfaces();
+  // Guests hold no task:read or project:read; disable, do not merely unrender,
+  // or the landing page 403s before its redirect runs.
+  const staffNav = navForSurfaces(surfaces).staffNav;
   const {
     data: assigned,
     isLoading,
     isError,
-  } = useGetAssignedTasks(workspaceId);
-  const { data: projects } = useGetProjects({ workspaceId }, true);
+  } = useGetAssignedTasks(workspaceId, false, ready && staffNav);
+  const { data: projects } = useGetProjects(
+    { workspaceId, enabled: ready && staffNav },
+    true,
+  );
   const { canCreateTasks, canCreateProjects } = useWorkspacePermission();
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
@@ -48,6 +57,16 @@ function RouteComponent() {
     afternoon: t("workspace:home.greeting.afternoon"),
     evening: t("workspace:home.greeting.evening"),
   };
+
+  if (ready && surfaces.kind === "guest") {
+    return (
+      <Navigate
+        to="/dashboard/workspace/$workspaceId/my-requests"
+        params={{ workspaceId }}
+        replace
+      />
+    );
+  }
 
   return (
     <>

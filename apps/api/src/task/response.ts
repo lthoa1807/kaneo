@@ -159,6 +159,9 @@ export const boardSchema = z
         }),
         isPublic: z.boolean().nullable(),
         includeSubtasks: z.boolean().optional(),
+        intakeEnabled: z.boolean().optional().openapi({
+          description: "When true the project accepts guest intake requests.",
+        }),
         workspaceId: z.string(),
         backgroundVersion: z.string().nullable(),
         columns: z.array(boardColumnSchema),

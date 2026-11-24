@@ -21,6 +21,10 @@ export const workspaceCapabilities = {
   manageTeam: { member: ["update", "delete"] },
   updateMembers: { member: ["update"] },
   removeMembers: { member: ["delete"] },
+  readIntake: { intakeRequest: ["read"] },
+  createIntakeRequests: { intakeRequest: ["create"] },
+  updateIntake: { intakeRequest: ["update"] },
+  manageIntake: { intakeRequest: ["manage"] },
 } as const satisfies Record<string, Record<string, readonly string[]>>;
 
 export type WorkspaceCapability = keyof typeof workspaceCapabilities;

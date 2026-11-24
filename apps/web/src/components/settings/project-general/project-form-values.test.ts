@@ -20,6 +20,7 @@ describe("normalizeProjectValues", () => {
       description: "",
       icon: "Layout",
       includeSubtasks: true,
+      intakeEnabled: false,
     });
   });
 });
@@ -44,6 +45,23 @@ describe("getProjectFieldChanges", () => {
       description: false,
       icon: false,
       includeSubtasks: false,
+      intakeEnabled: false,
+    });
+  });
+
+  it("flags the intake flag on its own", () => {
+    expect(
+      getProjectFieldChanges(
+        { ...saved, intakeEnabled: false },
+        { ...saved, intakeEnabled: true },
+      ),
+    ).toEqual({
+      name: false,
+      slug: false,
+      description: false,
+      icon: false,
+      includeSubtasks: false,
+      intakeEnabled: true,
     });
   });
 

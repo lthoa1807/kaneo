@@ -24,6 +24,9 @@ export const projectSchema = z
         "Non-null once archived; archived projects are hidden by default.",
     }),
     position: z.number().openapi({ description: "Sidebar order, ascending." }),
+    intakeEnabled: z.boolean().openapi({
+      description: "When true the project accepts guest intake requests.",
+    }),
     lastTaskNumber: z.number().openapi({
       description:
         "Highest task number issued in this project; the next task gets this plus one.",

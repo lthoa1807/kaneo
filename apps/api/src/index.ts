@@ -115,6 +115,7 @@ import { apiKeyResponseHeaders } from "./utils/rate-limit-headers";
 import { readApiKeyCheck, verifyApiKey } from "./utils/verify-api-key";
 import workflowRule from "./workflow-rule";
 import workspace from "./workspace";
+import intake from "./intake";
 import {
   addConnection,
   addUserConnection,
@@ -818,6 +819,7 @@ export function createApp() {
   const projectApi = api.route("/project", project);
   const calendarFeedApi = api.route("/calendar-feed", calendarFeed);
   const taskApi = api.route("/task", task);
+  const intakeApi = api.route("/intake", intake);
   const columnApi = api.route("/column", column);
   const activityApi = api.route("/activity", activity);
   const commentApi = api.route("/comment", comment);
@@ -999,6 +1001,7 @@ export function createApp() {
     gitlabIntegrationApi,
     invitationApi,
     invitationPublicApi,
+    intakeApi,
     labelApi,
     notificationApi,
     notificationPreferencesApi,
@@ -1135,6 +1138,7 @@ const {
   gitlabIntegrationApi,
   invitationApi,
   invitationPublicApi,
+  intakeApi,
   labelApi,
   mattermostIntegrationApi,
   notificationApi,
@@ -1203,6 +1207,7 @@ export type AppType =
   | typeof adminApi
   | typeof publicProjectApi
   | typeof invitationPublicApi
-  | typeof oauthApi;
+  | typeof oauthApi
+  | typeof intakeApi;
 
 export default app;

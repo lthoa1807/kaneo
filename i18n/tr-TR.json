@@ -945,7 +945,9 @@
 				"title": "Project fields",
 				"unset": "Unset",
 				"yes": "Yes"
-			}
+			},
+			"acceptIntake": "Accept guest requests",
+			"acceptIntakeHint": "Guests with access to this project can submit requests. Turning it off keeps the requests already made."
 		},
 		"projectIntegrations": {
 			"pageTitle": "Entegrasyonlar",
@@ -4185,12 +4187,14 @@
 			"owner": "Sahip",
 			"admin": "Yönetici",
 			"member": "Üye",
-			"viewer": "Görüntüleyici"
+			"viewer": "Görüntüleyici",
+			"guest": "Guest"
 		},
 		"members": {
 			"pageTitle": "Üyeler",
 			"inviteMember": "Üye davet et",
-			"you": "Siz"
+			"you": "Siz",
+			"inviteGuest": "Invite guest"
 		},
 		"invitations": {
 			"linkLabel": "Davet bağlantısı",
@@ -4257,7 +4261,11 @@
 			"updateError": "Failed to update project access",
 			"updateSuccess": "Project access updated",
 			"archived": "Archived",
-			"allProjectsUnavailable": "Your own access is limited, so you can only give access to selected projects."
+			"allProjectsUnavailable": "Your own access is limited, so you can only give access to selected projects.",
+			"allProjectsUnavailableGuest": "Guests only get access to the projects you choose."
+		},
+		"inviteGuest": {
+			"title": "Invite a guest"
 		}
 	},
 	"publicProject": {
@@ -5361,6 +5369,97 @@
 		},
 		"permissions": {
 			"photos": "Kaneo, taleplere ve yorumlara görsel eklemek ve profil fotoğrafınız için fotoğraflarınızı kullanır."
+		}
+	},
+	"intake": {
+		"detail": {
+			"activity": "Activity",
+			"activityEmpty": "No activity yet",
+			"confirmed": "Confirmed",
+			"created": "Request created",
+			"descriptionEmpty": "No description",
+			"status_changed": "Status changed",
+			"task_linked": "Task linked",
+			"tasksProgress": "{{done}} of {{total}} tasks done",
+			"action": {
+				"approved": "Approve",
+				"confirmed": "Looks good, confirm",
+				"delivered": "Mark delivered",
+				"in_progress": "Start work",
+				"needs_revision": "Request changes",
+				"rejected": "Reject",
+				"triaged": "Mark triaged"
+			},
+			"confirmedOn": "Confirmed on {{date}}",
+			"revisionDescription": "Tell us what needs to change. We will pick the request up again.",
+			"revisionTitle": "Request changes"
+		},
+		"errors": {
+			"loadFailed": "Could not load this request",
+			"transitionFailed": "Could not change the status",
+			"transitionConflict": "Someone else just changed this request. Reloading."
+		},
+		"form": {
+			"description": "Tell us what you need. We will review it and reply here.",
+			"descriptionLabel": "Details",
+			"descriptionPlaceholder": "Add any detail that helps us understand the request",
+			"error": "Could not send the request",
+			"projectLabel": "Project",
+			"projectPlaceholder": "Choose a project",
+			"submit": "Send request",
+			"submitting": "Sending…",
+			"success": "Request sent",
+			"title": "New request",
+			"titleLabel": "Title",
+			"titlePlaceholder": "What do you need?"
+		},
+		"list": {
+			"empty": "No requests yet",
+			"loadError": "Could not load requests",
+			"retry": "Try again"
+		},
+		"note": {
+			"confirm": "Confirm",
+			"placeholder": "Add a note"
+		},
+		"status": {
+			"approved": "Approved",
+			"confirmed": "Confirmed",
+			"delivered": "Delivered",
+			"in_progress": "In progress",
+			"needs_revision": "Needs revision",
+			"new": "New",
+			"rejected": "Rejected",
+			"triaged": "Triaged"
+		},
+		"portal": {
+			"all": "All",
+			"nav": "My requests",
+			"newRequest": "New request",
+			"title": "My requests"
+		},
+		"staff": {
+			"attachDescription": "Create the task that fulfils this request. It stays linked to the request.",
+			"attachError": "Could not attach the task",
+			"attachSubmit": "Create and link",
+			"attachSuccess": "Task attached",
+			"attachTask": "Attach task",
+			"attachTitle": "Attach a task",
+			"group": {
+				"awaiting": "Awaiting guest",
+				"closed": "Closed",
+				"progress": "In progress",
+				"triage": "Needs triage"
+			},
+			"linkedTasks": "Linked tasks",
+			"priority": "Priority",
+			"rejectDescription": "Tell the guest why this request is rejected. The note appears in their activity.",
+			"rejectTitle": "Reject request",
+			"status": "Status",
+			"tab": "Intake",
+			"taskTitle": "Task title",
+			"title": "Intake requests",
+			"truncated": "Showing {{shown}} of {{total}} requests — filter by status to narrow"
 		}
 	}
 }

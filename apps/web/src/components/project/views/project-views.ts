@@ -10,13 +10,19 @@ import type { TaskLayout } from "@/store/user-preferences";
 
 export type ProjectView = "board" | "list" | "backlog" | "calendar" | "gantt";
 
-export type ProjectRoute = "board" | "backlog" | "calendar" | "gantt";
+export type ProjectRoute =
+  | "board"
+  | "backlog"
+  | "calendar"
+  | "gantt"
+  | "intake";
 
 export const PROJECT_ROUTE_PATHS = {
   board: "/dashboard/workspace/$workspaceId/project/$projectId/board",
   backlog: "/dashboard/workspace/$workspaceId/project/$projectId/backlog",
   calendar: "/dashboard/workspace/$workspaceId/project/$projectId/calendar",
   gantt: "/dashboard/workspace/$workspaceId/project/$projectId/gantt",
+  intake: "/dashboard/workspace/$workspaceId/project/$projectId/intake",
 } as const;
 
 export const PROJECT_VIEWS: ReadonlyArray<{
@@ -56,7 +62,7 @@ export function routeForView(view: ProjectView): ProjectRoute {
 }
 
 export function resolveProjectView(
-  route: ProjectRoute,
+  route: Exclude<ProjectRoute, "intake">,
   viewMode: "board" | "list",
 ): ProjectView {
   return route === "board" ? viewMode : route;

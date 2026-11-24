@@ -13,6 +13,7 @@ describe("getAssignableRoleOptions", () => {
       "viewer",
       "member",
       "admin",
+      "guest",
     ]);
   });
 
@@ -21,6 +22,7 @@ describe("getAssignableRoleOptions", () => {
       "viewer",
       "member",
       "admin",
+      "guest",
       "Designer",
     ]);
     expect(getAssignableRoleOptions(["viewer"], "viewer")).toEqual(["viewer"]);

@@ -7,7 +7,7 @@ import queryClient from "@/query-client";
 type InviteWorkspaceUserRequest = {
   workspaceId: string;
   email: string;
-  role: "admin" | "member" | "owner";
+  role: "admin" | "member" | "owner" | "guest";
   resend?: boolean;
   projectAccess?: "all" | "selected";
   projectIds?: string[];

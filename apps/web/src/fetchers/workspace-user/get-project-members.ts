@@ -12,7 +12,8 @@ async function getProjectMembers({
 }: GetProjectMembersRequest) {
   const response = await client.workspace[":workspaceId"].members.$get({
     param: { workspaceId },
-    query: { projectId },
+    // Guests never take assignments; keep them out of the assignee picker.
+    query: { projectId, assignable: "true" },
   });
 
   if (!response.ok) {

@@ -6131,287 +6131,6 @@
 						"loadError"
 					]
 				},
-				"workspaceProjectFields": {
-					"type": "object",
-					"additionalProperties": false,
-					"properties": {
-						"title": {
-							"type": "string"
-						},
-						"pageTitle": {
-							"type": "string"
-						},
-						"subtitle": {
-							"type": "string"
-						},
-						"newField": {
-							"type": "string"
-						},
-						"emptyTitle": {
-							"type": "string"
-						},
-						"emptyDescription": {
-							"type": "string"
-						},
-						"loadError": {
-							"type": "string"
-						},
-						"nameLabel": {
-							"type": "string"
-						},
-						"namePlaceholder": {
-							"type": "string"
-						},
-						"typeLabel": {
-							"type": "string"
-						},
-						"requiredLabel": {
-							"type": "string"
-						},
-						"requiredHint": {
-							"type": "string"
-						},
-						"defaultValueLabel": {
-							"type": "string"
-						},
-						"defaultValueHint": {
-							"type": "string"
-						},
-						"optionsLabel": {
-							"type": "string"
-						},
-						"optionsHint": {
-							"type": "string"
-						},
-						"optionsPlaceholder": {
-							"type": "string"
-						},
-						"formulaLabel": {
-							"type": "string"
-						},
-						"formulaHint": {
-							"type": "string"
-						},
-						"createField": {
-							"type": "string"
-						},
-						"saveField": {
-							"type": "string"
-						},
-						"editField": {
-							"type": "string"
-						},
-						"deleteField": {
-							"type": "string"
-						},
-						"deleteTitle": {
-							"type": "string"
-						},
-						"deleteDescription": {
-							"type": "string"
-						},
-						"deleteUsage": {
-							"type": "string"
-						},
-						"deleteBlocked": {
-							"type": "string"
-						},
-						"deleteConfirm": {
-							"type": "string"
-						},
-						"usageUnavailable": {
-							"type": "string"
-						},
-						"createSuccess": {
-							"type": "string"
-						},
-						"updateSuccess": {
-							"type": "string"
-						},
-						"deleteSuccess": {
-							"type": "string"
-						},
-						"createError": {
-							"type": "string"
-						},
-						"updateError": {
-							"type": "string"
-						},
-						"deleteError": {
-							"type": "string"
-						},
-						"nameRequired": {
-							"type": "string"
-						},
-						"duplicateName": {
-							"type": "string"
-						},
-						"optionsRequired": {
-							"type": "string"
-						},
-						"formulaRequired": {
-							"type": "string"
-						},
-						"moveUp": {
-							"type": "string"
-						},
-						"moveDown": {
-							"type": "string"
-						},
-						"requiredBadge": {
-							"type": "string"
-						},
-						"formulaOperation": {
-							"type": "string"
-						},
-						"formulaSource": {
-							"type": "string"
-						},
-						"formulaTarget": {
-							"type": "string"
-						},
-						"formulaAmount": {
-							"type": "string"
-						},
-						"formulaUnit": {
-							"type": "string"
-						},
-						"formulaLeft": {
-							"type": "string"
-						},
-						"formulaRight": {
-							"type": "string"
-						},
-						"unitDay": {
-							"type": "string"
-						},
-						"unitMonth": {
-							"type": "string"
-						},
-						"operationDateDiff": {
-							"type": "string"
-						},
-						"operationDateAdd": {
-							"type": "string"
-						},
-						"operationNumber": {
-							"type": "string"
-						},
-						"operatorAdd": {
-							"type": "string"
-						},
-						"operatorSubtract": {
-							"type": "string"
-						},
-						"operatorMultiply": {
-							"type": "string"
-						},
-						"operatorDivide": {
-							"type": "string"
-						},
-						"types": {
-							"type": "object",
-							"additionalProperties": false,
-							"properties": {
-								"text": {
-									"type": "string"
-								},
-								"long_text": {
-									"type": "string"
-								},
-								"number": {
-									"type": "string"
-								},
-								"date": {
-									"type": "string"
-								},
-								"dropdown": {
-									"type": "string"
-								},
-								"multiselect": {
-									"type": "string"
-								},
-								"boolean": {
-									"type": "string"
-								},
-								"formula": {
-									"type": "string"
-								}
-							},
-							"required": [
-								"text",
-								"long_text",
-								"number",
-								"date",
-								"dropdown",
-								"multiselect",
-								"boolean",
-								"formula"
-							]
-						}
-					},
-					"required": [
-						"title",
-						"pageTitle",
-						"subtitle",
-						"newField",
-						"emptyTitle",
-						"emptyDescription",
-						"loadError",
-						"nameLabel",
-						"namePlaceholder",
-						"typeLabel",
-						"requiredLabel",
-						"requiredHint",
-						"defaultValueLabel",
-						"defaultValueHint",
-						"optionsLabel",
-						"optionsHint",
-						"optionsPlaceholder",
-						"formulaLabel",
-						"formulaHint",
-						"createField",
-						"saveField",
-						"editField",
-						"deleteField",
-						"deleteTitle",
-						"deleteDescription",
-						"deleteUsage",
-						"deleteBlocked",
-						"deleteConfirm",
-						"usageUnavailable",
-						"createSuccess",
-						"updateSuccess",
-						"deleteSuccess",
-						"createError",
-						"updateError",
-						"deleteError",
-						"nameRequired",
-						"duplicateName",
-						"optionsRequired",
-						"formulaRequired",
-						"moveUp",
-						"moveDown",
-						"requiredBadge",
-						"formulaOperation",
-						"formulaSource",
-						"formulaTarget",
-						"formulaAmount",
-						"formulaUnit",
-						"formulaLeft",
-						"formulaRight",
-						"unitDay",
-						"unitMonth",
-						"operationDateDiff",
-						"operationDateAdd",
-						"operationNumber",
-						"operatorAdd",
-						"operatorSubtract",
-						"operatorMultiply",
-						"operatorDivide",
-						"types"
-					]
-				},
 				"workspaceImport": {
 					"type": "object",
 					"additionalProperties": false,
@@ -7709,6 +7428,12 @@
 						"projectInfoTitle": {
 							"type": "string"
 						},
+						"acceptIntake": {
+							"type": "string"
+						},
+						"acceptIntakeHint": {
+							"type": "string"
+						},
 						"iconLabel": {
 							"type": "string"
 						},
@@ -7869,13 +7594,10 @@
 							"type": "object",
 							"additionalProperties": false,
 							"properties": {
-								"title": {
+								"definedInWorkspace": {
 									"type": "string"
 								},
 								"description": {
-									"type": "string"
-								},
-								"definedInWorkspace": {
 									"type": "string"
 								},
 								"empty": {
@@ -7887,10 +7609,19 @@
 								"loadError": {
 									"type": "string"
 								},
+								"no": {
+									"type": "string"
+								},
+								"required": {
+									"type": "string"
+								},
 								"retry": {
 									"type": "string"
 								},
 								"saveError": {
+									"type": "string"
+								},
+								"title": {
 									"type": "string"
 								},
 								"unset": {
@@ -7898,27 +7629,21 @@
 								},
 								"yes": {
 									"type": "string"
-								},
-								"no": {
-									"type": "string"
-								},
-								"required": {
-									"type": "string"
 								}
 							},
 							"required": [
-								"title",
-								"description",
 								"definedInWorkspace",
+								"description",
 								"empty",
 								"emptyAction",
 								"loadError",
+								"no",
+								"required",
 								"retry",
 								"saveError",
+								"title",
 								"unset",
-								"yes",
-								"no",
-								"required"
+								"yes"
 							]
 						}
 					},
@@ -7927,6 +7652,8 @@
 						"title",
 						"subtitle",
 						"projectInfoTitle",
+						"acceptIntake",
+						"acceptIntakeHint",
 						"iconLabel",
 						"iconHint",
 						"pickIconTitle",
@@ -11962,6 +11689,287 @@
 						"errors",
 						"save"
 					]
+				},
+				"workspaceProjectFields": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"createError": {
+							"type": "string"
+						},
+						"createField": {
+							"type": "string"
+						},
+						"createSuccess": {
+							"type": "string"
+						},
+						"defaultValueHint": {
+							"type": "string"
+						},
+						"defaultValueLabel": {
+							"type": "string"
+						},
+						"deleteBlocked": {
+							"type": "string"
+						},
+						"deleteConfirm": {
+							"type": "string"
+						},
+						"deleteDescription": {
+							"type": "string"
+						},
+						"deleteError": {
+							"type": "string"
+						},
+						"deleteField": {
+							"type": "string"
+						},
+						"deleteSuccess": {
+							"type": "string"
+						},
+						"deleteTitle": {
+							"type": "string"
+						},
+						"deleteUsage": {
+							"type": "string"
+						},
+						"duplicateName": {
+							"type": "string"
+						},
+						"editField": {
+							"type": "string"
+						},
+						"emptyDescription": {
+							"type": "string"
+						},
+						"emptyTitle": {
+							"type": "string"
+						},
+						"formulaAmount": {
+							"type": "string"
+						},
+						"formulaHint": {
+							"type": "string"
+						},
+						"formulaLabel": {
+							"type": "string"
+						},
+						"formulaLeft": {
+							"type": "string"
+						},
+						"formulaOperation": {
+							"type": "string"
+						},
+						"formulaRequired": {
+							"type": "string"
+						},
+						"formulaRight": {
+							"type": "string"
+						},
+						"formulaSource": {
+							"type": "string"
+						},
+						"formulaTarget": {
+							"type": "string"
+						},
+						"formulaUnit": {
+							"type": "string"
+						},
+						"loadError": {
+							"type": "string"
+						},
+						"moveDown": {
+							"type": "string"
+						},
+						"moveUp": {
+							"type": "string"
+						},
+						"nameLabel": {
+							"type": "string"
+						},
+						"namePlaceholder": {
+							"type": "string"
+						},
+						"nameRequired": {
+							"type": "string"
+						},
+						"newField": {
+							"type": "string"
+						},
+						"operationDateAdd": {
+							"type": "string"
+						},
+						"operationDateDiff": {
+							"type": "string"
+						},
+						"operationNumber": {
+							"type": "string"
+						},
+						"operatorAdd": {
+							"type": "string"
+						},
+						"operatorDivide": {
+							"type": "string"
+						},
+						"operatorMultiply": {
+							"type": "string"
+						},
+						"operatorSubtract": {
+							"type": "string"
+						},
+						"optionsHint": {
+							"type": "string"
+						},
+						"optionsLabel": {
+							"type": "string"
+						},
+						"optionsPlaceholder": {
+							"type": "string"
+						},
+						"optionsRequired": {
+							"type": "string"
+						},
+						"pageTitle": {
+							"type": "string"
+						},
+						"requiredBadge": {
+							"type": "string"
+						},
+						"requiredHint": {
+							"type": "string"
+						},
+						"requiredLabel": {
+							"type": "string"
+						},
+						"saveField": {
+							"type": "string"
+						},
+						"subtitle": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"typeLabel": {
+							"type": "string"
+						},
+						"types": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"boolean": {
+									"type": "string"
+								},
+								"date": {
+									"type": "string"
+								},
+								"dropdown": {
+									"type": "string"
+								},
+								"formula": {
+									"type": "string"
+								},
+								"long_text": {
+									"type": "string"
+								},
+								"multiselect": {
+									"type": "string"
+								},
+								"number": {
+									"type": "string"
+								},
+								"text": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"boolean",
+								"date",
+								"dropdown",
+								"formula",
+								"long_text",
+								"multiselect",
+								"number",
+								"text"
+							]
+						},
+						"unitDay": {
+							"type": "string"
+						},
+						"unitMonth": {
+							"type": "string"
+						},
+						"updateError": {
+							"type": "string"
+						},
+						"updateSuccess": {
+							"type": "string"
+						},
+						"usageUnavailable": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"createError",
+						"createField",
+						"createSuccess",
+						"defaultValueHint",
+						"defaultValueLabel",
+						"deleteBlocked",
+						"deleteConfirm",
+						"deleteDescription",
+						"deleteError",
+						"deleteField",
+						"deleteSuccess",
+						"deleteTitle",
+						"deleteUsage",
+						"duplicateName",
+						"editField",
+						"emptyDescription",
+						"emptyTitle",
+						"formulaAmount",
+						"formulaHint",
+						"formulaLabel",
+						"formulaLeft",
+						"formulaOperation",
+						"formulaRequired",
+						"formulaRight",
+						"formulaSource",
+						"formulaTarget",
+						"formulaUnit",
+						"loadError",
+						"moveDown",
+						"moveUp",
+						"nameLabel",
+						"namePlaceholder",
+						"nameRequired",
+						"newField",
+						"operationDateAdd",
+						"operationDateDiff",
+						"operationNumber",
+						"operatorAdd",
+						"operatorDivide",
+						"operatorMultiply",
+						"operatorSubtract",
+						"optionsHint",
+						"optionsLabel",
+						"optionsPlaceholder",
+						"optionsRequired",
+						"pageTitle",
+						"requiredBadge",
+						"requiredHint",
+						"requiredLabel",
+						"saveField",
+						"subtitle",
+						"title",
+						"typeLabel",
+						"types",
+						"unitDay",
+						"unitMonth",
+						"updateError",
+						"updateSuccess",
+						"usageUnavailable"
+					]
 				}
 			},
 			"required": [
@@ -11987,7 +11995,6 @@
 				"workspaceGeneral",
 				"workspaceRoles",
 				"workspaceLabels",
-				"workspaceProjectFields",
 				"workspaceImport",
 				"projectGeneral",
 				"projectIntegrations",
@@ -12022,7 +12029,8 @@
 				"adminOverview",
 				"adminRoles",
 				"adminSettings",
-				"adminWebhooks"
+				"adminWebhooks",
+				"workspaceProjectFields"
 			]
 		},
 		"navigation": {
@@ -16701,21 +16709,33 @@
 						"reorderError": {
 							"type": "string"
 						},
-						"views": {
+						"unavailable": {
 							"type": "object",
 							"additionalProperties": false,
 							"properties": {
-								"label": {
+								"noAccessTitle": {
 									"type": "string"
 								},
-								"overview": {
+								"noAccessDescription": {
 									"type": "string"
 								},
-								"fields": {
+								"notFoundTitle": {
+									"type": "string"
+								},
+								"notFoundDescription": {
+									"type": "string"
+								},
+								"backToWorkspace": {
 									"type": "string"
 								}
 							},
-							"required": ["label", "overview", "fields"]
+							"required": [
+								"noAccessTitle",
+								"noAccessDescription",
+								"notFoundTitle",
+								"notFoundDescription",
+								"backToWorkspace"
+							]
 						},
 						"columns": {
 							"type": "string"
@@ -16724,9 +16744,6 @@
 							"type": "object",
 							"additionalProperties": false,
 							"properties": {
-								"archived": {
-									"type": "string"
-								},
 								"addFilter": {
 									"type": "string"
 								},
@@ -16736,11 +16753,33 @@
 								"applyFilter": {
 									"type": "string"
 								},
+								"archived": {
+									"type": "string"
+								},
 								"ascending": {
 									"type": "string"
 								},
 								"clearFilters": {
 									"type": "string"
+								},
+								"columns": {
+									"type": "object",
+									"additionalProperties": false,
+									"properties": {
+										"dueDate": {
+											"type": "string"
+										},
+										"progress": {
+											"type": "string"
+										},
+										"project": {
+											"type": "string"
+										},
+										"status": {
+											"type": "string"
+										}
+									},
+									"required": ["dueDate", "progress", "project", "status"]
 								},
 								"condition": {
 									"type": "string"
@@ -16785,80 +16824,80 @@
 									"type": "object",
 									"additionalProperties": false,
 									"properties": {
-										"equals": {
-											"type": "string"
-										},
-										"notEquals": {
-											"type": "string"
-										},
-										"contains": {
-											"type": "string"
-										},
-										"notContains": {
-											"type": "string"
-										},
-										"startsWith": {
-											"type": "string"
-										},
-										"greaterThan": {
-											"type": "string"
-										},
-										"greaterOrEqual": {
-											"type": "string"
-										},
-										"lessThan": {
-											"type": "string"
-										},
-										"lessOrEqual": {
+										"after": {
 											"type": "string"
 										},
 										"before": {
 											"type": "string"
 										},
-										"after": {
+										"contains": {
 											"type": "string"
 										},
-										"onOrBefore": {
+										"equals": {
 											"type": "string"
 										},
-										"onOrAfter": {
+										"greaterOrEqual": {
 											"type": "string"
 										},
-										"isEmpty": {
-											"type": "string"
-										},
-										"isNotEmpty": {
+										"greaterThan": {
 											"type": "string"
 										},
 										"isAnyOf": {
 											"type": "string"
 										},
-										"isYes": {
+										"isEmpty": {
 											"type": "string"
 										},
 										"isNo": {
 											"type": "string"
+										},
+										"isNotEmpty": {
+											"type": "string"
+										},
+										"isYes": {
+											"type": "string"
+										},
+										"lessOrEqual": {
+											"type": "string"
+										},
+										"lessThan": {
+											"type": "string"
+										},
+										"notContains": {
+											"type": "string"
+										},
+										"notEquals": {
+											"type": "string"
+										},
+										"onOrAfter": {
+											"type": "string"
+										},
+										"onOrBefore": {
+											"type": "string"
+										},
+										"startsWith": {
+											"type": "string"
 										}
 									},
 									"required": [
-										"equals",
-										"notEquals",
-										"contains",
-										"notContains",
-										"startsWith",
-										"greaterThan",
-										"greaterOrEqual",
-										"lessThan",
-										"lessOrEqual",
-										"before",
 										"after",
-										"onOrBefore",
-										"onOrAfter",
-										"isEmpty",
-										"isNotEmpty",
+										"before",
+										"contains",
+										"equals",
+										"greaterOrEqual",
+										"greaterThan",
 										"isAnyOf",
+										"isEmpty",
+										"isNo",
+										"isNotEmpty",
 										"isYes",
-										"isNo"
+										"lessOrEqual",
+										"lessThan",
+										"notContains",
+										"notEquals",
+										"onOrAfter",
+										"onOrBefore",
+										"startsWith"
 									]
 								},
 								"pageSummary": {
@@ -16888,52 +16927,34 @@
 								"sortHint": {
 									"type": "string"
 								},
-								"value": {
-									"type": "string"
-								},
-								"columns": {
-									"type": "object",
-									"additionalProperties": false,
-									"properties": {
-										"project": {
-											"type": "string"
-										},
-										"progress": {
-											"type": "string"
-										},
-										"dueDate": {
-											"type": "string"
-										},
-										"status": {
-											"type": "string"
-										}
-									},
-									"required": ["project", "progress", "dueDate", "status"]
-								},
 								"sorts": {
 									"type": "object",
 									"additionalProperties": false,
 									"properties": {
-										"name": {
+										"createdAt": {
 											"type": "string"
 										},
 										"dueDate": {
 											"type": "string"
 										},
-										"createdAt": {
+										"name": {
 											"type": "string"
 										}
 									},
-									"required": ["name", "dueDate", "createdAt"]
+									"required": ["createdAt", "dueDate", "name"]
+								},
+								"value": {
+									"type": "string"
 								}
 							},
 							"required": [
-								"archived",
 								"addFilter",
 								"addSort",
 								"applyFilter",
+								"archived",
 								"ascending",
 								"clearFilters",
+								"columns",
 								"condition",
 								"descending",
 								"editFilter",
@@ -16957,38 +16978,28 @@
 								"sort",
 								"sortField",
 								"sortHint",
-								"value",
-								"columns",
-								"sorts"
+								"sorts",
+								"value"
 							]
 						},
-						"unavailable": {
+						"views": {
 							"type": "object",
 							"additionalProperties": false,
 							"properties": {
-								"noAccessTitle": {
+								"fields": {
 									"type": "string"
 								},
-								"noAccessDescription": {
+								"fieldsHint": {
 									"type": "string"
 								},
-								"notFoundTitle": {
+								"label": {
 									"type": "string"
 								},
-								"notFoundDescription": {
-									"type": "string"
-								},
-								"backToWorkspace": {
+								"overview": {
 									"type": "string"
 								}
 							},
-							"required": [
-								"noAccessTitle",
-								"noAccessDescription",
-								"notFoundTitle",
-								"notFoundDescription",
-								"backToWorkspace"
-							]
+							"required": ["fields", "fieldsHint", "label", "overview"]
 						}
 					},
 					"required": [
@@ -17006,10 +17017,10 @@
 						"noDueDate",
 						"reorderHandle",
 						"reorderError",
-						"views",
+						"unavailable",
 						"columns",
 						"table",
-						"unavailable"
+						"views"
 					]
 				},
 				"search": {
@@ -17419,6 +17430,359 @@
 				"archived"
 			]
 		},
+		"intake": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"status": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"new": {
+							"type": "string"
+						},
+						"triaged": {
+							"type": "string"
+						},
+						"rejected": {
+							"type": "string"
+						},
+						"approved": {
+							"type": "string"
+						},
+						"in_progress": {
+							"type": "string"
+						},
+						"delivered": {
+							"type": "string"
+						},
+						"needs_revision": {
+							"type": "string"
+						},
+						"confirmed": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"new",
+						"triaged",
+						"rejected",
+						"approved",
+						"in_progress",
+						"delivered",
+						"needs_revision",
+						"confirmed"
+					]
+				},
+				"list": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"empty": {
+							"type": "string"
+						},
+						"loadError": {
+							"type": "string"
+						},
+						"retry": {
+							"type": "string"
+						}
+					},
+					"required": ["empty", "loadError", "retry"]
+				},
+				"portal": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"nav": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"all": {
+							"type": "string"
+						},
+						"newRequest": {
+							"type": "string"
+						}
+					},
+					"required": ["nav", "title", "all", "newRequest"]
+				},
+				"detail": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"descriptionEmpty": {
+							"type": "string"
+						},
+						"action": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"confirmed": {
+									"type": "string"
+								},
+								"needs_revision": {
+									"type": "string"
+								},
+								"triaged": {
+									"type": "string"
+								},
+								"approved": {
+									"type": "string"
+								},
+								"rejected": {
+									"type": "string"
+								},
+								"in_progress": {
+									"type": "string"
+								},
+								"delivered": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"confirmed",
+								"needs_revision",
+								"triaged",
+								"approved",
+								"rejected",
+								"in_progress",
+								"delivered"
+							]
+						},
+						"revisionTitle": {
+							"type": "string"
+						},
+						"revisionDescription": {
+							"type": "string"
+						},
+						"confirmedOn": {
+							"type": "string"
+						},
+						"created": {
+							"type": "string"
+						},
+						"status_changed": {
+							"type": "string"
+						},
+						"task_linked": {
+							"type": "string"
+						},
+						"confirmed": {
+							"type": "string"
+						},
+						"tasksProgress": {
+							"type": "string"
+						},
+						"activity": {
+							"type": "string"
+						},
+						"activityEmpty": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"descriptionEmpty",
+						"action",
+						"revisionTitle",
+						"revisionDescription",
+						"confirmedOn",
+						"created",
+						"status_changed",
+						"task_linked",
+						"confirmed",
+						"tasksProgress",
+						"activity",
+						"activityEmpty"
+					]
+				},
+				"form": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"titleLabel": {
+							"type": "string"
+						},
+						"titlePlaceholder": {
+							"type": "string"
+						},
+						"descriptionLabel": {
+							"type": "string"
+						},
+						"descriptionPlaceholder": {
+							"type": "string"
+						},
+						"projectLabel": {
+							"type": "string"
+						},
+						"projectPlaceholder": {
+							"type": "string"
+						},
+						"submit": {
+							"type": "string"
+						},
+						"submitting": {
+							"type": "string"
+						},
+						"success": {
+							"type": "string"
+						},
+						"error": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"title",
+						"description",
+						"titleLabel",
+						"titlePlaceholder",
+						"descriptionLabel",
+						"descriptionPlaceholder",
+						"projectLabel",
+						"projectPlaceholder",
+						"submit",
+						"submitting",
+						"success",
+						"error"
+					]
+				},
+				"note": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"placeholder": {
+							"type": "string"
+						},
+						"confirm": {
+							"type": "string"
+						}
+					},
+					"required": ["placeholder", "confirm"]
+				},
+				"errors": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"loadFailed": {
+							"type": "string"
+						},
+						"transitionFailed": {
+							"type": "string"
+						},
+						"transitionConflict": {
+							"type": "string"
+						}
+					},
+					"required": ["loadFailed", "transitionFailed", "transitionConflict"]
+				},
+				"staff": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"tab": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"group": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"triage": {
+									"type": "string"
+								},
+								"progress": {
+									"type": "string"
+								},
+								"awaiting": {
+									"type": "string"
+								},
+								"closed": {
+									"type": "string"
+								}
+							},
+							"required": ["triage", "progress", "awaiting", "closed"]
+						},
+						"truncated": {
+							"type": "string"
+						},
+						"linkedTasks": {
+							"type": "string"
+						},
+						"attachTask": {
+							"type": "string"
+						},
+						"attachTitle": {
+							"type": "string"
+						},
+						"attachDescription": {
+							"type": "string"
+						},
+						"attachSubmit": {
+							"type": "string"
+						},
+						"attachSuccess": {
+							"type": "string"
+						},
+						"attachError": {
+							"type": "string"
+						},
+						"taskTitle": {
+							"type": "string"
+						},
+						"status": {
+							"type": "string"
+						},
+						"priority": {
+							"type": "string"
+						},
+						"rejectTitle": {
+							"type": "string"
+						},
+						"rejectDescription": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"tab",
+						"title",
+						"group",
+						"truncated",
+						"linkedTasks",
+						"attachTask",
+						"attachTitle",
+						"attachDescription",
+						"attachSubmit",
+						"attachSuccess",
+						"attachError",
+						"taskTitle",
+						"status",
+						"priority",
+						"rejectTitle",
+						"rejectDescription"
+					]
+				}
+			},
+			"required": [
+				"status",
+				"list",
+				"portal",
+				"detail",
+				"form",
+				"note",
+				"errors",
+				"staff"
+			]
+		},
 		"team": {
 			"type": "object",
 			"additionalProperties": false,
@@ -17438,9 +17802,12 @@
 						},
 						"viewer": {
 							"type": "string"
+						},
+						"guest": {
+							"type": "string"
 						}
 					},
-					"required": ["owner", "admin", "member", "viewer"]
+					"required": ["owner", "admin", "member", "viewer", "guest"]
 				},
 				"members": {
 					"type": "object",
@@ -17452,11 +17819,14 @@
 						"inviteMember": {
 							"type": "string"
 						},
+						"inviteGuest": {
+							"type": "string"
+						},
 						"you": {
 							"type": "string"
 						}
 					},
-					"required": ["pageTitle", "inviteMember", "you"]
+					"required": ["pageTitle", "inviteMember", "inviteGuest", "you"]
 				},
 				"invitations": {
 					"type": "object",
@@ -17489,6 +17859,16 @@
 						"linkCopied",
 						"copyFailed"
 					]
+				},
+				"inviteGuest": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						}
+					},
+					"required": ["title"]
 				},
 				"inviteModal": {
 					"type": "object",
@@ -17656,6 +18036,9 @@
 						"allProjectsUnavailable": {
 							"type": "string"
 						},
+						"allProjectsUnavailableGuest": {
+							"type": "string"
+						},
 						"selectedProjects": {
 							"type": "string"
 						},
@@ -17717,6 +18100,7 @@
 						"allProjects",
 						"allProjectsDescription",
 						"allProjectsUnavailable",
+						"allProjectsUnavailableGuest",
 						"selectedProjects",
 						"selectedProjectsDescription",
 						"projectsLabel",
@@ -17736,6 +18120,7 @@
 				"roles",
 				"members",
 				"invitations",
+				"inviteGuest",
 				"inviteModal",
 				"membersTable",
 				"projectAccess"
@@ -22258,6 +22643,7 @@
 		"tasks",
 		"invitations",
 		"workspace",
+		"intake",
 		"team",
 		"publicProject",
 		"press",

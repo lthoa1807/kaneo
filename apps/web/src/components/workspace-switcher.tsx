@@ -27,6 +27,8 @@ import { Kbd } from "@/components/ui/kbd";
 import { getModifierKeyText } from "@/lib/shortcuts/platform";
 import { useShortcut } from "@/lib/shortcuts/use-shortcut";
 import { authClient } from "@/lib/auth-client";
+import { navForSurfaces } from "@/components/intake/intake-surfaces";
+import { useIntakeSurfaces } from "@/hooks/use-intake-surfaces";
 import { hasInstanceAdminRole } from "@/lib/instance-admin";
 import type { Workspace } from "@/types/workspace";
 import CreateWorkspaceModal from "./shared/modals/create-workspace-modal";
@@ -34,6 +36,7 @@ import CreateWorkspaceModal from "./shared/modals/create-workspace-modal";
 export function WorkspaceSwitcher() {
   const { t } = useTranslation();
   const { data: workspace } = useActiveWorkspace();
+  const { surfaces } = useIntakeSurfaces();
 
   const { data: workspaces } = useGetWorkspaces();
   const { data: session } = authClient.useSession();
@@ -191,7 +194,8 @@ export function WorkspaceSwitcher() {
         </SidebarMenu>
 
         <div className="flex items-center gap-0.5">
-          <Search />
+          {/* Search reads the workspace list and projects, both closed to guests. */}
+          {navForSurfaces(surfaces).staffNav ? <Search /> : null}
           <div className="h-8 w-8 shrink-0">
             <UserAvatar />
           </div>

@@ -13,7 +13,7 @@ Date: 2026-11-22. Scope: modern color palette work, but the resource limits appl
 | Action | Observed result |
 | --- | --- |
 | Full `apps/web` Vitest suite | 37 jsdom environments, ~460 s of environment setup alone; one run took 17 minutes and was killed by the harness |
-| `tsc -p tsconfig.app.json` (TypeScript 7 native) | 4.5 GB RSS, ~190% CPU, no output after 17 minutes; had to be killed |
+| `tsc -p tsconfig.app.json` (TypeScript 7 native) | 4.5 GB RSS, ~190% CPU, no output after 17 minutes; had to be killed. Re-measured 2026-11-24: 4.66 GB RSS and 339% CPU after 52 s, still climbing on a box where k3s, gunicorn and other services already hold ~4 GB, so the run thrashes swap instead of finishing. It ignores SIGTERM; `kill -9` is the only way to stop it and frees ~5 GB. A small package (`packages/libs`) typechecks in seconds, so the size of `apps/web` is the problem, not `tsc` |
 | Test + typecheck in parallel | Both slowed down and the test run reported 12 spurious errors; a clean rerun passed |
 | `pnpm test` / repo-wide `pnpm lint` | Pre-existing failures in untouched files (596 files flagged by the formatting check), not caused by the change |
 | `git stash` without pathspec | Captures unrelated dirty files; use a scoped pathspec instead |
@@ -26,7 +26,7 @@ Date: 2026-11-22. Scope: modern color palette work, but the resource limits appl
 2. Run one heavy job at a time. Do not run tests, typecheck, or builds concurrently. Check `free -h` first; stop if available memory is below ~1.5 GB.
 3. Do not run full `pnpm build`, `pnpm test`, or repo-wide `pnpm lint` for a small change. Format and lint only changed files:
    `pnpm exec vp check $(git diff --name-only)`.
-4. Avoid package-wide `tsc -p` here. Prefer focused tests; if typecheck is required, run it alone with a timeout and watch its memory.
+4. Avoid package-wide `tsc -p` here. Prefer focused tests; if typecheck is required, run it alone with a timeout and watch its memory. For `apps/web` typechecking, let CI (`.github/workflows/fork-ci.yml`) be the gate and use `pnpm exec vp check` plus focused Vitest runs locally.
 5. Only run `pnpm install` when dependencies or the lockfile actually changed, and not while a dev server or tests are running.
 6. Keep git operations scoped: `git stash push -u -- <paths>`, explicit `git add <paths>`, and `git diff --stat` before committing.
 7. The pre-commit hook runs repo-wide lint. Check changed files first; if the hook fails only on pre-existing files, use `--no-verify` and report why.

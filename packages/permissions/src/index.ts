@@ -12,6 +12,7 @@ export const statement = {
   task: ["create", "read", "update", "delete", "assign"],
   label: ["create", "read", "update", "delete"],
   workspace: ["read", "update", "delete", "manage_settings"],
+  intakeRequest: ["create", "read", "update", "manage"],
 } as const;
 
 export const ac = createAccessControl(statement);
@@ -22,6 +23,7 @@ export const viewer = ac.newRole({
   task: ["read"],
   label: ["read"],
   workspace: ["read"],
+  intakeRequest: ["read"],
 });
 
 export const member = ac.newRole({
@@ -30,6 +32,7 @@ export const member = ac.newRole({
   task: ["create", "read", "update"],
   label: ["create", "read", "update", "delete"],
   workspace: ["read"],
+  intakeRequest: ["create", "read", "update", "manage"],
 });
 
 export const admin = ac.newRole({
@@ -38,6 +41,7 @@ export const admin = ac.newRole({
   task: ["create", "read", "update", "delete", "assign"],
   label: ["create", "read", "update", "delete"],
   workspace: ["read", "update", "manage_settings"],
+  intakeRequest: ["create", "read", "update", "manage"],
 });
 
 export const owner = ac.newRole({
@@ -46,9 +50,24 @@ export const owner = ac.newRole({
   task: ["create", "read", "update", "delete", "assign"],
   label: ["create", "read", "update", "delete"],
   workspace: ["read", "update", "delete", "manage_settings"],
+  intakeRequest: ["create", "read", "update", "manage"],
 });
 
-export const builtInRoles = { viewer, member, admin, owner } as const;
+// Guests submit and track intake requests; memberAc.statements keeps the
+// better-auth organization surface (invitation accept, member read) that
+// workspace membership requires.
+export const guest = ac.newRole({
+  ...memberAc.statements,
+  intakeRequest: ["create", "read", "update"],
+});
+
+export const builtInRoles = {
+  viewer,
+  member,
+  admin,
+  owner,
+  guest,
+} as const;
 
 export type BuiltInRoleName = keyof typeof builtInRoles;
 
@@ -57,7 +76,12 @@ export type BuiltInRoleName = keyof typeof builtInRoles;
 // are reserved and the rows are auto-created on workspace creation /
 // backfilled at boot. `owner` is intentionally NOT in this list because it
 // stays a true static role on the better-auth side.
-export const DEFAULT_ROLE_NAMES = ["viewer", "member", "admin"] as const;
+export const DEFAULT_ROLE_NAMES = [
+  "viewer",
+  "member",
+  "admin",
+  "guest",
+] as const;
 export type DefaultRoleName = (typeof DEFAULT_ROLE_NAMES)[number];
 
 function toMutablePayload(
@@ -81,6 +105,7 @@ export const defaultRolePayloads: Record<
   viewer: toMutablePayload(viewer.statements),
   member: toMutablePayload(member.statements),
   admin: toMutablePayload(admin.statements),
+  guest: toMutablePayload(guest.statements),
 };
 
 export {
