@@ -62,7 +62,7 @@ export function routeForView(view: ProjectView): ProjectRoute {
 }
 
 export function resolveProjectView(
-  route: ProjectRoute,
+  route: Exclude<ProjectRoute, "intake">,
   viewMode: "board" | "list",
 ): ProjectView {
   return route === "board" ? viewMode : route;
