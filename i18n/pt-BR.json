@@ -4261,7 +4261,8 @@
 			"owner": "Proprietário",
 			"admin": "Administrador",
 			"member": "Membro",
-			"viewer": "Visualizador"
+			"viewer": "Visualizador",
+			"guest": "Guest"
 		},
 		"members": {
 			"pageTitle": "Membros",

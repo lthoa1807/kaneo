@@ -4185,7 +4185,8 @@
 			"owner": "Eigenaar",
 			"admin": "Beheerder",
 			"member": "Lid",
-			"viewer": "Kijker"
+			"viewer": "Kijker",
+			"guest": "Guest"
 		},
 		"members": {
 			"pageTitle": "Leden",

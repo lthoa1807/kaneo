@@ -219,6 +219,7 @@ const workspace = apiRouter<BaseVariables & { workspaceId: string }>()
         workspaceId: c.get("workspaceId"),
         userId: c.get("userId"),
         projectId: c.req.valid("query").projectId,
+        assignable: c.req.valid("query").assignable === "true",
       }),
       200,
     ),

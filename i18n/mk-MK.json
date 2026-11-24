@@ -4185,7 +4185,8 @@
 			"owner": "Сопственик",
 			"admin": "Администратор",
 			"member": "Член",
-			"viewer": "Прегледувач"
+			"viewer": "Прегледувач",
+			"guest": "Guest"
 		},
 		"members": {
 			"pageTitle": "Членови",

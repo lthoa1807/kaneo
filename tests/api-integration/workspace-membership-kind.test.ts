@@ -5,7 +5,10 @@ import { createApp } from "../../apps/api/src/index";
 import { defaultRolePayloads } from "../../packages/permissions/src";
 import { mockAuthenticatedSession } from "./helpers/auth";
 import { resetTestDatabase } from "./helpers/database";
-import { createWorkspaceMember } from "./helpers/fixtures";
+import {
+  createProjectFixture,
+  createWorkspaceMember,
+} from "./helpers/fixtures";
 
 const { app } = createApp();
 
@@ -98,4 +101,39 @@ describe("guest capabilities", () => {
       manageProjects: false,
     });
   });
+});
+
+it("hides guests from an assignable member query", async () => {
+  const owner = await createWorkspaceMember({ role: "owner" });
+  const { project } = await createProjectFixture({
+    workspaceId: owner.workspace.id,
+    name: "Portal",
+    slug: "portal",
+  });
+  const guest = await createWorkspaceMember({ role: "guest" });
+  const member = await createWorkspaceMember({ role: "member" });
+  for (const other of [guest, member]) {
+    await db
+      .update(schema.workspaceUserTable)
+      .set({ workspaceId: owner.workspace.id })
+      .where(eq(schema.workspaceUserTable.userId, other.user.id));
+  }
+  mockAuthenticatedSession(owner.user);
+
+  const assignable = await app.request(
+    `/api/workspace/${owner.workspace.id}/members?projectId=${project.id}&assignable=true`,
+  );
+  expect(assignable.status).toBe(200);
+  expect(
+    ((await assignable.json()) as { id: string }[])
+      .map((row) => row.id)
+      .sort(),
+  ).toEqual([owner.user.id, member.user.id].sort());
+
+  const unfiltered = await app.request(
+    `/api/workspace/${owner.workspace.id}/members?projectId=${project.id}`,
+  );
+  expect(
+    ((await unfiltered.json()) as { id: string }[]).map((row) => row.id).sort(),
+  ).toEqual([owner.user.id, guest.user.id, member.user.id].sort());
 });

@@ -4337,7 +4337,8 @@
 			"owner": "Власник",
 			"admin": "Адміністратор",
 			"member": "Учасник",
-			"viewer": "Спостерігач"
+			"viewer": "Спостерігач",
+			"guest": "Guest"
 		},
 		"members": {
 			"pageTitle": "Учасники",

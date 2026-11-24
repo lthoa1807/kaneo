@@ -4185,7 +4185,8 @@
 			"owner": "Sahip",
 			"admin": "Yönetici",
 			"member": "Üye",
-			"viewer": "Görüntüleyici"
+			"viewer": "Görüntüleyici",
+			"guest": "Guest"
 		},
 		"members": {
 			"pageTitle": "Üyeler",

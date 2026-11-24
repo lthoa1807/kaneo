@@ -4109,7 +4109,8 @@
 			"owner": "소유자",
 			"admin": "관리자",
 			"member": "멤버",
-			"viewer": "뷰어"
+			"viewer": "뷰어",
+			"guest": "Guest"
 		},
 		"members": {
 			"pageTitle": "멤버",

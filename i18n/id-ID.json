@@ -4109,7 +4109,8 @@
 			"owner": "Pemilik",
 			"admin": "Admin",
 			"member": "Anggota",
-			"viewer": "Lihat Saja"
+			"viewer": "Lihat Saja",
+			"guest": "Guest"
 		},
 		"members": {
 			"pageTitle": "Anggota",

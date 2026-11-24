@@ -4185,7 +4185,8 @@
 			"owner": "Ιδιοκτήτης",
 			"admin": "Διαχειριστής",
 			"member": "Μέλος",
-			"viewer": "Θεατής"
+			"viewer": "Θεατής",
+			"guest": "Guest"
 		},
 		"members": {
 			"pageTitle": "Μέλη",

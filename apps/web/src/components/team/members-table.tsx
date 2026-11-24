@@ -305,6 +305,12 @@ function MembersTable({ workspaceId, invitations, users }: Props) {
                       <ShieldIcon className="size-3" />
                       {t("team:roles.owner", { defaultValue: "Owner" })}
                     </Badge>
+                  ) : member.role === "guest" ? (
+                    // Guests hold no workspace role to pick: they only reach
+                    // their own intake requests.
+                    <Badge variant="outline">
+                      {t("team:roles.guest", { defaultValue: "Guest" })}
+                    </Badge>
                   ) : showRoleSelect ? (
                     <Select
                       value={member.role}

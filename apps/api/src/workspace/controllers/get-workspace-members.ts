@@ -5,11 +5,13 @@ import { userTable, workspaceUserTable } from "../../database/schema";
 import { assertProjectAccess } from "../../project-access/assert-project-access";
 import { findWorkspaceProjectIds } from "../../project-access/find-workspace-project-ids";
 import { projectAccessCondition } from "../../project-access/project-access-condition";
+import { isGuestRole } from "../../workspace-members/is-guest-role";
 
 async function getWorkspaceMembers(request: {
   workspaceId: string;
   userId: string;
   projectId?: string;
+  assignable?: boolean;
 }) {
   const { workspaceId, projectId } = request;
 
@@ -40,7 +42,9 @@ async function getWorkspaceMembers(request: {
       ),
     );
 
-  return members;
+  return request.assignable
+    ? members.filter((member) => !isGuestRole(member.role))
+    : members;
 }
 
 export default getWorkspaceMembers;

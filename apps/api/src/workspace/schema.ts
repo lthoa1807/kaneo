@@ -13,6 +13,10 @@ export const workspaceMembersQuery = z.object({
     description:
       "Only return members who can access this project, for example to fill an assignee picker.",
   }),
+  assignable: z.enum(["true", "false"]).optional().openapi({
+    description:
+      "Set to true to leave out guests, who receive work through intake requests and can never be assigned a task.",
+  }),
 });
 
 export const updateMemberProjectAccessBody = z.object({

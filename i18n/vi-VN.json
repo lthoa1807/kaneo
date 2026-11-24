@@ -4109,7 +4109,8 @@
 			"owner": "Chủ sở hữu",
 			"admin": "Quản trị viên",
 			"member": "Thành viên",
-			"viewer": "Người xem"
+			"viewer": "Người xem",
+			"guest": "Guest"
 		},
 		"members": {
 			"pageTitle": "Thành viên",

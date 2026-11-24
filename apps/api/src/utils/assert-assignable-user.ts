@@ -2,6 +2,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db, { schema } from "../database";
 import { findInaccessibleProjectIds } from "../project-access/find-inaccessible-project-ids";
+import { isGuestRole } from "../workspace-members/is-guest-role";
 import { instanceAdminRoleSql } from "./instance-admin-role";
 
 export const NOT_ASSIGNABLE = "Assignee is not a member of this workspace";
@@ -18,7 +19,10 @@ export async function filterAssignableUsers(
   }
 
   const memberships = await database
-    .select({ userId: schema.workspaceUserTable.userId })
+    .select({
+      userId: schema.workspaceUserTable.userId,
+      role: schema.workspaceUserTable.role,
+    })
     .from(schema.workspaceUserTable)
     .where(
       and(
@@ -27,7 +31,14 @@ export async function filterAssignableUsers(
       ),
     );
 
-  const assignable = new Set(memberships.map((row) => row.userId));
+  const guests = new Set(
+    memberships.filter((row) => isGuestRole(row.role)).map((row) => row.userId),
+  );
+  const assignable = new Set(
+    memberships
+      .filter((row) => !guests.has(row.userId))
+      .map((row) => row.userId),
+  );
   const remaining = userIds.filter((id) => !assignable.has(id));
 
   if (remaining.length === 0) {
@@ -46,6 +57,11 @@ export async function filterAssignableUsers(
 
   for (const admin of admins) {
     assignable.add(admin.id);
+  }
+
+  // A guest is a portal account, never a coworker to hand work to.
+  for (const id of guests) {
+    assignable.delete(id);
   }
 
   return assignable;

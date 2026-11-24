@@ -4185,7 +4185,8 @@
 			"owner": "Eigentümer",
 			"admin": "Administrator",
 			"member": "Mitglied",
-			"viewer": "Betrachter"
+			"viewer": "Betrachter",
+			"guest": "Guest"
 		},
 		"members": {
 			"pageTitle": "Mitglieder",

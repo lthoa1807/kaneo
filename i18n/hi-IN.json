@@ -4185,7 +4185,8 @@
 			"owner": "मालिक",
 			"admin": "व्यवस्थापक",
 			"member": "सदस्य",
-			"viewer": "दर्शक"
+			"viewer": "दर्शक",
+			"guest": "Guest"
 		},
 		"members": {
 			"pageTitle": "सदस्य",

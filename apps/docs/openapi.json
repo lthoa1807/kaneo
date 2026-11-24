@@ -25676,6 +25676,20 @@
             "description": "Only return members who can access this project, for example to fill an assignee picker.",
             "name": "projectId",
             "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ],
+              "description": "Set to true to leave out guests, who receive work through intake requests and can never be assigned a task."
+            },
+            "required": false,
+            "description": "Set to true to leave out guests, who receive work through intake requests and can never be assigned a task.",
+            "name": "assignable",
+            "in": "query"
           }
         ],
         "responses": {

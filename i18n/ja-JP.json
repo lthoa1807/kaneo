@@ -4109,7 +4109,8 @@
 			"owner": "オーナー",
 			"admin": "管理者",
 			"member": "メンバー",
-			"viewer": "閲覧者"
+			"viewer": "閲覧者",
+			"guest": "Guest"
 		},
 		"members": {
 			"pageTitle": "メンバー",

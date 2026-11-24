@@ -4185,7 +4185,8 @@
 			"owner": "Owner",
 			"admin": "Admin",
 			"member": "Member",
-			"viewer": "Viewer"
+			"viewer": "Viewer",
+			"guest": "Guest"
 		},
 		"members": {
 			"pageTitle": "Members",

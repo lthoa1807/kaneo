@@ -4185,7 +4185,8 @@
 			"owner": "Sahib",
 			"admin": "İnzibatçı",
 			"member": "Üzv",
-			"viewer": "Baxışçı"
+			"viewer": "Baxışçı",
+			"guest": "Guest"
 		},
 		"members": {
 			"pageTitle": "Üzvlər",
