@@ -4342,6 +4342,7 @@
 			"allProjects": "All projects",
 			"allProjectsDescription": "Access every project in this workspace, including new ones.",
 			"allProjectsUnavailable": "Your own access is limited, so you can only give access to selected projects.",
+			"allProjectsUnavailableGuest": "Guests only get access to the projects you choose.",
 			"selectedProjects": "Selected projects",
 			"selectedProjectsDescription": "Only access the projects you choose.",
 			"projectsLabel": "Projects",

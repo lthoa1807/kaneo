@@ -132,7 +132,7 @@ export function StaffRequestDetail({
                   params={{ workspaceId, projectId, taskId: task.id }}
                   className="text-sm hover:underline"
                 >
-                  {task.number ? `${task.number} · ` : ""}
+                  {task.number ? `${data.projectSlug}-${task.number} · ` : ""}
                   {task.title}
                 </Link>
               </li>

@@ -18,6 +18,7 @@ type Props = {
   isLoadingProjects?: boolean;
   disabled?: boolean;
   allowAll?: boolean;
+  guestInvite?: boolean;
   error?: string;
 };
 
@@ -28,6 +29,7 @@ function ProjectAccessFields({
   isLoadingProjects = false,
   disabled = false,
   allowAll = true,
+  guestInvite = false,
   error,
 }: Props) {
   const { t } = useTranslation();
@@ -64,7 +66,9 @@ function ProjectAccessFields({
             <span className="font-normal text-muted-foreground text-xs">
               {allowAll
                 ? t("team:projectAccess.allProjectsDescription")
-                : t("team:projectAccess.allProjectsUnavailable")}
+                : guestInvite
+                  ? t("team:projectAccess.allProjectsUnavailableGuest")
+                  : t("team:projectAccess.allProjectsUnavailable")}
             </span>
           </span>
         </Label>

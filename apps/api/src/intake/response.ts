@@ -71,6 +71,10 @@ export const intakeActivityListSchema = z.object({
 });
 
 export const intakeRequestDetailSchema = intakeRequestListItemSchema.extend({
+  projectSlug: z.string().openapi({
+    description:
+      "Project key used to build task keys such as `PE-12`, embedded for the same reason as the name.",
+  }),
   linkedTasks: z
     .array(
       z.object({

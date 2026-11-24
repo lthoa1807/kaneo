@@ -4184,7 +4184,8 @@
 			"updateError": "更新项目访问权限失败",
 			"updateSuccess": "项目访问权限已更新",
 			"archived": "已归档",
-			"allProjectsUnavailable": "你自己的访问权限有限，所以只能授予指定项目。"
+			"allProjectsUnavailable": "你自己的访问权限有限，所以只能授予指定项目。",
+			"allProjectsUnavailableGuest": "Guests only get access to the projects you choose."
 		},
 		"inviteGuest": {
 			"title": "Invite a guest"

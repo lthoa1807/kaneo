@@ -1,5 +1,4 @@
 import { useTranslation } from "react-i18next";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -60,8 +59,12 @@ export function AttachTaskDialog({
     useState<AttachIntakeTaskBody["priority"]>(DEFAULT_PRIORITY);
   const [status, setStatus] = useState("");
 
-  const firstColumn = columns.data?.[0]?.slug;
-  const chosenStatus = status || firstColumn || "to-do";
+  const firstColumn = columns.data?.[0];
+  const chosenStatus = status || firstColumn?.slug || "to-do";
+  // Show the column's own name: the slug ("to-do") means nothing to a reader.
+  const chosenStatusLabel =
+    columns.data?.find((column) => column.slug === chosenStatus)?.name ??
+    chosenStatus;
 
   return (
     <Dialog
@@ -138,7 +141,7 @@ export function AttachTaskDialog({
                   }}
                 >
                   <SelectTrigger id={statusId}>
-                    <SelectValue>{chosenStatus}</SelectValue>
+                    <SelectValue>{chosenStatusLabel}</SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {(columns.data ?? []).map((column) => (
@@ -160,12 +163,12 @@ export function AttachTaskDialog({
                   }}
                 >
                   <SelectTrigger id={priorityId}>
-                    <SelectValue>{priority}</SelectValue>
+                    <SelectValue>{t(`tasks:priority.${priority}`)}</SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {PRIORITIES.map((option) => (
                       <SelectItem key={option} value={option}>
-                        <Badge variant="outline">{option}</Badge>
+                        {t(`tasks:priority.${option}`)}
                       </SelectItem>
                     ))}
                   </SelectContent>

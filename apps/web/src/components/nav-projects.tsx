@@ -226,7 +226,8 @@ export function NavProjects() {
     });
   };
 
-  if (!workspace) return null;
+  // A guest holds no project:read, so the group would only render empty.
+  if (!workspace || !navForSurfaces(surfaces).projectsNav) return null;
 
   return (
     <>

@@ -4338,7 +4338,8 @@
 			"updateError": "Échec de la mise à jour de l'accès aux projets",
 			"updateSuccess": "Accès aux projets mis à jour",
 			"archived": "Archivé",
-			"allProjectsUnavailable": "Vos propres accès sont limités. Vous ne pouvez donc donner accès qu'à certains projets."
+			"allProjectsUnavailable": "Vos propres accès sont limités. Vous ne pouvez donc donner accès qu'à certains projets.",
+			"allProjectsUnavailableGuest": "Guests only get access to the projects you choose."
 		},
 		"inviteGuest": {
 			"title": "Invite a guest"

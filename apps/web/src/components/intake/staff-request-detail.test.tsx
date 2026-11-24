@@ -21,6 +21,7 @@ const request: IntakeRequest = {
   id: "request-1",
   projectId: "project-1",
   projectName: "Portal",
+  projectSlug: "PE",
   number: 7,
   displayId: "REQ-7",
   title: "Export invoices",
@@ -174,6 +175,6 @@ describe("StaffRequestDetail", () => {
     renderDetail();
 
     expect(screen.getByText("intake:staff.linkedTasks")).toBeTruthy();
-    expect(screen.getByText("12 · Build the export")).toBeTruthy();
+    expect(screen.getByText("PE-12 · Build the export")).toBeTruthy();
   });
 });

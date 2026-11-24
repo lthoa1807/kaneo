@@ -16,9 +16,15 @@ async function getMyMembership(workspaceId: string, userId: string) {
     )
     .limit(1);
 
+  const [workspace] = await db
+    .select({ name: schema.workspaceTable.name })
+    .from(schema.workspaceTable)
+    .where(eq(schema.workspaceTable.id, workspaceId))
+    .limit(1);
+
   const role = member?.role ?? null;
   const kind: MembershipKind = isGuestRole(role) ? "guest" : "staff";
-  return { kind, role };
+  return { workspaceName: workspace?.name ?? "", kind, role };
 }
 
 export default getMyMembership;

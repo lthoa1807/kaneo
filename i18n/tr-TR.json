@@ -4261,7 +4261,8 @@
 			"updateError": "Failed to update project access",
 			"updateSuccess": "Project access updated",
 			"archived": "Archived",
-			"allProjectsUnavailable": "Your own access is limited, so you can only give access to selected projects."
+			"allProjectsUnavailable": "Your own access is limited, so you can only give access to selected projects.",
+			"allProjectsUnavailableGuest": "Guests only get access to the projects you choose."
 		},
 		"inviteGuest": {
 			"title": "Invite a guest"

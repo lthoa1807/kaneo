@@ -157,6 +157,12 @@ describe("guest invitations", () => {
         name: /team:projectAccess.selectedProjects/,
       }),
     ).toHaveAttribute("aria-checked", "true");
+    expect(
+      screen.getByText("team:projectAccess.allProjectsUnavailableGuest"),
+    ).toBeVisible();
+    expect(
+      screen.queryByText("team:projectAccess.allProjectsUnavailable"),
+    ).toBeNull();
   });
 
   it("refuses to invite a guest before a project is chosen", async () => {

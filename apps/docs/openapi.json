@@ -4711,6 +4711,10 @@
       "WorkspaceMembership": {
         "type": "object",
         "properties": {
+          "workspaceName": {
+            "type": "string",
+            "description": "Display name of the workspace, so a guest who cannot read the workspace list still shows it."
+          },
           "kind": {
             "type": "string",
             "enum": [
@@ -4728,6 +4732,7 @@
           }
         },
         "required": [
+          "workspaceName",
           "kind",
           "role"
         ],
@@ -15779,6 +15784,10 @@
                       "type": "number",
                       "description": "Linked tasks whose status is done or archived."
                     },
+                    "projectSlug": {
+                      "type": "string",
+                      "description": "Project key used to build task keys such as `PE-12`, embedded for the same reason as the name."
+                    },
                     "linkedTasks": {
                       "type": "array",
                       "items": {
@@ -15829,7 +15838,8 @@
                     "createdAt",
                     "updatedAt",
                     "taskCount",
-                    "completedTaskCount"
+                    "completedTaskCount",
+                    "projectSlug"
                   ]
                 }
               }

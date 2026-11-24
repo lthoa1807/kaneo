@@ -65,6 +65,10 @@ export const workspaceCapabilitiesSchema = z
 
 export const workspaceMembershipSchema = z
   .object({
+    workspaceName: z.string().openapi({
+      description:
+        "Display name of the workspace, so a guest who cannot read the workspace list still shows it.",
+    }),
     kind: z.enum(["guest", "staff"]).openapi({
       description:
         "The caller's membership kind: guest for a guest member, staff for every other member and for instance admins who are not members.",

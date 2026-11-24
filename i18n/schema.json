@@ -18036,6 +18036,9 @@
 						"allProjectsUnavailable": {
 							"type": "string"
 						},
+						"allProjectsUnavailableGuest": {
+							"type": "string"
+						},
 						"selectedProjects": {
 							"type": "string"
 						},
@@ -18097,6 +18100,7 @@
 						"allProjects",
 						"allProjectsDescription",
 						"allProjectsUnavailable",
+						"allProjectsUnavailableGuest",
 						"selectedProjects",
 						"selectedProjectsDescription",
 						"projectsLabel",

@@ -219,6 +219,7 @@ function InviteTeamMemberModal({ open, onClose, mode = "member" }: Props) {
                 />
                 <ProjectAccessFields
                   allowAll={!isGuest && !inviterLimited}
+                  guestInvite={isGuest}
                   value={projectAccess}
                   onChange={(next) => {
                     setProjectAccess(next);

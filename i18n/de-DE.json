@@ -4261,7 +4261,8 @@
 			"updateError": "Projektzugriff konnte nicht aktualisiert werden",
 			"updateSuccess": "Projektzugriff aktualisiert",
 			"archived": "Archiviert",
-			"allProjectsUnavailable": "Dein eigener Zugriff ist eingeschränkt. Du kannst daher nur Zugriff auf ausgewählte Projekte gewähren."
+			"allProjectsUnavailable": "Dein eigener Zugriff ist eingeschränkt. Du kannst daher nur Zugriff auf ausgewählte Projekte gewähren.",
+			"allProjectsUnavailableGuest": "Guests only get access to the projects you choose."
 		},
 		"inviteGuest": {
 			"title": "Invite a guest"

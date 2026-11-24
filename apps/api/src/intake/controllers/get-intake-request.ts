@@ -30,7 +30,7 @@ async function getIntakeRequest(c: Context, requestId: string) {
   const { row, isManager } = await resolveIntakeActor(c, requestId);
 
   const [project] = await db
-    .select({ name: schema.projectTable.name })
+    .select({ name: schema.projectTable.name, slug: schema.projectTable.slug })
     .from(schema.projectTable)
     .where(eq(schema.projectTable.id, row.projectId))
     .limit(1);
@@ -41,6 +41,7 @@ async function getIntakeRequest(c: Context, requestId: string) {
   const base = {
     ...row,
     projectName: project?.name ?? "",
+    projectSlug: project?.slug ?? "",
     displayId: `REQ-${row.number}`,
     taskCount,
     completedTaskCount,
