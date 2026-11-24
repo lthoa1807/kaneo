@@ -4,7 +4,7 @@ import type { IntakeRequestListItem } from "./list-intake-requests";
 
 export type TransitionIntakeRequestRequest = {
   requestId: string;
-  to: IntakeRequestListItem["status"];
+  to: Exclude<IntakeRequestListItem["status"], "new">;
   note?: string;
 };
 
