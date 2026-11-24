@@ -5271,5 +5271,53 @@
 		"permissions": {
 			"photos": "Kaneo는 작업과 댓글에 이미지를 첨부하고 프로필 사진을 설정하기 위해 사진을 사용합니다."
 		}
+	},
+	"intake": {
+		"detail": {
+			"activity": "Activity",
+			"activityEmpty": "No activity yet",
+			"confirmed": "Confirmed",
+			"created": "Request created",
+			"descriptionEmpty": "No description",
+			"status_changed": "Status changed",
+			"task_linked": "Task linked",
+			"tasksProgress": "{{done}} of {{total}} tasks done"
+		},
+		"errors": {
+			"loadFailed": "Could not load this request",
+			"transitionFailed": "Could not change the status"
+		},
+		"form": {
+			"description": "Tell us what you need. We will review it and reply here.",
+			"descriptionLabel": "Details",
+			"descriptionPlaceholder": "Add any detail that helps us understand the request",
+			"error": "Could not send the request",
+			"projectLabel": "Project",
+			"projectPlaceholder": "Choose a project",
+			"submit": "Send request",
+			"submitting": "Sending…",
+			"success": "Request sent",
+			"title": "New request",
+			"titleLabel": "Title",
+			"titlePlaceholder": "What do you need?"
+		},
+		"list": {
+			"empty": "No requests yet",
+			"loadError": "Could not load requests"
+		},
+		"note": {
+			"confirm": "Confirm",
+			"placeholder": "Add a note"
+		},
+		"status": {
+			"approved": "Approved",
+			"confirmed": "Confirmed",
+			"delivered": "Delivered",
+			"in_progress": "In progress",
+			"needs_revision": "Needs revision",
+			"new": "New",
+			"rejected": "Rejected",
+			"triaged": "Triaged"
+		}
 	}
 }

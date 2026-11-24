@@ -4180,6 +4180,54 @@
 			"manage": "Manage workspaces"
 		}
 	},
+	"intake": {
+		"status": {
+			"new": "New",
+			"triaged": "Triaged",
+			"rejected": "Rejected",
+			"approved": "Approved",
+			"in_progress": "In progress",
+			"delivered": "Delivered",
+			"needs_revision": "Needs revision",
+			"confirmed": "Confirmed"
+		},
+		"list": {
+			"empty": "No requests yet",
+			"loadError": "Could not load requests"
+		},
+		"detail": {
+			"descriptionEmpty": "No description",
+			"created": "Request created",
+			"status_changed": "Status changed",
+			"task_linked": "Task linked",
+			"confirmed": "Confirmed",
+			"tasksProgress": "{{done}} of {{total}} tasks done",
+			"activity": "Activity",
+			"activityEmpty": "No activity yet"
+		},
+		"form": {
+			"title": "New request",
+			"description": "Tell us what you need. We will review it and reply here.",
+			"titleLabel": "Title",
+			"titlePlaceholder": "What do you need?",
+			"descriptionLabel": "Details",
+			"descriptionPlaceholder": "Add any detail that helps us understand the request",
+			"projectLabel": "Project",
+			"projectPlaceholder": "Choose a project",
+			"submit": "Send request",
+			"submitting": "Sending…",
+			"success": "Request sent",
+			"error": "Could not send the request"
+		},
+		"note": {
+			"placeholder": "Add a note",
+			"confirm": "Confirm"
+		},
+		"errors": {
+			"loadFailed": "Could not load this request",
+			"transitionFailed": "Could not change the status"
+		}
+	},
 	"team": {
 		"roles": {
 			"owner": "Owner",
