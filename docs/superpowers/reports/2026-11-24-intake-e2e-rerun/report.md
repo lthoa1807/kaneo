@@ -1,5 +1,8 @@
 # Intake portal — second end-to-end run, 2026-11-24
 
+Replaces `docs/superpowers/reports/2026-11-24-intake-e2e/report.md`, which is
+kept for the before/after screenshots of the defects it caught.
+
 Fixes under test: `62f5aed8` (the five minor defects the first run recorded),
 on top of `4587304c`. Environment: local dev (API `http://localhost:1337`, web
 `http://localhost:5173`, Postgres in `kaneo-dev-pg`), driven with `agent-browser`
@@ -77,7 +80,7 @@ The first report listed realtime as untested. It is now tested, and it fails on
 both sides.
 
 With the guest's `REQ-2` detail page open, staff marked the request triaged.
-Five seconds later the guest page still read **New** — `14-guest-stale-no-reload.png`.
+The guest page still read **New** — `14-guest-stale-no-reload.png`.
 Reloading the same URL showed **Triaged** — `15-guest-after-reload.png`. The
 write reached the database; nothing pushed it to the open page.
 
@@ -85,7 +88,7 @@ write reached the database; nothing pushed it to the open page.
 | --- | --- |
 | ![guest page still says New](screenshots/14-guest-stale-no-reload.png) | ![guest page says Triaged](screenshots/15-guest-after-reload.png) |
 
-Two causes, both in code rather than in the browser:
+Two causes, both read from code rather than measured with a socket trace:
 
 - The API publishes `intake_request.updated`, but the socket audience is built
   from `PROJECT_READ_PERMISSIONS` (`apps/api/src/ws/project-read-access.ts`); a
@@ -126,5 +129,7 @@ Fifteen files in `screenshots/`, in the order the run happened:
 - `pnpm exec vp check` on the changed files — format and lint clean.
 - `pnpm i18n:check` — every locale in sync after the new guest string.
 - `apps/docs/openapi.json` regenerated for `projectSlug` and `workspaceName`.
-- Fork CI on the pushed commit is the remaining gate; the local box does not
-  typecheck `apps/web` (it needs more memory than this machine has).
+- Fork CI: run `45390351988` on `fa81054f`, all five jobs green after the review
+  pass that folded `get-my-membership` into one join and named the invitation
+  note key. The local box does not typecheck `apps/web` (it needs more memory
+  than this machine has), so that gate is CI-only.

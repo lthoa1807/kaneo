@@ -1,5 +1,9 @@
 # Intake portal — end-to-end run, 2026-11-24
 
+**Superseded by the second run: `docs/superpowers/reports/2026-11-24-intake-e2e-rerun/report.md`.**
+This one is kept for the before/after screenshots: it caught the six defects and
+the five smaller issues that the second run then verified as fixed.
+
 Branch `feature/intake-portal`, run started at `02a20be5` and ended at
 `4587304c`. UI build `v2.50.0`.
 Environment: local dev (API `http://localhost:1337`, web `http://localhost:5173`,
@@ -23,8 +27,9 @@ Accounts: `e2e-staff@test.local` (owner of workspace "E2E Intake", project
 
 ## Result
 
-Both paths completed. Six defects turned up and were fixed in this branch; a few
-smaller wording and layout issues are listed at the end and left for a follow-up.
+Both paths completed. Six defects turned up and were fixed in this branch, plus
+five smaller wording and layout issues listed at the end — all five were fixed
+afterwards in `62f5aed8` and re-checked in the second run.
 
 | Step | Expected | Observed |
 | --- | --- | --- |
@@ -103,7 +108,9 @@ Now counts `task.id`; the same request shows no progress until a task exists.
 ### 6. A rejection reason was invisible to the guest — `25647d7d`
 
 The reject dialog stores the note on the `status_changed` activity, but the
-activity list only printed "New → Rejected" and dropped the content
+activity list only printed "New → Rejected" and dropped the note the guest was
+waiting for.
+
 | Before | After |
 | --- | --- |
 | ![rejected without a reason](screenshots/30-guest-sees-rejected.png) | ![rejected with the reason](screenshots/31-guest-rejected-detail.png) |
@@ -119,7 +126,10 @@ Two checks caught what the browser could not, and both needed a follow-up commit
 
 Fork CI run `45377859064` on `4587304c`: success, both jobs.
 
-## Smaller issues, not fixed
+## Smaller issues (all fixed later in `62f5aed8`)
+
+The second run re-checked each of these in the browser; its report holds the
+after screenshots.
 
 - Guest sidebar still offers **Search** and an empty **Projects** group, and the
   workspace switcher has no label (the guest has no workspace name to show).
