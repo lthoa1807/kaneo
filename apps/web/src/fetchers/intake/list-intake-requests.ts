@@ -13,7 +13,7 @@ export type IntakeRequestPage = ListIntakeRequestsResponse;
 export type ListIntakeRequestsRequest = {
   workspaceId: string;
   projectId?: string;
-  status?: string;
+  status?: IntakeRequestListItem["status"];
   page?: number;
   limit?: number;
 };
@@ -32,8 +32,8 @@ async function listIntakeRequests({
     query: {
       ...(projectId ? { projectId } : {}),
       ...(status ? { status } : {}),
-      ...(page ? { page: String(page) } : {}),
-      ...(limit ? { limit: String(limit) } : {}),
+      page: page ? String(page) : undefined,
+      limit: limit ? String(limit) : undefined,
     },
   });
 

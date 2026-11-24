@@ -33,8 +33,8 @@ const request: IntakeRequest = {
   sourceId: null,
   externalReference: null,
   confirmedAt: null,
-  createdAt: new Date("2026-11-01T10:00:00Z"),
-  updatedAt: new Date("2026-11-02T10:00:00Z"),
+  createdAt: "2026-11-01T10:00:00Z",
+  updatedAt: "2026-11-02T10:00:00Z",
   taskCount: 1,
   completedTaskCount: 0,
   linkedTasks: [

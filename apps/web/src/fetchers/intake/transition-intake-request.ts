@@ -1,9 +1,10 @@
 import { client } from "@kaneo/libs";
 import { HttpError } from "@/lib/http-error";
+import type { IntakeRequestListItem } from "./list-intake-requests";
 
 export type TransitionIntakeRequestRequest = {
   requestId: string;
-  to: string;
+  to: IntakeRequestListItem["status"];
   note?: string;
 };
 
