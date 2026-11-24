@@ -109,7 +109,7 @@ async function listIntakeRequests(
       confirmedAt: intakeRequestTable.confirmedAt,
       createdAt: intakeRequestTable.createdAt,
       updatedAt: intakeRequestTable.updatedAt,
-      taskCount: count(),
+      taskCount: count(taskTable.id),
       completedTaskCount: count(completedSql),
     })
     .from(intakeRequestTable)
