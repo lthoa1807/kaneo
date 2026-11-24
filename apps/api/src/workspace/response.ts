@@ -62,3 +62,19 @@ export const workspaceCapabilitiesSchema = z
     description:
       "Whether the caller's roles (and API key scope, if any) allow each named action in the workspace. Mirrors the checks the API enforces.",
   });
+
+export const workspaceMembershipSchema = z
+  .object({
+    kind: z.enum(["guest", "staff"]).openapi({
+      description:
+        "The caller's membership kind: guest for a guest member, staff for every other member and for instance admins who are not members.",
+    }),
+    role: z.string().nullable().openapi({
+      description:
+        "The caller's stored role names, comma-separated. Null when the caller is an instance admin without a membership.",
+    }),
+  })
+  .openapi("WorkspaceMembership", {
+    description:
+      "The caller's own membership in the workspace. Guests hold no workspace:* permission, so this is the only answer they can read.",
+  });

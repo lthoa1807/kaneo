@@ -13,6 +13,7 @@ import {
 } from "../utils/require-workspace-permission";
 import { workspaceAccess } from "../utils/workspace-access-middleware";
 import getMyCapabilitiesCtrl from "./controllers/get-my-capabilities";
+import getMyMembershipCtrl from "./controllers/get-my-membership";
 import getMyProjectAccessCtrl from "./controllers/get-my-project-access";
 import getWorkspaceCtrl from "./controllers/get-workspace";
 import getWorkspaceMembersCtrl from "./controllers/get-workspace-members";
@@ -24,6 +25,7 @@ import {
   workspaceCapabilitiesSchema,
   workspaceListSchema,
   workspaceMemberListSchema,
+  workspaceMembershipSchema,
   workspaceSchema,
 } from "./response";
 import {
@@ -149,6 +151,25 @@ const getMyCapabilitiesRoute = createRoute({
   },
 });
 
+const getMyMembershipRoute = createRoute({
+  method: "get",
+  operationId: "getMyWorkspaceMembership",
+  path: "/{workspaceId}/membership",
+  tags: ["Workspaces"],
+  summary: "Get my workspace membership",
+  description:
+    "Answer whether the caller is a guest or a staff member of the workspace. Separate from capabilities because guests hold no workspace:read and capabilities only decide what the UI may do, not who the caller is.",
+  middleware: [workspaceAccess.fromParam("workspaceId")] as const,
+  request: { params: workspaceIdParam },
+  responses: {
+    200: jsonResponse(
+      "The caller's membership kind and role",
+      workspaceMembershipSchema,
+    ),
+    404: errorResponse("Workspace not found"),
+  },
+});
+
 const updateMemberProjectAccessRoute = createRoute({
   method: "put",
   operationId: "updateMemberProjectAccess",
@@ -210,6 +231,12 @@ const workspace = apiRouter<BaseVariables & { workspaceId: string }>()
   )
   .openapi(getMyCapabilitiesRoute, async (c) =>
     c.json(getMyCapabilitiesCtrl(await workspacePermissionChecker(c)), 200),
+  )
+  .openapi(getMyMembershipRoute, async (c) =>
+    c.json(
+      await getMyMembershipCtrl(c.get("workspaceId"), c.get("userId")),
+      200,
+    ),
   )
   .openapi(getWorkspaceProjectAccessRoute, async (c) =>
     c.json(

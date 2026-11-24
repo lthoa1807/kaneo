@@ -4658,6 +4658,18 @@
           },
           "removeMembers": {
             "type": "boolean"
+          },
+          "readIntake": {
+            "type": "boolean"
+          },
+          "createIntakeRequests": {
+            "type": "boolean"
+          },
+          "updateIntake": {
+            "type": "boolean"
+          },
+          "manageIntake": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -4679,9 +4691,38 @@
           "inviteUsers",
           "manageTeam",
           "updateMembers",
-          "removeMembers"
+          "removeMembers",
+          "readIntake",
+          "createIntakeRequests",
+          "updateIntake",
+          "manageIntake"
         ],
         "description": "Whether the caller's roles (and API key scope, if any) allow each named action in the workspace. Mirrors the checks the API enforces."
+      },
+      "WorkspaceMembership": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "guest",
+              "staff"
+            ],
+            "description": "The caller's membership kind: guest for a guest member, staff for every other member and for instance admins who are not members."
+          },
+          "role": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The caller's stored role names, comma-separated. Null when the caller is an instance admin without a membership."
+          }
+        },
+        "required": [
+          "kind",
+          "role"
+        ],
+        "description": "The caller's own membership in the workspace. Guests hold no workspace:* permission, so this is the only answer they can read."
       },
       "CustomFieldDefinition": {
         "type": "object",
@@ -25767,6 +25808,61 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/WorkspaceCapabilities"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workspace not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
+    "/workspace/{workspaceId}/membership": {
+      "get": {
+        "operationId": "getMyWorkspaceMembership",
+        "tags": [
+          "Workspaces"
+        ],
+        "summary": "Get my workspace membership",
+        "description": "Answer whether the caller is a guest or a staff member of the workspace. Separate from capabilities because guests hold no workspace:read and capabilities only decide what the UI may do, not who the caller is.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The caller's membership kind and role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceMembership"
                 }
               }
             }

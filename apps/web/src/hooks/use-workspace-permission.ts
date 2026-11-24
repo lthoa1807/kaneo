@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import getMyCapabilities from "@/fetchers/workspace/get-my-capabilities";
 import useActiveWorkspace from "@/hooks/queries/workspace/use-active-workspace";
-import { useGetActiveWorkspaceUser } from "@/hooks/queries/workspace-users/use-active-workspace-user";
+import useGetWorkspaceMembership from "@/hooks/queries/workspace/use-get-workspace-membership";
 import { authClient } from "@/lib/auth-client";
 
 export type PermissionLevel = "owner" | "admin" | "member";
@@ -28,9 +28,11 @@ function emptyCapabilityMap(): CapabilityMap {
 
 export function useWorkspacePermission() {
   const { data: activeWorkspace } = useActiveWorkspace();
-  const { data: activeMember } = useGetActiveWorkspaceUser();
+  // Membership answers role and kind without the member list: guests are
+  // refused by /organization/list-members (no workspace:read).
+  const { data: membership } = useGetWorkspaceMembership(activeWorkspace?.id);
   const workspaceId = activeWorkspace?.id;
-  const role = activeMember?.role as string | undefined;
+  const role = membership?.role ?? undefined;
 
   // Cached by (workspaceId, role). Refetches when either changes, e.g., when
   // the admin edits the role's permissions in the Roles UI and we invalidate
@@ -71,6 +73,10 @@ export function useWorkspacePermission() {
       canManageTeam: () => can.manageTeam,
       canUpdateMembers: () => can.updateMembers,
       canRemoveMembers: () => can.removeMembers,
+      canReadIntake: () => can.readIntake,
+      canCreateIntakeRequests: () => can.createIntakeRequests,
+      canUpdateIntake: () => can.updateIntake,
+      canManageIntake: () => can.manageIntake,
       // Escape hatch for ad-hoc permission checks (uncached). Prefer adding
       // a capability above.
       hasPermission: async (permissions: Record<string, string[]>) => {
@@ -91,7 +97,6 @@ export function useWorkspacePermission() {
   return {
     ...helpers,
     workspace: activeWorkspace,
-    member: activeMember,
     role,
     isOwner: role === "owner",
     isAdmin: role === "owner" || role === "admin",
