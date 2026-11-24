@@ -30,6 +30,9 @@ export function IntakeActivityList({ items }: { items: IntakeActivity[] }) {
                 ? `${t(`intake:status.${from}`)} → ${t(`intake:status.${to}`)}`
                 : item.content || t(`intake:detail.${item.type}`)}
             </span>
+            {item.type === "status_changed" && item.content ? (
+              <span>{item.content}</span>
+            ) : null}
             <span className="text-muted-foreground text-xs">
               {formatRelativeTime(item.createdAt)}
             </span>
