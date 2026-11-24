@@ -23,6 +23,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import useGetProject from "@/hooks/queries/project/use-get-project";
+import { useIntakeSurfaces } from "@/hooks/use-intake-surfaces";
 import { useProjectWebSocket } from "@/hooks/use-project-websocket";
 import { cn } from "@/lib/cn";
 import { getProjectUnavailableReason } from "@/lib/project-unavailable-reason";
@@ -74,16 +75,23 @@ export default function ProjectLayout({
         ? "calendar"
         : location.pathname.includes("/gantt")
           ? "gantt"
-          : "board");
-  const currentView = resolveProjectView(resolvedRoute, viewMode);
+          : location.pathname.includes("/intake")
+            ? "intake"
+            : "board");
+  // "intake" is a project route, not a task view: the toggle and the shortcuts
+  // keep pointing at the task layout the visitor last used.
+  const onIntake = resolvedRoute === "intake";
+  const taskRoute = onIntake ? "board" : resolvedRoute;
+  const currentView = resolveProjectView(taskRoute, viewMode);
   const showViews = showViewSwitcher && !unavailableReason;
+  const { surfaces, ready } = useIntakeSurfaces();
 
   const goToView = useGoToProjectView({
     workspaceId,
     projectId,
     currentRoute: resolvedRoute,
   });
-  useProjectViewShortcuts(goToView, currentView, showViews);
+  useProjectViewShortcuts(goToView, currentView, showViews && !onIntake);
 
   const handleProjectSwitch = (nextProjectId: string) => {
     navigate({
@@ -157,6 +165,8 @@ export default function ProjectLayout({
                 projectId={projectId}
                 currentView={currentView}
                 onSelect={goToView}
+                showIntake={ready && surfaces.staffIntake}
+                intakeActive={onIntake}
               />
             )}
             {summary}

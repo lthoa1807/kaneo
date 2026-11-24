@@ -78,7 +78,9 @@ import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProject
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/board'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdCalendarRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/calendar'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/gantt'
+import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/intake'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRequestsRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/requests'
+import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRequestIdRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/intake.$requestId_'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRequestsRequestIdRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/requests.$requestId_'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdTaskTaskIdRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId_'
 
@@ -507,6 +509,15 @@ const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute
         LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute,
     } as any,
   )
+const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRoute =
+  LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRouteImport.update(
+    {
+      id: '/project/$projectId/intake',
+      path: '/project/$projectId/intake',
+      getParentRoute: () =>
+        LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute,
+    } as any,
+  )
 const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRequestsRoute =
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRequestsRouteImport.update(
     {
@@ -514,6 +525,15 @@ const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRequestsRo
       path: '/project/$projectId/requests',
       getParentRoute: () =>
         LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute,
+    } as any,
+  )
+const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRequestIdRoute =
+  LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRequestIdRouteImport.update(
+    {
+      id: '/$requestId_',
+      path: '/$requestId',
+      getParentRoute: () =>
+        LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRoute,
     } as any,
   )
 const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRequestsRequestIdRoute =
@@ -602,8 +622,10 @@ export interface FileRoutesByFullPath {
   '/dashboard/workspace/$workspaceId/project/$projectId/board': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/calendar': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdCalendarRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/gantt': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute
+  '/dashboard/workspace/$workspaceId/project/$projectId/intake': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRouteWithChildren
   '/dashboard/workspace/$workspaceId/project/$projectId/requests': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRequestsRouteWithChildren
   '/dashboard/workspace/$workspaceId/project/$projectId/': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIndexRoute
+  '/dashboard/workspace/$workspaceId/project/$projectId/intake/$requestId': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRequestIdRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/requests/$requestId': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRequestsRequestIdRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdTaskTaskIdRoute
 }
@@ -670,8 +692,10 @@ export interface FileRoutesByTo {
   '/dashboard/workspace/$workspaceId/project/$projectId/board': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/calendar': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdCalendarRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/gantt': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute
+  '/dashboard/workspace/$workspaceId/project/$projectId/intake': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRouteWithChildren
   '/dashboard/workspace/$workspaceId/project/$projectId/requests': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRequestsRouteWithChildren
   '/dashboard/workspace/$workspaceId/project/$projectId': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIndexRoute
+  '/dashboard/workspace/$workspaceId/project/$projectId/intake/$requestId': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRequestIdRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/requests/$requestId': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRequestsRequestIdRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdTaskTaskIdRoute
 }
@@ -745,8 +769,10 @@ export interface FileRoutesById {
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/board': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/calendar': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdCalendarRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/gantt': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute
+  '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/intake': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRouteWithChildren
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/requests': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRequestsRouteWithChildren
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIndexRoute
+  '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/intake/$requestId_': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRequestIdRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/requests/$requestId_': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRequestsRequestIdRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId_': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdTaskTaskIdRoute
 }
@@ -819,8 +845,10 @@ export interface FileRouteTypes {
     | '/dashboard/workspace/$workspaceId/project/$projectId/board'
     | '/dashboard/workspace/$workspaceId/project/$projectId/calendar'
     | '/dashboard/workspace/$workspaceId/project/$projectId/gantt'
+    | '/dashboard/workspace/$workspaceId/project/$projectId/intake'
     | '/dashboard/workspace/$workspaceId/project/$projectId/requests'
     | '/dashboard/workspace/$workspaceId/project/$projectId/'
+    | '/dashboard/workspace/$workspaceId/project/$projectId/intake/$requestId'
     | '/dashboard/workspace/$workspaceId/project/$projectId/requests/$requestId'
     | '/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId'
   fileRoutesByTo: FileRoutesByTo
@@ -887,8 +915,10 @@ export interface FileRouteTypes {
     | '/dashboard/workspace/$workspaceId/project/$projectId/board'
     | '/dashboard/workspace/$workspaceId/project/$projectId/calendar'
     | '/dashboard/workspace/$workspaceId/project/$projectId/gantt'
+    | '/dashboard/workspace/$workspaceId/project/$projectId/intake'
     | '/dashboard/workspace/$workspaceId/project/$projectId/requests'
     | '/dashboard/workspace/$workspaceId/project/$projectId'
+    | '/dashboard/workspace/$workspaceId/project/$projectId/intake/$requestId'
     | '/dashboard/workspace/$workspaceId/project/$projectId/requests/$requestId'
     | '/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId'
   id:
@@ -961,8 +991,10 @@ export interface FileRouteTypes {
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/board'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/calendar'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/gantt'
+    | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/intake'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/requests'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/'
+    | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/intake/$requestId_'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/requests/$requestId_'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId_'
   fileRoutesById: FileRoutesById
@@ -1463,12 +1495,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRouteImport
       parentRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute
     }
+    '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/intake': {
+      id: '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/intake'
+      path: '/project/$projectId/intake'
+      fullPath: '/dashboard/workspace/$workspaceId/project/$projectId/intake'
+      preLoaderRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRouteImport
+      parentRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute
+    }
     '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/requests': {
       id: '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/requests'
       path: '/project/$projectId/requests'
       fullPath: '/dashboard/workspace/$workspaceId/project/$projectId/requests'
       preLoaderRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRequestsRouteImport
       parentRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute
+    }
+    '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/intake/$requestId_': {
+      id: '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/intake/$requestId_'
+      path: '/$requestId'
+      fullPath: '/dashboard/workspace/$workspaceId/project/$projectId/intake/$requestId'
+      preLoaderRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRequestIdRouteImport
+      parentRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRoute
     }
     '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/requests/$requestId_': {
       id: '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/requests/$requestId_'
@@ -1637,6 +1683,21 @@ const LayoutAuthenticatedDashboardSettingsRouteWithChildren =
     LayoutAuthenticatedDashboardSettingsRouteChildren,
   )
 
+interface LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRouteChildren {
+  LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRequestIdRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRequestIdRoute
+}
+
+const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRouteChildren: LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRouteChildren =
+  {
+    LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRequestIdRoute:
+      LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRequestIdRoute,
+  }
+
+const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRouteWithChildren =
+  LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRoute._addFileChildren(
+    LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRouteChildren,
+  )
+
 interface LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRequestsRouteChildren {
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRequestsRequestIdRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRequestsRequestIdRoute
 }
@@ -1664,6 +1725,7 @@ interface LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRouteChildren {
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdCalendarRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdCalendarRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute
+  LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRouteWithChildren
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRequestsRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRequestsRouteWithChildren
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIndexRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIndexRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdTaskTaskIdRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdTaskTaskIdRoute
@@ -1693,6 +1755,8 @@ const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRouteChildren: LayoutAuthe
       LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdCalendarRoute,
     LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute:
       LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute,
+    LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRoute:
+      LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIntakeRouteWithChildren,
     LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRequestsRoute:
       LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRequestsRouteWithChildren,
     LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIndexRoute:

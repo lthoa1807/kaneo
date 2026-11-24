@@ -17674,6 +17674,94 @@
 						}
 					},
 					"required": ["loadFailed", "transitionFailed", "transitionConflict"]
+				},
+				"staff": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"tab": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"group": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"triage": {
+									"type": "string"
+								},
+								"progress": {
+									"type": "string"
+								},
+								"awaiting": {
+									"type": "string"
+								},
+								"closed": {
+									"type": "string"
+								}
+							},
+							"required": ["triage", "progress", "awaiting", "closed"]
+						},
+						"truncated": {
+							"type": "string"
+						},
+						"linkedTasks": {
+							"type": "string"
+						},
+						"attachTask": {
+							"type": "string"
+						},
+						"attachTitle": {
+							"type": "string"
+						},
+						"attachDescription": {
+							"type": "string"
+						},
+						"attachSubmit": {
+							"type": "string"
+						},
+						"attachSuccess": {
+							"type": "string"
+						},
+						"attachError": {
+							"type": "string"
+						},
+						"taskTitle": {
+							"type": "string"
+						},
+						"status": {
+							"type": "string"
+						},
+						"priority": {
+							"type": "string"
+						},
+						"rejectTitle": {
+							"type": "string"
+						},
+						"rejectDescription": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"tab",
+						"title",
+						"group",
+						"truncated",
+						"linkedTasks",
+						"attachTask",
+						"attachTitle",
+						"attachDescription",
+						"attachSubmit",
+						"attachSuccess",
+						"attachError",
+						"taskTitle",
+						"status",
+						"priority",
+						"rejectTitle",
+						"rejectDescription"
+					]
 				}
 			},
 			"required": [
@@ -17683,7 +17771,8 @@
 				"detail",
 				"form",
 				"note",
-				"errors"
+				"errors",
+				"staff"
 			]
 		},
 		"team": {

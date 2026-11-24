@@ -5522,6 +5522,29 @@
 			"nav": "My requests",
 			"newRequest": "New request",
 			"title": "My requests"
+		},
+		"staff": {
+			"attachDescription": "Create the task that fulfils this request. It stays linked to the request.",
+			"attachError": "Could not attach the task",
+			"attachSubmit": "Create and link",
+			"attachSuccess": "Task attached",
+			"attachTask": "Attach task",
+			"attachTitle": "Attach a task",
+			"group": {
+				"awaiting": "Awaiting guest",
+				"closed": "Closed",
+				"progress": "In progress",
+				"triage": "Needs triage"
+			},
+			"linkedTasks": "Linked tasks",
+			"priority": "Priority",
+			"rejectDescription": "Tell the guest why this request is rejected. The note appears in their activity.",
+			"rejectTitle": "Reject request",
+			"status": "Status",
+			"tab": "Intake",
+			"taskTitle": "Task title",
+			"title": "Intake requests",
+			"truncated": "Showing {{shown}} of {{total}} requests — filter by status to narrow"
 		}
 	}
 }

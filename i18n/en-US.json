@@ -4246,6 +4246,29 @@
 			"loadFailed": "Could not load this request",
 			"transitionFailed": "Could not change the status",
 			"transitionConflict": "Someone else just changed this request. Reloading."
+		},
+		"staff": {
+			"tab": "Intake",
+			"title": "Intake requests",
+			"group": {
+				"triage": "Needs triage",
+				"progress": "In progress",
+				"awaiting": "Awaiting guest",
+				"closed": "Closed"
+			},
+			"truncated": "Showing {{shown}} of {{total}} requests — filter by status to narrow",
+			"linkedTasks": "Linked tasks",
+			"attachTask": "Attach task",
+			"attachTitle": "Attach a task",
+			"attachDescription": "Create the task that fulfils this request. It stays linked to the request.",
+			"attachSubmit": "Create and link",
+			"attachSuccess": "Task attached",
+			"attachError": "Could not attach the task",
+			"taskTitle": "Task title",
+			"status": "Status",
+			"priority": "Priority",
+			"rejectTitle": "Reject request",
+			"rejectDescription": "Tell the guest why this request is rejected. The note appears in their activity."
 		}
 	},
 	"team": {
