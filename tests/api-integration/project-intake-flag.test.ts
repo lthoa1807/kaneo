@@ -62,6 +62,16 @@ describe("project intake flag", () => {
       ((await readBack.json()) as { intakeEnabled: boolean }).intakeEnabled,
     ).toBe(true);
 
+    // The project settings screen reads the board payload, not the project one.
+    const board = await app.request(`/api/task/tasks/${ctx.project.id}`);
+    expect(board.status).toBe(200);
+    const boardProject = (
+      (await board.json()) as {
+        data: { intakeEnabled: boolean };
+      }
+    ).data;
+    expect(boardProject.intakeEnabled).toBe(true);
+
     const disabled = await updateProjectRequest(ctx.project.id, false);
     expect(
       ((await disabled.json()) as { intakeEnabled: boolean }).intakeEnabled,

@@ -469,6 +469,7 @@ async function getTasksPage(
       descriptionDeferred: project.descriptionDeferred,
       isPublic: project.isPublic,
       includeSubtasks: project.includeSubtasks,
+      intakeEnabled: project.intakeEnabled,
       workspaceId: project.workspaceId,
       backgroundVersion: project.backgroundVersion,
       columns,
