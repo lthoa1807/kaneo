@@ -577,7 +577,6 @@
           "icon",
           "description",
           "isPublic",
-          "intakeEnabled",
           "workspaceId",
           "backgroundVersion",
           "columns",
