@@ -317,7 +317,7 @@ git commit -m "feat: workspace membership kind separates guests from staff"
 
 ### Task 2: Guest invitations are bounded to selected projects
 
-The `guest` role is already invitable through the existing member invite modal, and nothing stops an admin from choosing "all projects" or from being invited as a guest and later silently re-roled.
+The API already accepts the `guest` role on an invitation, and nothing stops an admin from choosing "all projects" or from being invited as a guest and later silently re-roled. **Correction (2026-11-24): no UI can create a guest.** `invite-team-member-modal.tsx` hardcodes `role: "member"` (there is a `// TODO: role and email` there), and the members-table role `Select` lists only `viewer`, `member`, `admin` plus custom roles — `guest` is filtered out because it is a `DEFAULT_ROLE_NAMES` entry. The spec's dedicated "Invite guests" entry (§8, MVP item 6) was never built, so guests can only be created through the database today. Task 2's server guard is still correct and tested; the missing entry is tracked as the Phase 3.1 follow-up.
 
 **Files:**
 - Modify: `apps/api/src/project-access/resolve-project-access-request.ts`
@@ -764,7 +764,7 @@ The first Fork CI run found three real type errors that the local gate missed, b
 | Guest/staff identity separation | Phase 3 |
 | Notifications (spec §11) | Phase 4 |
 | Guest in-portal title/description editing (PATCH exists) | Phase 4 |
-| Dedicated "Invite guests" settings entry | Phase 4 — the existing invite modal already offers the `guest` role, and Task 2 bounds project access. Add the dedicated flow only if the invite modal proves confusing. |
+| Dedicated "Invite guests" settings entry | **Missing from Phase 3 — build as Phase 3.1.** The spec lists it as MVP item 6 (§8, §12) and the earlier claim that "the existing invite modal already offers the `guest` role" was wrong: the modal hardcodes `role: "member"` and the members-table select filters `guest` out. Until it exists, a guest can only be created by editing `workspace_member.role` directly, so the invite half of the feature is unreachable from the product. |
 | Standalone/shareable project portal URL (no account) | Phase 5 — the in-app project portal route is the shape it will render; auth for it is a separate design |
 | API/Slack/Telegram/AI intake channels | Later phases (spec §13) |
 
@@ -772,5 +772,5 @@ The first Fork CI run found three real type errors that the local gate missed, b
 
 - **Notifications** (spec §11 bold rows): the `intake_request` notification resourceType, in-app entries, and transactional guest emails. Touches the notification pipeline, preference gates and `@kaneo/email` templates — not UI.
 - **Guest in-portal title/description editing** (API `PATCH` exists).
-- **Dedicated "Invite guests" settings entry** — see the scope table; guest invitation itself is in Phase 3 (Tasks 1–2).
+- **Dedicated "Invite guests" settings entry** — not deferred after all: it is MVP item 6 of the spec and was missed (see the scope table). Phase 3.1.
 - **Standalone shareable portal URL** — Phase 5. The Phase 3 routes do not lock it in: the project portal page is addressed by workspace + project id and reads everything through the intake API, so a tokenized entry point can later render the same components.
