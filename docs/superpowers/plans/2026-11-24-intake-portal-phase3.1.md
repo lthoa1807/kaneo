@@ -25,16 +25,16 @@ Add a `mode` prop to the existing modal instead of a second component. The two d
 
 **Files:** `apps/web/src/components/team/invite-team-member-modal.tsx`, `apps/web/src/hooks/mutations/workspace-user/use-invite-workspace-user.ts`, `apps/web/src/components/team/invite-team-member-modal.test.tsx`
 
-- [ ] **Step 1: Write the failing test.** Extend `invite-team-member-modal.test.tsx` with a `guest invitations` block:
+- [x] **Step 1: Write the failing test.** Extend `invite-team-member-modal.test.tsx` with a `guest invitations` block:
   - `mode="guest"` renders the "all projects" radio as `aria-disabled="true"` and the "selected projects" radio as `aria-checked="true"`.
   - submitting without a project shows `team:projectAccess.selectAtLeastOne` and does not call `inviteMember`.
   - after checking one project, submitting calls `inviteMember` with `role: "guest"`, `projectAccess: "selected"` and that project's id.
 
   Run: `pnpm --filter @kaneo/web exec vp test run --config vitest.config.ts invite-team-member-modal` — expect the three new tests to fail.
 
-- [ ] **Step 2: Widen the hook's role union.** In `use-invite-workspace-user.ts`: `role: "admin" | "member" | "owner" | "guest"`. The value is passed straight to `authClient.organization.inviteMember`.
+- [x] **Step 2: Widen the hook's role union.** In `use-invite-workspace-user.ts`: `role: "admin" | "member" | "owner" | "guest"`. The value is passed straight to `authClient.organization.inviteMember`.
 
-- [ ] **Step 3: Add `mode` to the modal.** `Props` gains `mode?: "member" | "guest"`. Then:
+- [x] **Step 3: Add `mode` to the modal.** `Props` gains `mode?: "member" | "guest"`. Then:
   - `const isGuest = mode === "guest";`
   - default access: `chosenAccess ?? (isGuest || inviterLimited ? SELECTED_PROJECTS_ACCESS : ALL_PROJECTS_ACCESS)`
   - `allowAll={!isGuest && !inviterLimited}`
@@ -42,23 +42,23 @@ Add a `mode` prop to the existing modal instead of a second component. The two d
   - dialog title: `t(isGuest ? "team:inviteGuest.title" : "team:inviteModal.title")`
   - keep the `canInvite` guard and the invitation-link step unchanged.
 
-- [ ] **Step 4: Re-run the test file.** All cases pass, including the four existing project-access cases.
+- [x] **Step 4: Re-run the test file.** All cases pass, including the four existing project-access cases.
 
-- [ ] **Step 5: Commit.** `feat(web): invite guests with selected project access`
+- [x] **Step 5: Commit.** `feat(web): invite guests with selected project access`
 
 ## Task 2: The entry point and its copy
 
 **Files:** `apps/web/src/routes/_layout/_authenticated/dashboard/workspace/$workspaceId/members.tsx`, `i18n/en-US.json`
 
-- [ ] **Step 1: Add the second button.** Next to "Invite member", render "Invite guest" (`UserPlus`, `variant="outline"`, `size="xs"`) behind the same `canInvite` gate, opening a second `<InviteTeamMemberModal mode="guest" />` with its own open state.
+- [x] **Step 1: Add the second button.** Next to "Invite member", render "Invite guest" (`UserPlus`, `variant="outline"`, `size="xs"`) behind the same `canInvite` gate, opening a second `<InviteTeamMemberModal mode="guest" />` with its own open state.
 
-- [ ] **Step 2: Add the two keys** by editing `i18n/en-US.json` in place (tab-indented, never re-dumped):
+- [x] **Step 2: Add the two keys** by editing `i18n/en-US.json` in place (tab-indented, never re-dumped):
   - `team:members.inviteGuest` — "Invite guest"
   - `team:inviteGuest.title` — "Invite a guest"
 
-- [ ] **Step 3: Sync the schema and check.** `pnpm i18n:check:fix && pnpm i18n:schema && pnpm i18n:check`.
+- [x] **Step 3: Sync the schema and check.** `pnpm i18n:check:fix && pnpm i18n:schema && pnpm i18n:check`.
 
-- [ ] **Step 4: Commit.** `feat(web): add the invite-guest entry to workspace members`
+- [x] **Step 4: Commit.** `feat(web): add the invite-guest entry to workspace members`
 
 ## Verification
 
