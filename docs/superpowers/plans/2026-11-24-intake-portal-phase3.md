@@ -692,9 +692,10 @@ Manual as a member: `Tasks | Backlog | Intake`; approve a `new` request; deliver
 - Regenerated/verified: `apps/docs/openapi.json` (Task 1 added one operation; Task 3 added one query param)
 - Modify: `apps/docs` intake/workspace API page if one exists (mirror Phase 2's docs; skip if the site renders from the spec)
 
-- [ ] **Step 1: Regenerate the route tree and inspect the diff.** Start `pnpm --filter @kaneo/web dev`, wait for `routeTree.gen.ts` to be rewritten, stop the server (web tests do not run the router plugin). Expected: exactly the five new route ids from the route map, no changed existing parents, `/project/$projectId/index` still redirecting to `board`.
+- [x] **Step 1: Regenerate the route tree and inspect the diff.** Start `pnpm --filter @kaneo/web dev`, wait for `routeTree.gen.ts` to be rewritten, stop the server (web tests do not run the router plugin). Expected: exactly the five new route ids from the route map, no changed existing parents, `/project/$projectId/index` still redirecting to `board`.
+  - Done in `4773ae7e`, `0a27f114`, `f2750710`. All five ids are present (`/project/$projectId/intake`, `/project/$projectId/intake/$requestId`, `/project/$projectId/requests`, `/project/$projectId/requests/$requestId`, `…/my-requests`), and `project/$projectId/index.tsx` still redirects to `board`.
 
-- [ ] **Step 2: Confirm guests still cannot reach staff surfaces**
+- [x] **Step 2: Confirm guests still cannot reach staff surfaces**
 
 ```bash
 grep -rn "useGetProject\|useGetColumns\|useGetTasks\|client.project" \
@@ -703,19 +704,24 @@ grep -rn "useGetProject\|useGetColumns\|useGetTasks\|client.project" \
   apps/web/src/routes/_layout/_authenticated/dashboard/workspace/\$workspaceId/project/\$projectId/requests.\$requestId_.tsx
 ```
 
-Expected: no matches.
+Expected: one allowlisted match, `components/intake/attach-task-dialog.tsx`. It reads `useGetColumns` but is staff-only: it is rendered from `staff-request-detail` behind `canManageIntake() && canCreateTasks()`, and no guest route or guest component imports it. Anything else matching the pattern is a regression.
 
-- [ ] **Step 3: Run the gates**
+- [x] **Step 3: Run the gates**
 
 ```
 pnpm i18n:check
 pnpm openapi:check
-node …/tsc.js -p apps/web/tsconfig.json --noEmit      # alone (WSL memory)
+node …/tsc.js -p apps/web/tsconfig.app.json --noEmit   # alone (WSL memory)
+node …/tsc.js -p apps/api/tsconfig.json --noEmit       # alone (WSL memory)
 pnpm --filter @kaneo/web exec vp test run --config vitest.config.ts intake
 pnpm exec vp check
 ```
 
-- [ ] **Step 4: Manual end-to-end pass** (one browser, two accounts)
+`tsconfig.app.json`, not `tsconfig.json` — the latter is a solution config with `"files": []`, so it typechecks nothing and always exits 0.
+
+Results: i18n in sync, `apps/docs/openapi.json` unchanged after export, both typechecks clean, 4 intake test files / 23 tests pass, `vp check` clean.
+
+- [ ] **Step 4: Manual end-to-end pass** (one browser, two accounts) — **still open.** Everything below is covered by unit/integration tests; this pass is the only check that the screens actually work together in a browser.
 
 Guest: sidebar is only "My requests" → create a request from the workspace page → open the project portal from the row → detail shows progress 0/0 and the created activity.
 Staff: intake tab → request under "Needs triage" → approve → attach a task → deliver.
@@ -724,16 +730,26 @@ Members: the guest row shows the "Guest" badge and no role dropdown; the assigne
 
 - [ ] **Step 5: Acceptance checklist** (all must hold before the PR)
 
-- [ ] Guest vs staff identity comes from membership (`GET /workspace/{id}/membership`); no surface gate reads `task:read` or a browser-side role name.
-- [ ] A guest invitation with `all` project access is rejected; a guest stays `kind: "guest"` after accepting.
-- [ ] Guests are rejected as assignees by the API, and hidden from the assignee picker; the members table shows a Guest badge.
-- [ ] The three surfaces (workspace portal, project portal, staff intake) have their own routes and gates; a guest gets nothing from the staff routes.
-- [ ] Guests see no `linkedTasks`; staff see linked tasks and progress.
-- [ ] Request and task stay separate (progress is display-only).
-- [ ] Tests exist for the identity endpoint, the invitation guard, assignability, the surface/nav resolver, the status maps, and the guest/staff detail action gating.
-- [ ] `pnpm i18n:check`, `pnpm openapi:check`, web typecheck, focused vitest and `vp check` are green.
+- [x] Guest vs staff identity comes from membership (`GET /workspace/{id}/membership`); no surface gate reads `task:read` or a browser-side role name. — `workspace-membership-kind.test.ts`, `intake-surfaces.test.ts`.
+- [x] A guest invitation with `all` project access is rejected; a guest stays `kind: "guest"` after accepting. — `resolve-project-access-request` tests plus the integration suite.
+- [x] Guests are rejected as assignees by the API, and hidden from the assignee picker; the members table shows a Guest badge. — `assignable-guests.test.ts`, `assert-assignable-user` tests.
+- [x] The three surfaces (workspace portal, project portal, staff intake) have their own routes and gates; a guest gets nothing from the staff routes. — route tree above, `IntakeAccessGate`, guest routes never mount `ProjectLayout`.
+- [ ] Guests see no `linkedTasks`; staff see linked tasks and progress. — implementation only; confirm in Step 4.
+- [ ] Request and task stay separate (progress is display-only). — confirm in Step 4.
+- [x] Tests exist for the identity endpoint, the invitation guard, assignability, the surface/nav resolver, the status maps, and the guest/staff detail action gating.
+- [x] `pnpm i18n:check`, `pnpm openapi:check`, web typecheck, focused vitest and `vp check` are green.
 
-- [ ] **Step 6: Commit + push** — `git commit -m "chore: regenerate route tree and verify intake gates"`, push `feature/intake-portal`, watch fork CI to green.
+- [x] **Step 6: Commit + push** — `git commit -m "chore: regenerate route tree and verify intake gates"`, push `feature/intake-portal`, watch fork CI to green. — Landed as `4773ae7e`, `0a27f114`, `f2750710` and the three CI fixes below; Fork CI `45346044213` is green.
+
+## CI fixes after the first push
+
+The first Fork CI run found three real type errors that the local gate missed, because `apps/web/tsconfig.json` is a solution config with `"files": []` and typechecks nothing. Always use `apps/web/tsconfig.app.json`.
+
+| Commit | Fix |
+| --- | --- |
+| `625305d1` | The intake router was mounted with a bare `api.route("/intake", intake)`, so it never entered the `AppType` union and `client.intake` was untyped. Routers must be destructured from `createApp()`'s return value. Also `resolveProjectView` now takes `Exclude<ProjectRoute, "intake">`. |
+| `8b2e03d6` | Test fixtures used `Date` where the API returns ISO strings; fetcher query objects were wider than the Zod schema (`page`/`limit` always present, `status` narrowed). |
+| `b7f3afd9` | `transition` accepts seven targets, not `"new"`: `to: Exclude<IntakeRequestListItem["status"], "new">`. |
 
 ## Scope decisions (agreed)
 
