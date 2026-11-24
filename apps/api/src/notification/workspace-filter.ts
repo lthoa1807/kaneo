@@ -9,6 +9,12 @@ export function notificationWorkspaceFilter(workspaceId?: string) {
     (${notificationTable.resourceId} IS NULL AND ${notificationTable.resourceType} IS NULL)
     OR
     (${notificationTable.resourceType} = 'workspace' AND ${notificationTable.resourceId} = ${workspaceId})
+    OR (${notificationTable.resourceType} = 'intake_request' AND EXISTS (
+      SELECT 1 FROM intake_request AS inbox_request
+      JOIN project AS inbox_request_project ON inbox_request_project.id = inbox_request.project_id
+      WHERE inbox_request.id = ${notificationTable.resourceId}
+        AND inbox_request_project.workspace_id = ${workspaceId}
+    ))
     OR (${notificationTable.resourceType} = 'task' AND EXISTS (
       SELECT 1 FROM task AS inbox_task
       JOIN project AS inbox_project ON inbox_project.id = inbox_task.project_id
