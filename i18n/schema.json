@@ -17475,9 +17475,31 @@
 						},
 						"loadError": {
 							"type": "string"
+						},
+						"retry": {
+							"type": "string"
 						}
 					},
-					"required": ["empty", "loadError"]
+					"required": ["empty", "loadError", "retry"]
+				},
+				"portal": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"nav": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"all": {
+							"type": "string"
+						},
+						"newRequest": {
+							"type": "string"
+						}
+					},
+					"required": ["nav", "title", "all", "newRequest"]
 				},
 				"detail": {
 					"type": "object",
@@ -17602,7 +17624,15 @@
 					"required": ["loadFailed", "transitionFailed"]
 				}
 			},
-			"required": ["status", "list", "detail", "form", "note", "errors"]
+			"required": [
+				"status",
+				"list",
+				"portal",
+				"detail",
+				"form",
+				"note",
+				"errors"
+			]
 		},
 		"team": {
 			"type": "object",

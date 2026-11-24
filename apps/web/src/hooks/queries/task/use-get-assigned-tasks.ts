@@ -4,11 +4,13 @@ import getAssignedTasks from "@/fetchers/task/get-assigned-tasks";
 function useGetAssignedTasks(
   workspaceId: string | undefined,
   countOnly = false,
+  enabled = true,
 ) {
   return useQuery({
     queryKey: ["assigned-tasks", workspaceId, { countOnly }],
     queryFn: () => getAssignedTasks(workspaceId ?? "", countOnly),
-    enabled: Boolean(workspaceId),
+    // Guests hold no task:read; callers disable this instead of paying a 403.
+    enabled: Boolean(workspaceId) && enabled,
     // The app default skips refetching on mount; these lists go stale while
     // the user works elsewhere.
     refetchOnMount: "always",

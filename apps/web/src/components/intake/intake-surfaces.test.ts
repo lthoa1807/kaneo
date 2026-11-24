@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vite-plus/test";
-import { type IntakeIdentity, resolveIntakeSurfaces } from "./intake-surfaces";
+import {
+  type IntakeIdentity,
+  navForSurfaces,
+  resolveIntakeSurfaces,
+} from "./intake-surfaces";
 
 function identity(overrides: Partial<IntakeIdentity>): IntakeIdentity {
   return {
@@ -19,6 +23,7 @@ describe("resolveIntakeSurfaces", () => {
         identity({ readIntake: true, createIntakeRequests: true }),
       ),
     ).toEqual({
+      kind: "guest",
       guestPortal: true,
       staffIntake: false,
       canCreate: true,
@@ -28,6 +33,7 @@ describe("resolveIntakeSurfaces", () => {
 
   it("hides the portal from a guest who cannot create requests", () => {
     expect(resolveIntakeSurfaces(identity({ readIntake: true }))).toEqual({
+      kind: "guest",
       guestPortal: false,
       staffIntake: false,
       canCreate: false,
@@ -47,6 +53,7 @@ describe("resolveIntakeSurfaces", () => {
         }),
       ),
     ).toEqual({
+      kind: "staff",
       guestPortal: false,
       staffIntake: true,
       canCreate: true,
@@ -65,6 +72,7 @@ describe("resolveIntakeSurfaces", () => {
 
   it("shows nothing when the workspace has no intake permissions", () => {
     expect(resolveIntakeSurfaces(identity({ kind: "staff" }))).toEqual({
+      kind: "staff",
       guestPortal: false,
       staffIntake: false,
       canCreate: false,
@@ -83,5 +91,43 @@ describe("resolveIntakeSurfaces", () => {
         }),
       ).staffIntake,
     ).toBe(false);
+  });
+});
+
+describe("navForSurfaces", () => {
+  it("shows guests only the portal nav", () => {
+    expect(
+      navForSurfaces({
+        kind: "guest",
+        guestPortal: true,
+        staffIntake: false,
+        canCreate: true,
+        canManage: false,
+      }),
+    ).toEqual({ staffNav: false, projectsNav: false, portalNav: true });
+  });
+
+  it("keeps the staff nav for a staff role without intake permission", () => {
+    expect(
+      navForSurfaces({
+        kind: "staff",
+        guestPortal: false,
+        staffIntake: false,
+        canCreate: false,
+        canManage: false,
+      }),
+    ).toEqual({ staffNav: true, projectsNav: true, portalNav: false });
+  });
+
+  it("keeps the staff nav untouched for members and viewers", () => {
+    expect(
+      navForSurfaces({
+        kind: "staff",
+        guestPortal: false,
+        staffIntake: true,
+        canCreate: true,
+        canManage: true,
+      }),
+    ).toEqual({ staffNav: true, projectsNav: true, portalNav: false });
   });
 });

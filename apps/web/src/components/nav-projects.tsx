@@ -64,7 +64,9 @@ import useDeleteProject from "@/hooks/mutations/project/use-delete-project";
 import useReorderProjects from "@/hooks/mutations/project/use-reorder-projects";
 import useGetProjects from "@/hooks/queries/project/use-get-projects";
 import useActiveWorkspace from "@/hooks/queries/workspace/use-active-workspace";
+import { useIntakeSurfaces } from "@/hooks/use-intake-surfaces";
 import { useBoardHoverPrefetch } from "@/hooks/use-board-hover-prefetch";
+import { navForSurfaces } from "@/components/intake/intake-surfaces";
 import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
 import { EASE_OUT_CSS } from "@/lib/motion";
 import { toast } from "@/lib/toast";
@@ -125,9 +127,12 @@ export function NavProjects() {
   const { t } = useTranslation();
   const { isMobile } = useSidebar();
   const { data: workspace } = useActiveWorkspace();
+  const { surfaces, ready } = useIntakeSurfaces();
   const { data: projects } = useGetProjects(
     {
       workspaceId: workspace?.id || "",
+      // A guest holds no project:read, so the query must stay disabled.
+      enabled: ready && navForSurfaces(surfaces).projectsNav,
     },
     true,
   );

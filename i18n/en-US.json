@@ -4193,7 +4193,14 @@
 		},
 		"list": {
 			"empty": "No requests yet",
-			"loadError": "Could not load requests"
+			"loadError": "Could not load requests",
+			"retry": "Try again"
+		},
+		"portal": {
+			"nav": "My requests",
+			"title": "My requests",
+			"all": "All",
+			"newRequest": "New request"
 		},
 		"detail": {
 			"descriptionEmpty": "No description",

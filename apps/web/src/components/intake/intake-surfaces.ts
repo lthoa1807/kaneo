@@ -9,6 +9,7 @@ export type IntakeIdentity = {
 };
 
 export type IntakeSurfaces = {
+  kind: MembershipKind;
   guestPortal: boolean;
   staffIntake: boolean;
   canCreate: boolean;
@@ -20,9 +21,29 @@ export type IntakeSurfaces = {
 export function resolveIntakeSurfaces(can: IntakeIdentity): IntakeSurfaces {
   const isGuest = can.kind === "guest";
   return {
+    kind: can.kind,
     guestPortal: isGuest && can.readIntake && can.createIntakeRequests,
     staffIntake: !isGuest && can.readIntake,
     canCreate: can.createIntakeRequests,
     canManage: can.manageIntake,
+  };
+}
+
+export type IntakeNav = {
+  staffNav: boolean;
+  projectsNav: boolean;
+  portalNav: boolean;
+};
+
+// The sidebar follows the same split: a guest sees only their portal, staff
+// keep the workspace nav and the project list.
+export function navForSurfaces(surfaces: IntakeSurfaces): IntakeNav {
+  // Keyed on identity, not on intake permission: a custom staff role without
+  // intake:read still belongs in the workspace nav.
+  const isGuest = surfaces.kind === "guest";
+  return {
+    staffNav: !isGuest,
+    projectsNav: !isGuest,
+    portalNav: surfaces.guestPortal,
   };
 }

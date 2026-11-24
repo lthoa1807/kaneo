@@ -19,6 +19,8 @@ import { usePendingInvitations } from "@/hooks/queries/invitation/use-pending-in
 import useGetNotifications from "@/hooks/queries/notification/use-get-notifications";
 import useGetAssignedTasks from "@/hooks/queries/task/use-get-assigned-tasks";
 import useActiveWorkspace from "@/hooks/queries/workspace/use-active-workspace";
+import { useIntakeSurfaces } from "@/hooks/use-intake-surfaces";
+import { navForSurfaces } from "./intake/intake-surfaces";
 import { cn } from "@/lib/cn";
 
 type NavItem = {
@@ -38,36 +40,55 @@ export function NavMain() {
   });
   const { data: invitations = [] } = usePendingInvitations();
   const { data: notifications = [] } = useGetNotifications(workspace?.id);
-  const { data: assignedTasks } = useGetAssignedTasks(workspace?.id, true);
+  const { surfaces, ready } = useIntakeSurfaces();
+  const nav = navForSurfaces(surfaces);
+  const { data: assignedTasks } = useGetAssignedTasks(
+    workspace?.id,
+    true,
+    nav.staffNav,
+  );
 
-  if (!workspace) return null;
+  // Wait for the identity answer: rendering the staff items first would flash
+  // workspace navigation at a guest.
+  if (!workspace || !ready) return null;
 
   const homeUrl = `/dashboard/workspace/${workspace.id}`;
   const unreadCount = notifications.filter(
     (notification) => !notification.isRead,
   ).length;
 
-  const navItems: NavItem[] = [
-    { title: t("navigation:sidebar.home"), icon: House, url: homeUrl },
-    {
-      title: t("navigation:sidebar.inbox"),
+  const navItems: NavItem[] = nav.staffNav
+    ? [
+        { title: t("navigation:sidebar.home"), icon: House, url: homeUrl },
+        {
+          title: t("navigation:sidebar.inbox"),
+          icon: Inbox,
+          url: `${homeUrl}/inbox`,
+          count: unreadCount,
+          emphasizeCount: true,
+        },
+        {
+          title: t("navigation:sidebar.myTasks"),
+          icon: CircleCheck,
+          url: `${homeUrl}/my-tasks`,
+          count: assignedTasks?.total,
+        },
+        {
+          title: t("navigation:sidebar.members"),
+          icon: Users,
+          url: `${homeUrl}/members`,
+        },
+      ]
+    : [];
+
+  // A guest only ever sees their own requests.
+  if (nav.portalNav) {
+    navItems.push({
+      title: t("intake:portal.nav"),
       icon: Inbox,
-      url: `${homeUrl}/inbox`,
-      count: unreadCount,
-      emphasizeCount: true,
-    },
-    {
-      title: t("navigation:sidebar.myTasks"),
-      icon: CircleCheck,
-      url: `${homeUrl}/my-tasks`,
-      count: assignedTasks?.total,
-    },
-    {
-      title: t("navigation:sidebar.members"),
-      icon: Users,
-      url: `${homeUrl}/members`,
-    },
-  ];
+      url: `${homeUrl}/my-requests`,
+    });
+  }
 
   // Invitations to other workspaces only matter while one is waiting.
   if (invitations.length > 0) {

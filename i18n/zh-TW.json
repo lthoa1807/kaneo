@@ -5303,7 +5303,8 @@
 		},
 		"list": {
 			"empty": "No requests yet",
-			"loadError": "Could not load requests"
+			"loadError": "Could not load requests",
+			"retry": "Try again"
 		},
 		"note": {
 			"confirm": "Confirm",
@@ -5318,6 +5319,12 @@
 			"new": "New",
 			"rejected": "Rejected",
 			"triaged": "Triaged"
+		},
+		"portal": {
+			"all": "All",
+			"nav": "My requests",
+			"newRequest": "New request",
+			"title": "My requests"
 		}
 	}
 }
