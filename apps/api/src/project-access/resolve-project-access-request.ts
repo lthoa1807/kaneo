@@ -1,4 +1,5 @@
 import db from "../database";
+import { isGuestRole } from "../workspace-members/is-guest-role";
 import type { DbOrTx } from "./db-or-tx";
 import { findInaccessibleProjectIds } from "./find-inaccessible-project-ids";
 import { isProjectAccessRestricted } from "./is-project-access-restricted";
@@ -57,6 +58,15 @@ export async function resolveProjectAccessRequest(request: {
   }
 
   if (projectAccess === "all") {
+    // A guest is bounded to the projects they were invited to; "all" would
+    // turn a portal account into a workspace-wide reader.
+    if (isGuestRole(request.targetRole)) {
+      return {
+        ok: false,
+        status: 400,
+        message: "Guests can only be given selected projects",
+      };
+    }
     if (
       await isProjectAccessRestricted(
         request.workspaceId,

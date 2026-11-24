@@ -555,3 +555,90 @@ describe("notification rules with project access", () => {
     expect(stored.map((row) => row.projectId)).toEqual([ctx.beta.id]);
   });
 });
+
+describe("guest invitations", () => {
+  const GUEST_ALL_DENIED = "Guests can only be given selected projects";
+
+  async function inviteGuest(
+    ctx: Awaited<ReturnType<typeof createInvitationWorkspace>>,
+    email: string,
+  ) {
+    const invited = await ctx.ownerRequest("/auth/organization/invite-member", {
+      method: "POST",
+      body: {
+        organizationId: ctx.workspaceId,
+        email,
+        role: "guest",
+        projectAccess: "selected",
+        projectIds: [ctx.alpha.id],
+      },
+    });
+    expect(invited.status).toBe(200);
+    const invitation = (await invited.json()) as { id: string };
+    const invitee = await signUpWithSession(ctx.app, { email, name: "Guest" });
+    const request = projectAccessApi({ cookie: invitee.cookies });
+    const accepted = await request("/auth/organization/accept-invitation", {
+      method: "POST",
+      body: { invitationId: invitation.id },
+    });
+    return { invitation, invitee, request, accepted };
+  }
+
+  it("rejects all-project access for a guest invitation", async () => {
+    const ctx = await createInvitationWorkspace();
+
+    const invited = await ctx.ownerRequest("/auth/organization/invite-member", {
+      method: "POST",
+      body: {
+        organizationId: ctx.workspaceId,
+        email: "guest@example.com",
+        role: "guest",
+        projectAccess: "all",
+      },
+    });
+
+    expect(invited.status).toBe(400);
+    expect(((await invited.json()) as { message: string }).message).toBe(
+      GUEST_ALL_DENIED,
+    );
+    expect(
+      await db
+        .select({ id: schema.invitationTable.id })
+        .from(schema.invitationTable)
+        .where(eq(schema.invitationTable.email, "guest@example.com")),
+    ).toEqual([]);
+  });
+
+  it("accepts a guest invitation limited to selected projects", async () => {
+    const ctx = await createInvitationWorkspace();
+    const { accepted, invitee, request } = await inviteGuest(
+      ctx,
+      "bounded@example.com",
+    );
+
+    expect(accepted.status).toBe(200);
+    expect(
+      await (await request(`/workspace/${ctx.workspaceId}/membership`)).json(),
+    ).toEqual({ kind: "guest", role: "guest" });
+    const rows = await readMemberAccessRows(ctx.workspaceId, invitee.userId);
+    expect(rows.rules.map((rule) => rule.projectAccess)).toEqual(["selected"]);
+    expect(rows.grants.map((grant) => grant.projectId)).toEqual([ctx.alpha.id]);
+  });
+
+  it("rejects lifting an existing guest to all-project access", async () => {
+    const ctx = await createInvitationWorkspace();
+    const { invitee } = await inviteGuest(ctx, "lifted@example.com");
+
+    const lifted = await putMemberProjectAccess(
+      ctx.ownerRequest,
+      ctx.workspaceId,
+      invitee.userId,
+      { projectAccess: "all" },
+    );
+
+    expect(lifted.status).toBe(400);
+    expect(((await lifted.json()) as { message: string }).message).toBe(
+      GUEST_ALL_DENIED,
+    );
+  });
+});
