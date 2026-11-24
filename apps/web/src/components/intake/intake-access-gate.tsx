@@ -5,11 +5,14 @@ import { type ReactNode, useEffect } from "react";
 // sends an unentitled visitor home instead of rendering a page it cannot fill.
 export function IntakeAccessGate({
   allowed,
+  ready = true,
   workspaceId,
   projectId,
   children,
 }: {
   allowed: boolean;
+  /** False while membership and capabilities load; do not bounce yet. */
+  ready?: boolean;
   workspaceId: string;
   /** Set on project surfaces to send an unentitled visitor to the board. */
   projectId?: string;
@@ -18,7 +21,7 @@ export function IntakeAccessGate({
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (allowed) return;
+    if (allowed || !ready) return;
     void navigate(
       projectId
         ? {
@@ -30,7 +33,7 @@ export function IntakeAccessGate({
             params: { workspaceId },
           },
     );
-  }, [allowed, navigate, projectId, workspaceId]);
+  }, [allowed, ready, navigate, projectId, workspaceId]);
 
-  return allowed ? children : null;
+  return allowed && ready ? children : null;
 }

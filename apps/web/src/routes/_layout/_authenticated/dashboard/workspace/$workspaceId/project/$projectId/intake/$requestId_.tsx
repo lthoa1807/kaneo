@@ -15,7 +15,7 @@ export const Route = createFileRoute(
 function RouteComponent() {
   const { t } = useTranslation();
   const { workspaceId, projectId, requestId } = Route.useParams();
-  const { surfaces } = useIntakeSurfaces();
+  const { surfaces, ready } = useIntakeSurfaces();
 
   return (
     <>
@@ -29,6 +29,7 @@ function RouteComponent() {
           <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6">
             <IntakeAccessGate
               allowed={surfaces.staffIntake}
+              ready={ready}
               workspaceId={workspaceId}
               projectId={projectId}
             >

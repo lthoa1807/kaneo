@@ -7,7 +7,7 @@ import PageTitle from "@/components/page-title";
 import { useIntakeSurfaces } from "@/hooks/use-intake-surfaces";
 
 export const Route = createFileRoute(
-  "/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/intake",
+  "/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/intake/",
 )({
   component: RouteComponent,
 });
@@ -15,7 +15,7 @@ export const Route = createFileRoute(
 function RouteComponent() {
   const { t } = useTranslation();
   const { workspaceId, projectId } = Route.useParams();
-  const { surfaces } = useIntakeSurfaces();
+  const { surfaces, ready } = useIntakeSurfaces();
 
   return (
     <>
@@ -28,6 +28,7 @@ function RouteComponent() {
         <div className="h-full overflow-y-auto">
           <IntakeAccessGate
             allowed={surfaces.staffIntake}
+            ready={ready}
             workspaceId={workspaceId}
             projectId={projectId}
           >
