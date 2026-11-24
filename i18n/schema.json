@@ -7428,6 +7428,12 @@
 						"projectInfoTitle": {
 							"type": "string"
 						},
+						"acceptIntake": {
+							"type": "string"
+						},
+						"acceptIntakeHint": {
+							"type": "string"
+						},
 						"iconLabel": {
 							"type": "string"
 						},
@@ -7646,6 +7652,8 @@
 						"title",
 						"subtitle",
 						"projectInfoTitle",
+						"acceptIntake",
+						"acceptIntakeHint",
 						"iconLabel",
 						"iconHint",
 						"pickIconTitle",

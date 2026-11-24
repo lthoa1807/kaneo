@@ -909,6 +909,10 @@
             "type": "number",
             "description": "Sidebar order, ascending."
           },
+          "intakeEnabled": {
+            "type": "boolean",
+            "description": "When true the project accepts guest intake requests."
+          },
           "lastTaskNumber": {
             "type": "number",
             "description": "Highest task number issued in this project; the next task gets this plus one."
@@ -926,6 +930,7 @@
           "isPublic",
           "archivedAt",
           "position",
+          "intakeEnabled",
           "lastTaskNumber"
         ]
       },
@@ -11201,6 +11206,10 @@
                   },
                   "includeSubtasks": {
                     "type": "boolean"
+                  },
+                  "intakeEnabled": {
+                    "type": "boolean",
+                    "description": "When true the project accepts guest intake requests. Access grants visibility; this flag gates submission."
                   }
                 },
                 "required": [

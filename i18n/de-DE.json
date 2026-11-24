@@ -1108,7 +1108,9 @@
 				"title": "Project fields",
 				"unset": "Unset",
 				"yes": "Yes"
-			}
+			},
+			"acceptIntake": "Accept guest requests",
+			"acceptIntakeHint": "Guests with access to this project can submit requests. Turning it off keeps the requests already made."
 		},
 		"projectIntegrations": {
 			"pageTitle": "Integrationen",

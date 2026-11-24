@@ -34,6 +34,22 @@ export function ProjectDetailsSection({
           <SettingsCard>
             <FormField
               control={form.control}
+              name="intakeEnabled"
+              render={({ field }) => (
+                <SettingsFormRow
+                  label={t("settings:projectGeneral.acceptIntake")}
+                  description={t("settings:projectGeneral.acceptIntakeHint")}
+                >
+                  <Switch
+                    checked={field.value ?? false}
+                    onCheckedChange={field.onChange}
+                    disabled={!canEdit}
+                  />
+                </SettingsFormRow>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="includeSubtasks"
               render={({ field }) => (
                 <SettingsFormRow label={t("tasks:display.includeSubtasks")}>

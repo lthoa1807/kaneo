@@ -303,7 +303,7 @@
 			"signIn": "Sign in",
 			"toast": {
 				"acceptFailed": "Failed to accept invitation",
-				"acceptSuccess": "Invitation accepted! Welcome to the team."
+				"acceptSuccess": "Invitation accepted — you can start from the sidebar."
 			},
 			"description": "{{inviterName}} invited you to this workspace on Kaneo.",
 			"invitedBy": "Invited by",
@@ -1820,6 +1820,8 @@
 			"title": "General",
 			"subtitle": "The name, key, and look of {{name}}.",
 			"projectInfoTitle": "Project",
+			"acceptIntake": "Accept guest requests",
+			"acceptIntakeHint": "Guests with access to this project can submit requests. Turning it off keeps the requests already made.",
 			"iconLabel": "Icon",
 			"iconHint": "Shown in the sidebar and project lists.",
 			"pickIconTitle": "Pick icon",
@@ -3982,7 +3984,7 @@
 		},
 		"toast": {
 			"acceptError": "Failed to accept invitation",
-			"acceptSuccess": "Invitation accepted! Welcome to the team.",
+			"acceptSuccess": "Invitation accepted — you can start from the sidebar.",
 			"rejectError": "Failed to reject invitation",
 			"rejectSuccess": "Invitation rejected"
 		}

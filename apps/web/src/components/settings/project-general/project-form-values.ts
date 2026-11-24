@@ -4,6 +4,7 @@ export type ProjectFormValues = {
   description?: string;
   icon: string;
   includeSubtasks?: boolean;
+  intakeEnabled?: boolean;
 };
 
 export type NormalizedProjectValues = {
@@ -12,6 +13,7 @@ export type NormalizedProjectValues = {
   description: string;
   icon: string;
   includeSubtasks?: boolean;
+  intakeEnabled?: boolean;
 };
 
 export type ProjectFieldChanges = Record<
@@ -28,6 +30,7 @@ export function normalizeProjectValues(
     description: (data.description ?? "").trim(),
     icon: data.icon || "Layout",
     includeSubtasks: data.includeSubtasks ?? true,
+    intakeEnabled: data.intakeEnabled ?? false,
   };
 }
 
@@ -42,6 +45,8 @@ export function getProjectFieldChanges(
     icon: last?.icon !== next.icon,
     includeSubtasks:
       (last?.includeSubtasks ?? true) !== (next.includeSubtasks ?? true),
+    intakeEnabled:
+      (last?.intakeEnabled ?? false) !== (next.intakeEnabled ?? false),
   };
 }
 

@@ -45,6 +45,7 @@ export function useProjectAutosave({
       description: project?.description || "",
       icon: project?.icon || "Layout",
       includeSubtasks: project?.includeSubtasks ?? true,
+      intakeEnabled: project?.intakeEnabled ?? false,
     },
   });
 
@@ -62,6 +63,7 @@ export function useProjectAutosave({
       description: project.description || "",
       icon: project.icon || "Layout",
       includeSubtasks: project.includeSubtasks ?? true,
+      intakeEnabled: project.intakeEnabled ?? false,
     };
     lastSavedRef.current = normalizeProjectValues(nextValues);
 
@@ -122,6 +124,9 @@ export function useProjectAutosave({
             ...(changes.includeSubtasks
               ? { includeSubtasks: normalizedData.includeSubtasks }
               : {}),
+            ...(changes.intakeEnabled
+              ? { intakeEnabled: normalizedData.intakeEnabled }
+              : {}),
           });
 
           const currentValues = normalizeProjectValues(form.getValues());
@@ -143,6 +148,7 @@ export function useProjectAutosave({
             description: updatedProject.description ?? "",
             icon: updatedProject.icon ?? "Layout",
             includeSubtasks: updatedProject.includeSubtasks ?? true,
+            intakeEnabled: updatedProject.intakeEnabled ?? false,
           });
           form.reset(savedValues);
           lastSavedRef.current = savedValues;
