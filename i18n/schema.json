@@ -17508,6 +17508,51 @@
 						"descriptionEmpty": {
 							"type": "string"
 						},
+						"action": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"confirmed": {
+									"type": "string"
+								},
+								"needs_revision": {
+									"type": "string"
+								},
+								"triaged": {
+									"type": "string"
+								},
+								"approved": {
+									"type": "string"
+								},
+								"rejected": {
+									"type": "string"
+								},
+								"in_progress": {
+									"type": "string"
+								},
+								"delivered": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"confirmed",
+								"needs_revision",
+								"triaged",
+								"approved",
+								"rejected",
+								"in_progress",
+								"delivered"
+							]
+						},
+						"revisionTitle": {
+							"type": "string"
+						},
+						"revisionDescription": {
+							"type": "string"
+						},
+						"confirmedOn": {
+							"type": "string"
+						},
 						"created": {
 							"type": "string"
 						},
@@ -17532,6 +17577,10 @@
 					},
 					"required": [
 						"descriptionEmpty",
+						"action",
+						"revisionTitle",
+						"revisionDescription",
+						"confirmedOn",
 						"created",
 						"status_changed",
 						"task_linked",
@@ -17619,9 +17668,12 @@
 						},
 						"transitionFailed": {
 							"type": "string"
+						},
+						"transitionConflict": {
+							"type": "string"
 						}
 					},
-					"required": ["loadFailed", "transitionFailed"]
+					"required": ["loadFailed", "transitionFailed", "transitionConflict"]
 				}
 			},
 			"required": [

@@ -5609,11 +5609,24 @@
 			"descriptionEmpty": "No description",
 			"status_changed": "Status changed",
 			"task_linked": "Task linked",
-			"tasksProgress": "{{done}} of {{total}} tasks done"
+			"tasksProgress": "{{done}} of {{total}} tasks done",
+			"action": {
+				"approved": "Approve",
+				"confirmed": "Looks good, confirm",
+				"delivered": "Mark delivered",
+				"in_progress": "Start work",
+				"needs_revision": "Request changes",
+				"rejected": "Reject",
+				"triaged": "Mark triaged"
+			},
+			"confirmedOn": "Confirmed on {{date}}",
+			"revisionDescription": "Tell us what needs to change. We will pick the request up again.",
+			"revisionTitle": "Request changes"
 		},
 		"errors": {
 			"loadFailed": "Could not load this request",
-			"transitionFailed": "Could not change the status"
+			"transitionFailed": "Could not change the status",
+			"transitionConflict": "Someone else just changed this request. Reloading."
 		},
 		"form": {
 			"description": "Tell us what you need. We will review it and reply here.",

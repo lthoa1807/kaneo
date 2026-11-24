@@ -4204,6 +4204,18 @@
 		},
 		"detail": {
 			"descriptionEmpty": "No description",
+			"action": {
+				"confirmed": "Looks good, confirm",
+				"needs_revision": "Request changes",
+				"triaged": "Mark triaged",
+				"approved": "Approve",
+				"rejected": "Reject",
+				"in_progress": "Start work",
+				"delivered": "Mark delivered"
+			},
+			"revisionTitle": "Request changes",
+			"revisionDescription": "Tell us what needs to change. We will pick the request up again.",
+			"confirmedOn": "Confirmed on {{date}}",
 			"created": "Request created",
 			"status_changed": "Status changed",
 			"task_linked": "Task linked",
@@ -4232,7 +4244,8 @@
 		},
 		"errors": {
 			"loadFailed": "Could not load this request",
-			"transitionFailed": "Could not change the status"
+			"transitionFailed": "Could not change the status",
+			"transitionConflict": "Someone else just changed this request. Reloading."
 		}
 	},
 	"team": {
