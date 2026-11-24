@@ -22,6 +22,16 @@ type Props = {
   error?: string;
 };
 
+// Three different reasons a reader cannot pick "all projects"; name the one that
+// applies instead of the generic refusal.
+function allProjectsNoteKey(allowAll: boolean, guestInvite: boolean) {
+  if (allowAll) return "team:projectAccess.allProjectsDescription" as const;
+  if (guestInvite) {
+    return "team:projectAccess.allProjectsUnavailableGuest" as const;
+  }
+  return "team:projectAccess.allProjectsUnavailable" as const;
+}
+
 function ProjectAccessFields({
   value,
   onChange,
@@ -64,11 +74,7 @@ function ProjectAccessFields({
           <span className="flex flex-col gap-0.5">
             {t("team:projectAccess.allProjects")}
             <span className="font-normal text-muted-foreground text-xs">
-              {allowAll
-                ? t("team:projectAccess.allProjectsDescription")
-                : guestInvite
-                  ? t("team:projectAccess.allProjectsUnavailableGuest")
-                  : t("team:projectAccess.allProjectsUnavailable")}
+              {t(allProjectsNoteKey(allowAll, guestInvite))}
             </span>
           </span>
         </Label>

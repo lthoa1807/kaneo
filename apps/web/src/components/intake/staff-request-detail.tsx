@@ -125,18 +125,25 @@ export function StaffRequestDetail({
             {t("intake:staff.linkedTasks")}
           </h2>
           <ul className="space-y-1">
-            {linkedTasks.map((task) => (
-              <li key={task.id}>
-                <Link
-                  to="/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId"
-                  params={{ workspaceId, projectId, taskId: task.id }}
-                  className="text-sm hover:underline"
-                >
-                  {task.number ? `${data.projectSlug}-${task.number} · ` : ""}
-                  {task.title}
-                </Link>
-              </li>
-            ))}
+            {linkedTasks.map((task) => {
+              // Same key the board shows, e.g. "PE-12"; no slug means the
+              // project row is gone, so the bare number is all there is.
+              const taskKey = [data.projectSlug, task.number]
+                .filter(Boolean)
+                .join("-");
+              return (
+                <li key={task.id}>
+                  <Link
+                    to="/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId"
+                    params={{ workspaceId, projectId, taskId: task.id }}
+                    className="text-sm hover:underline"
+                  >
+                    {taskKey ? `${taskKey} · ` : ""}
+                    {task.title}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </section>
       ) : null}
