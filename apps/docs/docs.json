@@ -73,6 +73,7 @@
 						"group": "Your team and account",
 						"pages": [
 							"core/functional/collaborate-with-team",
+							"core/functional/guest-requests",
 							"core/functional/account-notifications",
 							"core/functional/personalize-your-workspace",
 							"core/functional/manage-your-account",
