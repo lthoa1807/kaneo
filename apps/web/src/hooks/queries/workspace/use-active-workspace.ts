@@ -19,7 +19,15 @@ function useActiveWorkspace() {
   const workspaceFromRoute = workspaceId
     ? organizations?.find((organization) => organization.id === workspaceId)
     : undefined;
-  const workspace = workspaceFromRoute ?? activeOrganization;
+  // A guest holds no workspace:read, so /organization/list omits the workspace
+  // they were invited to. The route already names it; only the id is needed
+  // there, and every other field would 403 anyway.
+  const workspaceFromGuestRoute =
+    workspaceId && !workspaceFromRoute && organizations
+      ? ({ id: workspaceId } as NonNullable<typeof organizations>[number])
+      : undefined;
+  const workspace =
+    workspaceFromRoute ?? workspaceFromGuestRoute ?? activeOrganization;
   const isLoading =
     (!!workspaceId && isOrganizationsPending && !workspaceFromRoute) ||
     (!workspace && !error);
