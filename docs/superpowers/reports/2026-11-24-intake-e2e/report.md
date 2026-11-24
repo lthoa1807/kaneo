@@ -1,6 +1,7 @@
 # Intake portal — end-to-end run, 2026-11-24
 
-Branch `feature/intake-portal`, first commit of the run `1e1a5508`.
+Branch `feature/intake-portal`, run started at `02a20be5` and ended at
+`4587304c`. UI build `v2.50.0`.
 Environment: local dev (API `http://localhost:1337`, web `http://localhost:5173`,
 Postgres in `kaneo-dev-pg`). Driven with `agent-browser` in two browser sessions,
 one per account, so the guest and staff sides stay independent.
@@ -48,8 +49,12 @@ session.
 The project settings screen reads the board payload (`GET /task/tasks/:projectId`),
 which listed its fields by hand and had no `intakeEnabled`. So the switch always
 rendered off, and turning it on wrote the column but the refetch put it back to
-off. Evidence: `04-intake-switch-off.png` (before), `05-intake-switch-on.png`
-(after the click), `06-intake-switch-persisted.png` (after a reload, now on).
+off. Before the fix the switch read off while the column said otherwise:
+
+| Before the click | After the click | After a reload |
+| --- | --- | --- |
+| ![switch off](screenshots/04-intake-switch-off.png) | ![switch on](screenshots/05-intake-switch-on.png) | ![switch persisted](screenshots/06-intake-switch-persisted.png) |
+
 Fixed by returning `intakeEnabled` from that payload and declaring it in
 `boardSchema`; an integration assertion covers it.
 
@@ -59,14 +64,20 @@ After accepting the invitation the guest landed on the staff home dashboard with
 an almost empty sidebar. `/organization/list` returns nothing for a guest (the
 guest role deliberately has no `workspace:read`), so `useActiveWorkspace()` had
 no workspace and every guest surface stayed shut. Evidence:
-`13-guest-lands-on-home.png`. Fixed by falling back to the workspace id the route
-already carries; `14-guest-portal-empty.png` shows the portal after the fix.
+![guest on the staff home](screenshots/13-guest-lands-on-home.png)
+
+Fixed by falling back to the workspace id the route already carries; after the
+fix the same guest lands in the portal:
+
+![guest portal after the fix](screenshots/14-guest-portal-empty.png)
 
 ### 3. The Intake tab bounced to the board on a hard load — `fe20306b`
 
 `IntakeAccessGate` navigated away on its first render, before membership and
 capabilities had answered. Clicking the tab worked (capabilities were cached);
-opening or reloading the URL did not. Evidence: `18-intake-tab-bounces.png`.
+opening or reloading the URL did not:
+
+![intake tab bounced to the board](screenshots/18-intake-tab-bounces.png)
 The gate now waits for `ready` before it can redirect.
 
 ### 4. Request details never rendered — `05e22afa`
@@ -74,21 +85,39 @@ The gate now waits for `ready` before it can redirect.
 `intake.$requestId_.tsx` and `requests.$requestId_.tsx` were nested under
 `intake.tsx` / `requests.tsx`, which render no `<Outlet/>`. Opening a request
 changed the URL and kept the list on screen. Fixed by moving the lists to index
-routes and leaving the details flat; `19-staff-request-detail.png` and
-`26-guest-request-detail.png` are the same steps after the fix.
+routes and leaving the details flat. The same step after the fix, on both sides:
+
+| Staff detail | Guest detail |
+| --- | --- |
+| ![staff request detail](screenshots/19-staff-request-detail.png) | ![guest request detail](screenshots/26-guest-request-detail.png) |
 
 ### 5. Every new request claimed one task — `53ca6ee0`
 
 `count()` counted the null row of the left join, so a request with no task still
-read "0 of 1 tasks done" (`16-guest-request-created.png`). Now counts
-`task.id`; the same request shows no progress until a task exists.
+read "0 of 1 tasks done" while no task existed:
+
+![request claiming one task](screenshots/16-guest-request-created.png)
+
+Now counts `task.id`; the same request shows no progress until a task exists.
 
 ### 6. A rejection reason was invisible to the guest — `25647d7d`
 
 The reject dialog stores the note on the `status_changed` activity, but the
 activity list only printed "New → Rejected" and dropped the content
-(`30-guest-sees-rejected.png`). The note now renders under the status line —
-`31-guest-rejected-detail.png`.
+| Before | After |
+| --- | --- |
+| ![rejected without a reason](screenshots/30-guest-sees-rejected.png) | ![rejected with the reason](screenshots/31-guest-rejected-detail.png) |
+
+## Gates that failed after the browser run
+
+Two checks caught what the browser could not, and both needed a follow-up commit:
+
+- `625b84bb` regenerated `apps/docs/openapi.json`, because the new field changed
+  the published reference (`pnpm openapi:check`).
+- `4587304c` made the board's `intakeEnabled` optional, so existing fixtures and
+  older payload shapes still typecheck.
+
+Fork CI run `45377859064` on `4587304c`: success, both jobs.
 
 ## Smaller issues, not fixed
 
@@ -107,12 +136,14 @@ activity list only printed "New → Rejected" and dropped the content
 - The Attach task dialog lists the status as the raw value `to-do` rather than
   the board's label. `22-attach-task-dialog.png`.
 
-## Screenshots
+## Screenshot index
 
-33 files in `screenshots/`, in the order the run happened: `01` landing, `02-04`
-sign-up and the first project, `04-06` the intake switch, `07-10` the guest
-invitation, `11-16` the guest side, `17-24` the staff side, `25-27` confirmation,
-`28-31` rejection, `32-33` the authorization probe and the members table.
+33 files in `screenshots/`, in the order the run happened:
+
+- `01` landing, `02-03` sign-up, `04-06` the intake switch
+- `07-10` the guest invitation, `11-16` the guest side
+- `17-24` the staff side, `25-27` confirmation
+- `28-31` rejection, `32-33` the authorization probe and the members table
 
 ## What this run did not check
 
