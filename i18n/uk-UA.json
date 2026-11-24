@@ -4343,7 +4343,8 @@
 		"members": {
 			"pageTitle": "Учасники",
 			"inviteMember": "Запросити учасника",
-			"you": "Ви"
+			"you": "Ви",
+			"inviteGuest": "Invite guest"
 		},
 		"invitations": {
 			"linkLabel": "Посилання на запрошення",
@@ -4413,6 +4414,9 @@
 			"updateSuccess": "Project access updated",
 			"archived": "Archived",
 			"allProjectsUnavailable": "Your own access is limited, so you can only give access to selected projects."
+		},
+		"inviteGuest": {
+			"title": "Invite a guest"
 		}
 	},
 	"publicProject": {

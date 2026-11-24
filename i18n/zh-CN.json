@@ -4115,7 +4115,8 @@
 		"members": {
 			"pageTitle": "成员",
 			"inviteMember": "邀请成员",
-			"you": "你"
+			"you": "你",
+			"inviteGuest": "Invite guest"
 		},
 		"invitations": {
 			"pendingBadge": "待处理",
@@ -4182,6 +4183,9 @@
 			"updateSuccess": "项目访问权限已更新",
 			"archived": "已归档",
 			"allProjectsUnavailable": "你自己的访问权限有限，所以只能授予指定项目。"
+		},
+		"inviteGuest": {
+			"title": "Invite a guest"
 		}
 	},
 	"publicProject": {

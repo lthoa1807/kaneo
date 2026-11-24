@@ -17811,11 +17811,14 @@
 						"inviteMember": {
 							"type": "string"
 						},
+						"inviteGuest": {
+							"type": "string"
+						},
 						"you": {
 							"type": "string"
 						}
 					},
-					"required": ["pageTitle", "inviteMember", "you"]
+					"required": ["pageTitle", "inviteMember", "inviteGuest", "you"]
 				},
 				"invitations": {
 					"type": "object",
@@ -17848,6 +17851,16 @@
 						"linkCopied",
 						"copyFailed"
 					]
+				},
+				"inviteGuest": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						}
+					},
+					"required": ["title"]
 				},
 				"inviteModal": {
 					"type": "object",
@@ -18095,6 +18108,7 @@
 				"roles",
 				"members",
 				"invitations",
+				"inviteGuest",
 				"inviteModal",
 				"membersTable",
 				"projectAccess"

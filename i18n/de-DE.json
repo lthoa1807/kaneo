@@ -4191,7 +4191,8 @@
 		"members": {
 			"pageTitle": "Mitglieder",
 			"inviteMember": "Mitglied einladen",
-			"you": "Du"
+			"you": "Du",
+			"inviteGuest": "Invite guest"
 		},
 		"invitations": {
 			"linkLabel": "Einladungslink",
@@ -4259,6 +4260,9 @@
 			"updateSuccess": "Projektzugriff aktualisiert",
 			"archived": "Archiviert",
 			"allProjectsUnavailable": "Dein eigener Zugriff ist eingeschränkt. Du kannst daher nur Zugriff auf ausgewählte Projekte gewähren."
+		},
+		"inviteGuest": {
+			"title": "Invite a guest"
 		}
 	},
 	"publicProject": {

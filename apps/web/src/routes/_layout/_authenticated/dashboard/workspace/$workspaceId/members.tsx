@@ -23,6 +23,7 @@ function RouteComponent() {
   const { canInviteUsers } = useWorkspacePermission();
   const canInvite = Boolean(canInviteUsers());
   const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [isInviteGuestOpen, setIsInviteGuestOpen] = useState(false);
 
   return (
     <>
@@ -31,15 +32,26 @@ function RouteComponent() {
         title={t("team:members.pageTitle")}
         headerActions={
           canInvite ? (
-            <Button
-              variant="outline"
-              size="xs"
-              onClick={() => setIsInviteOpen(true)}
-              className="gap-1"
-            >
-              <UserPlus className="w-3 h-3" />
-              {t("team:members.inviteMember")}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="xs"
+                onClick={() => setIsInviteGuestOpen(true)}
+                className="gap-1"
+              >
+                <UserPlus className="w-3 h-3" />
+                {t("team:members.inviteGuest")}
+              </Button>
+              <Button
+                variant="outline"
+                size="xs"
+                onClick={() => setIsInviteOpen(true)}
+                className="gap-1"
+              >
+                <UserPlus className="w-3 h-3" />
+                {t("team:members.inviteMember")}
+              </Button>
+            </div>
           ) : null
         }
       >
@@ -52,6 +64,12 @@ function RouteComponent() {
         <InviteTeamMemberModal
           open={isInviteOpen}
           onClose={() => setIsInviteOpen(false)}
+        />
+
+        <InviteTeamMemberModal
+          mode="guest"
+          open={isInviteGuestOpen}
+          onClose={() => setIsInviteGuestOpen(false)}
         />
       </WorkspaceLayout>
     </>

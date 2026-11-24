@@ -4191,7 +4191,8 @@
 		"members": {
 			"pageTitle": "Μέλη",
 			"inviteMember": "Πρόσκληση μέλους",
-			"you": "Εσείς"
+			"you": "Εσείς",
+			"inviteGuest": "Invite guest"
 		},
 		"invitations": {
 			"linkLabel": "Σύνδεσμος πρόσκλησης",
@@ -4259,6 +4260,9 @@
 			"updateSuccess": "Project access updated",
 			"archived": "Archived",
 			"allProjectsUnavailable": "Your own access is limited, so you can only give access to selected projects."
+		},
+		"inviteGuest": {
+			"title": "Invite a guest"
 		}
 	},
 	"publicProject": {

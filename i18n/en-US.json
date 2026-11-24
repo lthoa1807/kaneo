@@ -4282,6 +4282,7 @@
 		"members": {
 			"pageTitle": "Members",
 			"inviteMember": "Invite member",
+			"inviteGuest": "Invite guest",
 			"you": "You"
 		},
 		"invitations": {
@@ -4291,6 +4292,9 @@
 			"copyLink": "Copy link",
 			"linkCopied": "Invitation link copied",
 			"copyFailed": "Couldn't copy automatically. Select the link and press Ctrl+C."
+		},
+		"inviteGuest": {
+			"title": "Invite a guest"
 		},
 		"inviteModal": {
 			"title": "Invite Team Member",

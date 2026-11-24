@@ -4267,7 +4267,8 @@
 		"members": {
 			"pageTitle": "Miembros",
 			"inviteMember": "Invitar miembro",
-			"you": "Tú"
+			"you": "Tú",
+			"inviteGuest": "Invite guest"
 		},
 		"invitations": {
 			"linkLabel": "Enlace de invitación",
@@ -4336,6 +4337,9 @@
 			"updateSuccess": "Project access updated",
 			"archived": "Archived",
 			"allProjectsUnavailable": "Your own access is limited, so you can only give access to selected projects."
+		},
+		"inviteGuest": {
+			"title": "Invite a guest"
 		}
 	},
 	"publicProject": {

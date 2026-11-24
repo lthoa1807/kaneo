@@ -4115,7 +4115,8 @@
 		"members": {
 			"pageTitle": "Thành viên",
 			"inviteMember": "Mời thành viên",
-			"you": "Bạn"
+			"you": "Bạn",
+			"inviteGuest": "Invite guest"
 		},
 		"invitations": {
 			"pendingBadge": "đang chờ",
@@ -4182,6 +4183,9 @@
 			"updateSuccess": "Project access updated",
 			"archived": "Archived",
 			"allProjectsUnavailable": "Your own access is limited, so you can only give access to selected projects."
+		},
+		"inviteGuest": {
+			"title": "Invite a guest"
 		}
 	},
 	"publicProject": {

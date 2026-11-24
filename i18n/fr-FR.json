@@ -4267,7 +4267,8 @@
 		"members": {
 			"pageTitle": "Membres",
 			"inviteMember": "Inviter un membre",
-			"you": "Vous"
+			"you": "Vous",
+			"inviteGuest": "Invite guest"
 		},
 		"invitations": {
 			"pendingBadge": "En attente",
@@ -4336,6 +4337,9 @@
 			"updateSuccess": "Accès aux projets mis à jour",
 			"archived": "Archivé",
 			"allProjectsUnavailable": "Vos propres accès sont limités. Vous ne pouvez donc donner accès qu'à certains projets."
+		},
+		"inviteGuest": {
+			"title": "Invite a guest"
 		}
 	},
 	"publicProject": {
