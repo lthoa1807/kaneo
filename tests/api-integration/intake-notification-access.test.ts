@@ -95,6 +95,44 @@ describe("intake notifications", () => {
     expect(notification).toBeNull();
   });
 
+  it("reaches staff who may manage intake in that project", async () => {
+    const owner = await createWorkspaceMember({ role: "owner" });
+    const { project } = await createProjectFixture({
+      workspaceId: owner.workspace.id,
+    });
+    const staff = await createWorkspaceMember({ role: "member" });
+    await db.insert(schema.workspaceUserTable).values({
+      workspaceId: owner.workspace.id,
+      userId: staff.user.id,
+      role: "member",
+      joinedAt: new Date(),
+    });
+    await restrictToProjects(owner.workspace.id, staff.user.id, [project.id]);
+    const request = await intakeRequestFor(project.id, owner.user.id);
+
+    const notification = await notify(staff.user.id, request.id);
+    expect(notification).not.toBeNull();
+  });
+
+  it("stays away from a reader who may not manage intake", async () => {
+    const owner = await createWorkspaceMember({ role: "owner" });
+    const { project } = await createProjectFixture({
+      workspaceId: owner.workspace.id,
+    });
+    const viewer = await createWorkspaceMember({ role: "viewer" });
+    await db.insert(schema.workspaceUserTable).values({
+      workspaceId: owner.workspace.id,
+      userId: viewer.user.id,
+      role: "viewer",
+      joinedAt: new Date(),
+    });
+    await restrictToProjects(owner.workspace.id, viewer.user.id, [project.id]);
+    const request = await intakeRequestFor(project.id, owner.user.id);
+
+    const notification = await notify(viewer.user.id, request.id);
+    expect(notification).toBeNull();
+  });
+
   it("appears in the guest's inbox for that workspace", async () => {
     const guest = await createWorkspaceMember({ role: "guest" });
     const { project } = await createProjectFixture({

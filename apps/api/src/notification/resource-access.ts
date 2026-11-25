@@ -12,6 +12,13 @@ import { splitRoles } from "../utils/split-roles";
 import { notBannedCondition } from "../utils/user-ban";
 import { workspacePermissionGrants } from "../utils/workspace-permission-grants";
 
+// The read action each resource type needs before it can be delivered.
+const REQUIRED_READ: Record<string, PermissionMap> = {
+  task: { task: ["read"] },
+  intake_request: { intakeRequest: ["read"] },
+  workspace: { workspace: ["read"] },
+};
+
 // Membership, rather than public visibility or global admin privileges, defines
 // who may be subscribed to private task activity. Archived workspaces hide
 // their notifications until restored. Use the same predicate when
@@ -175,12 +182,6 @@ export async function canReceiveResourceNotification(
   if (!rows.length) return false;
   if (!resourceId && !resourceType) return true;
   if (hasInstanceAdminRole(rows[0]?.instanceRole)) return true;
-  const required: PermissionMap =
-    resourceType === "task"
-      ? { task: ["read"] }
-      : resourceType === "intake_request"
-        ? { intakeRequest: ["read"] }
-        : { workspace: ["read"] };
   const granted = (permission: PermissionMap) =>
     rolesAllow(
       splitRoles(rows[0]?.memberRole),
@@ -191,7 +192,15 @@ export async function canReceiveResourceNotification(
       ),
       permission,
     );
-  if (!granted(required)) return false;
+  // Managing intake implies hearing about it, so a custom role holding only
+  // `manage` is not silently cut out of the notifications it can act on.
+  const canRead =
+    granted(
+      REQUIRED_READ[resourceType ?? "workspace"] ?? { workspace: ["read"] },
+    ) ||
+    (resourceType === "intake_request" &&
+      granted({ intakeRequest: ["manage"] }));
+  if (!canRead) return false;
   // Reading intake is ownership-scoped: a guest only hears about their own
   // requests, staff need the manage action to hear about anyone's.
   if (resourceType === "intake_request") {
