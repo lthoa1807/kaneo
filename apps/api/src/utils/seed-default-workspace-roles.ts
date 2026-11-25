@@ -76,7 +76,7 @@ export async function seedDefaultWorkspaceRoles() {
       SET "permission" = ("permission"::jsonb || CASE "role"
         WHEN 'viewer' THEN '{"intakeRequest":["read"]}'::jsonb
         WHEN 'guest' THEN '{"intakeRequest":["create","read","update"]}'::jsonb
-        ELSE '{"intakeRequest":["create","read","update","manage"]}'::jsonb
+        ELSE '{"intakeRequest":["read","update","manage"]}'::jsonb
       END)::text
       WHERE "role" IN ('viewer', 'member', 'admin', 'guest')
         AND ("permission"::jsonb -> 'intakeRequest') IS NULL;

@@ -8,6 +8,7 @@ import {
 } from "../../database/schema";
 import { publishEvent } from "../../events";
 import { assertProjectAccess } from "../../project-access/assert-project-access";
+import { assertGuestMember } from "../../workspace-members/is-guest-role";
 import { claimIntakeRequestNumber } from "./claim-intake-request-numbers";
 
 export type CreateIntakeRequestInput = {
@@ -21,6 +22,7 @@ async function createIntakeRequest(
   input: CreateIntakeRequestInput,
   currentUserId: string,
 ) {
+  await assertGuestMember(input.workspaceId, currentUserId);
   await assertProjectAccess(currentUserId, input.projectId);
 
   const row = await db.transaction(async (tx) => {
