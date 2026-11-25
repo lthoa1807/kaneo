@@ -1166,6 +1166,11 @@ export const auth = betterAuth({
             organizations.map(
               (workspace) => workspace.organizationId ?? workspace.id,
             ),
+            // Guests are routed from this list; every other native read stays
+            // behind workspace:read.
+            ctx.path === "/organization/list"
+              ? { includeGuests: true }
+              : undefined,
           );
           organizations.splice(
             0,

@@ -1,6 +1,7 @@
 import { APIError, getSessionFromCtx } from "better-auth/api";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import db, { schema } from "../database";
+import { isGuestRole } from "../workspace-members/is-guest-role";
 import { rolesAllow, type StoredRolePermission } from "./role-permissions";
 import { splitRoles } from "./split-roles";
 
@@ -9,6 +10,7 @@ type AuthContext = Parameters<typeof getSessionFromCtx>[0];
 export async function readableNativeOrganizations(
   userId: string,
   workspaceIds: string[],
+  options: { includeGuests?: boolean } = {},
 ) {
   const ids = [...new Set(workspaceIds)];
   if (ids.length === 0) return new Set<string>();
@@ -64,10 +66,15 @@ export async function readableNativeOrganizations(
   // Native organization routes require membership, even for instance admins.
   return new Set(
     [...memberships]
-      .filter(([workspaceId, role]) =>
-        rolesAllow(splitRoles(role), byWorkspace.get(workspaceId) ?? [], {
-          workspace: ["read"],
-        }),
+      .filter(
+        ([workspaceId, role]) =>
+          rolesAllow(splitRoles(role), byWorkspace.get(workspaceId) ?? [], {
+            workspace: ["read"],
+          }) ||
+          // A guest holds no workspace:read, but the app picks their landing
+          // page from this list, so their own workspace has to be in it. Only
+          // the list asks for this; member and settings reads stay strict.
+          (options.includeGuests === true && isGuestRole(role)),
       )
       .map(([workspaceId]) => workspaceId),
   );
