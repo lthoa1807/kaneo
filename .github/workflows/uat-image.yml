@@ -1,0 +1,69 @@
+name: UAT image
+
+# Builds the self-host image from any branch or SHA and pushes it to GHCR, so a
+# UAT machine pulls instead of building:
+#   docker pull ghcr.io/<owner>/kaneo:uat-sha-<short sha>
+#   docker tag  ghcr.io/<owner>/kaneo:uat-sha-<short sha> kaneo-browserstack:test
+#   docker compose -f tests/e2e/compose.yml up --no-build --wait
+# Dispatch only: this builds unreviewed code and must not run on every push.
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Branch, tag or SHA to build (pin a SHA so the tag stays stable)"
+        required: true
+
+concurrency:
+  group: uat-image-${{ inputs.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  image:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout requested revision
+        uses: useblacksmith/checkout@2b9fe87d796feea153b455ec2f3125b471a7b0e7 # v1
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
+
+      - name: Setup Blacksmith Builder
+        uses: useblacksmith/setup-docker-builder@06dd9c83a5d541274d2e3ac67625560979275267 # v2.3.0
+        with:
+          cache-key: ${{ github.repository }}/kaneo
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/kaneo
+          tags: |
+            type=sha,prefix=uat-sha-
+            type=raw,value=uat
+
+      # The self-host image only. The web/api images need release inputs and are
+      # not what a UAT machine runs.
+      - name: Build and push
+        uses: useblacksmith/build-push-action@9b0579bbec7a6cad2f171596c57e7ac1e7658850 # v2
+        with:
+          context: .
+          file: Dockerfile.kaneo
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
