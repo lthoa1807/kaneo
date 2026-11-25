@@ -32,6 +32,15 @@ Date: 2026-11-22. Scope: modern color palette work, but the resource limits appl
 7. The pre-commit hook runs repo-wide lint. Check changed files first; if the hook fails only on pre-existing files, use `--no-verify` and report why.
 8. Base feature branches on `upstream/main` to avoid replaying unrelated local commits and their conflicts.
 
+## Integration tests read built packages, not their sources
+
+`tests/api-integration` resolves `@kaneo/permissions` (and other workspace
+packages) from `packages/*/dist`, so a package edit is invisible to a local
+integration run until that package is rebuilt. `pnpm --filter
+@kaneo/permissions build` aborts on this box (exit 134), so anything touching a
+shared package is verified in CI only; a green local run proves nothing there.
+Cost so far: one pushed commit whose test asserted the old payload.
+
 ## Minimal verification recipes
 
 ```bash

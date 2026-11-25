@@ -46,8 +46,8 @@ it("seeds a guest role row with intake-only permissions", async () => {
     ...memberAc.statements,
     intakeRequest: ["create", "read", "update"],
   });
+  // Guests submit; staff only read and handle.
   expect(byRole.get("member")!.intakeRequest).toEqual([
-    "create",
     "read",
     "update",
     "manage",
