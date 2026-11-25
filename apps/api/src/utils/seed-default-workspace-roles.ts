@@ -66,6 +66,22 @@ export async function seedDefaultWorkspaceRoles() {
       existingRows.map((r) => `${r.workspaceId}:${r.role}`),
     );
 
+    // A role row can exist and still predate the intake feature: a dump
+    // restored from an older instance, or a workspace seeded by an older
+    // build after the migration that patched this was already applied. Same
+    // add-only merge as that migration, so staff are not quietly locked out of
+    // Intake; an explicit customization already in the row survives.
+    await db.execute(sql`
+      UPDATE ${schema.workspaceRoleTable}
+      SET "permission" = ("permission"::jsonb || CASE "role"
+        WHEN 'viewer' THEN '{"intakeRequest":["read"]}'::jsonb
+        WHEN 'guest' THEN '{"intakeRequest":["create","read","update"]}'::jsonb
+        ELSE '{"intakeRequest":["create","read","update","manage"]}'::jsonb
+      END)::text
+      WHERE "role" IN ('viewer', 'member', 'admin', 'guest')
+        AND ("permission"::jsonb -> 'intakeRequest') IS NULL;
+    `);
+
     const now = new Date();
     const rows: Array<typeof schema.workspaceRoleTable.$inferInsert> = [];
     for (const workspaceId of workspaceIds) {
