@@ -6,6 +6,7 @@ import {
   type StoredRolePermission,
 } from "../utils/role-permissions";
 import { splitRoles } from "../utils/split-roles";
+import { isGuestRole } from "../workspace-members/is-guest-role";
 
 export const workspaceAccessColumns = {
   role: workspaceUserTable.role,
@@ -22,6 +23,9 @@ export function canReadWorkspace(
   storedRoles: readonly StoredRolePermission[],
 ) {
   if (access.instanceAdmin) return true;
+  // A guest holds no workspace:read but the app still has to route them: the
+  // workspace list is what sends a signed-in guest to their requests page.
+  if (isGuestRole(access.role)) return true;
   return rolesAllow(splitRoles(access.role), storedRoles, {
     workspace: ["read"],
   });

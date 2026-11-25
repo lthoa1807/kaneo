@@ -52,6 +52,8 @@ Changes apply to new notifications. Kaneo does not replay older inbox items when
 
 Forwarding uses the notifications Kaneo creates for your account and respects your event preferences. A project event does not automatically notify every member. Use a project integration when you want a shared feed of project activity.
 
+Intake requests follow the same inbox. When a guest submits a request, the people who can manage intake in that project receive a notification, and they receive a second one whenever the guest asks for a revision or confirms delivery. Rejecting or delivering a request notifies the guest instead, and Kaneo also emails the guest when the instance has SMTP configured. That email is transactional: guests have no notification settings, so it is sent without asking them to configure a channel.
+
 A notification without a workspace or project context may stay in the inbox only.
 
 ## If a channel cannot be saved or delivery fails

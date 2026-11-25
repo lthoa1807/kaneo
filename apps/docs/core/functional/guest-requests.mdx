@@ -70,6 +70,6 @@ If a guest opens a request they did not send, the API answers as if it does not 
 
 ## When a request changes
 
-The guest's page refreshes on its own within about half a minute, and immediately when they act. There is no live push yet, so a teammate watching the same request in two windows may see a status change on one side first. Reloading always brings the current state.
+When a teammate rejects or delivers the request, Kaneo emails the guest, provided the instance has SMTP configured. The guest's page also refreshes on its own within about half a minute, and immediately when they act, so the new status appears without a reload. There is no live push yet, so a teammate watching the same request in two windows may see a status change on one side first. Reloading always brings the current state.
 
 If two people change the same request at nearly the same moment, the later action is refused with a message that the request changed, and the page reloads rather than overwriting the other person's decision.

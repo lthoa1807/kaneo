@@ -172,6 +172,17 @@ describe("GET /api/workspace", () => {
     ]);
   });
 
+  it("lists the workspace a guest belongs to so the app can route them", async () => {
+    const guest = await createWorkspaceMember({ role: "guest" });
+    mockAuthenticatedSession(guest.user);
+
+    const response = await createApp().app.request("/api/workspace");
+
+    expect(await readJson(response)).toEqual([
+      expected(guest.workspace, "guest"),
+    ]);
+  });
+
   it("lists and reads a workspace when any of the caller's roles grants workspace:read", async () => {
     const { user, workspace: custom } = await createWorkspaceMember({
       role: "limited,reader",

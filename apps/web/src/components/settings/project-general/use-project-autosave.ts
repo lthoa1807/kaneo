@@ -35,6 +35,7 @@ export function useProjectAutosave({
   const queuedSaveRef = useRef<ProjectFormValues | null>(null);
   const inFlightSaveRef = useRef<Promise<boolean> | null>(null);
   const lastSavedRef = useRef<NormalizedProjectValues | null>(null);
+  const lastBlockedToastRef = useRef<string | null>(null);
 
   const form = useForm<ProjectFormValues>({
     resolver: standardSchemaResolver(schema),
@@ -226,10 +227,26 @@ export function useProjectAutosave({
     debounceTimeoutRef.current = setTimeout(async () => {
       const isValid = await form.trigger();
       if (isValid) {
+        lastBlockedToastRef.current = null;
         void saveProjectRef.current(form.getValues());
+        return;
+      }
+
+      // Autosave silently skips an invalid form, which makes an unrelated
+      // toggle look broken. Say which field blocked the save, once per message.
+      const parsed = schema.safeParse(normalizeProjectValues(form.getValues()));
+      const message = parsed.success
+        ? undefined
+        : parsed.error.issues[0]?.message;
+      if (
+        typeof message === "string" &&
+        message !== lastBlockedToastRef.current
+      ) {
+        lastBlockedToastRef.current = message;
+        toast.error(message);
       }
     }, 800);
-  }, [form]);
+  }, [form, schema]);
 
   useEffect(() => {
     if (!canEdit) return;
