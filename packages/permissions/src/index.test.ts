@@ -155,24 +155,14 @@ describe("intake permission vocabulary", () => {
 
   it("gives staff roles the manage set and viewer read-only", () => {
     expect(viewer.statements.intakeRequest).toEqual(["read"]);
-    expect(member.statements.intakeRequest).toEqual([
-      "create",
-      "read",
-      "update",
-      "manage",
-    ]);
-    expect(admin.statements.intakeRequest).toEqual([
-      "create",
-      "read",
-      "update",
-      "manage",
-    ]);
-    expect(owner.statements.intakeRequest).toEqual([
-      "create",
-      "read",
-      "update",
-      "manage",
-    ]);
+    for (const role of [member, admin, owner]) {
+      // Submitting belongs to guests alone.
+      expect(role.statements.intakeRequest).toEqual([
+        "read",
+        "update",
+        "manage",
+      ]);
+    }
   });
 
   it("seeds a guest role with no internal surface", () => {

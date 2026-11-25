@@ -84,6 +84,11 @@ The guest page still read **New** — `14-guest-stale-no-reload.png`.
 Reloading the same URL showed **Triaged** — `15-guest-after-reload.png`. The
 write reached the database; nothing pushed it to the open page.
 
+The page is not frozen: the intake queries poll every 30 seconds
+(`refetchInterval: 30_000` in `apps/web/src/hooks/queries/intake/`), which is
+what the spec's MVP asked for instead of websockets. This run watched for five
+seconds, so it proves the absence of a push, not the absence of an update.
+
 | Without a reload | After a reload |
 | --- | --- |
 | ![guest page still says New](screenshots/14-guest-stale-no-reload.png) | ![guest page says Triaged](screenshots/15-guest-after-reload.png) |

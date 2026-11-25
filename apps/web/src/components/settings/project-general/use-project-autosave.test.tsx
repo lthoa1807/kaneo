@@ -215,3 +215,35 @@ it("uses refreshed values when the pending debounce fires", async () => {
   });
   expect(mocks.update.mock.calls[0][0]).not.toHaveProperty("includeSubtasks");
 });
+
+async function flushValidation() {
+  // The debounce callback is async; drain the resolver before asserting.
+  for (let turn = 0; turn < 20; turn++) await Promise.resolve();
+}
+
+it("says which field blocked the autosave instead of saving nothing quietly", async () => {
+  const { result } = setup();
+  act(() =>
+    result.current.form.setValue("slug", "TOO-LONG-SLUG", {
+      shouldDirty: true,
+    }),
+  );
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(900);
+    await flushValidation();
+  });
+  expect(mocks.update).not.toHaveBeenCalled();
+  expect(mocks.error).toHaveBeenCalledWith(
+    "settings:projectGeneral.validation.keyMax",
+  );
+
+  act(() =>
+    result.current.form.setValue("slug", "okay", { shouldDirty: true }),
+  );
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(900);
+    await flushValidation();
+  });
+  expect(mocks.update).toHaveBeenCalledTimes(1);
+  expect(mocks.error).toHaveBeenCalledTimes(1);
+});

@@ -32,7 +32,8 @@ export const member = ac.newRole({
   task: ["create", "read", "update"],
   label: ["create", "read", "update", "delete"],
   workspace: ["read"],
-  intakeRequest: ["create", "read", "update", "manage"],
+  // Guests submit requests; staff only read and handle them.
+  intakeRequest: ["read", "update", "manage"],
 });
 
 export const admin = ac.newRole({
@@ -41,7 +42,7 @@ export const admin = ac.newRole({
   task: ["create", "read", "update", "delete", "assign"],
   label: ["create", "read", "update", "delete"],
   workspace: ["read", "update", "manage_settings"],
-  intakeRequest: ["create", "read", "update", "manage"],
+  intakeRequest: ["read", "update", "manage"],
 });
 
 export const owner = ac.newRole({
@@ -50,7 +51,7 @@ export const owner = ac.newRole({
   task: ["create", "read", "update", "delete", "assign"],
   label: ["create", "read", "update", "delete"],
   workspace: ["read", "update", "delete", "manage_settings"],
-  intakeRequest: ["create", "read", "update", "manage"],
+  intakeRequest: ["read", "update", "manage"],
 });
 
 // Guests submit and track intake requests; memberAc.statements keeps the

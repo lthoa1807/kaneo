@@ -3239,6 +3239,18 @@
 				"title": "Registro de tempo iniciado",
 				"contentWithTask": "Registro de tempo iniciado na tarefa: {{taskTitle}}",
 				"contentWithoutTask": "Registro de tempo iniciado em uma tarefa"
+			},
+			"intake_request_created": {
+				"content": "{{requestTitle}} was submitted",
+				"title": "New request from a guest"
+			},
+			"intake_request_guest_reply": {
+				"content": "{{requestTitle}} is now {{status}}",
+				"title": "Guest replied to a request"
+			},
+			"intake_request_status_changed": {
+				"content": "{{requestTitle}} is now {{status}}",
+				"title": "Request status changed"
 			}
 		},
 		"newCount_many": "{{count}} novas",

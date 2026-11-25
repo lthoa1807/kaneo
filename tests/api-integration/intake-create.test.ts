@@ -32,14 +32,14 @@ function postIntakeRequest(workspaceId: string, body: unknown) {
 
 describe("intake request creation", () => {
   it("creates a request with REQ numbering and a created activity row", async () => {
-    const member = await createWorkspaceMember();
+    const guest = await createWorkspaceMember({ role: "guest" });
     const { project } = await createProjectFixture({
-      workspaceId: member.workspace.id,
+      workspaceId: guest.workspace.id,
     });
     await enableIntake(project.id);
-    mockAuthenticatedSession(member.user);
+    mockAuthenticatedSession(guest.user);
 
-    const response = await postIntakeRequest(member.workspace.id, {
+    const response = await postIntakeRequest(guest.workspace.id, {
       projectId: project.id,
       title: "Fix login",
       description: "It 404s",
@@ -49,11 +49,11 @@ describe("intake request creation", () => {
     expect(body.number).toBe(1);
     expect(body.displayId).toBe("REQ-1");
     expect(body.status).toBe("new");
-    expect(body.createdById).toBe(member.user.id);
+    expect(body.createdById).toBe(guest.user.id);
     expect(body.projectName).toBe(project.name);
 
     const second = await (
-      await postIntakeRequest(member.workspace.id, {
+      await postIntakeRequest(guest.workspace.id, {
         projectId: project.id,
         title: "Second",
       })
@@ -64,17 +64,17 @@ describe("intake request creation", () => {
     const activities = await db.select().from(schema.intakeActivityTable);
     expect(activities).toHaveLength(2);
     expect(activities.every((a) => a.type === "created")).toBe(true);
-    expect(activities.every((a) => a.userId === member.user.id)).toBe(true);
+    expect(activities.every((a) => a.userId === guest.user.id)).toBe(true);
   });
 
   it("rejects creation in a project without intake enabled", async () => {
-    const member = await createWorkspaceMember();
+    const guest = await createWorkspaceMember({ role: "guest" });
     const { project } = await createProjectFixture({
-      workspaceId: member.workspace.id,
+      workspaceId: guest.workspace.id,
     });
-    mockAuthenticatedSession(member.user);
+    mockAuthenticatedSession(guest.user);
 
-    const response = await postIntakeRequest(member.workspace.id, {
+    const response = await postIntakeRequest(guest.workspace.id, {
       projectId: project.id,
       title: "X",
     });
@@ -82,22 +82,22 @@ describe("intake request creation", () => {
   });
 
   it("rejects creation in a project the actor cannot access", async () => {
-    const member = await createWorkspaceMember();
+    const guest = await createWorkspaceMember({ role: "guest" });
     const alpha = await createProjectFixture({
-      workspaceId: member.workspace.id,
+      workspaceId: guest.workspace.id,
       name: "Alpha",
     });
     const beta = await createProjectFixture({
-      workspaceId: member.workspace.id,
+      workspaceId: guest.workspace.id,
       name: "Beta",
     });
     await enableIntake(beta.project.id);
-    await restrictToProjects(member.workspace.id, member.user.id, [
+    await restrictToProjects(guest.workspace.id, guest.user.id, [
       alpha.project.id,
     ]);
-    mockAuthenticatedSession(member.user);
+    mockAuthenticatedSession(guest.user);
 
-    const response = await postIntakeRequest(member.workspace.id, {
+    const response = await postIntakeRequest(guest.workspace.id, {
       projectId: beta.project.id,
       title: "X",
     });
@@ -118,6 +118,56 @@ describe("intake request creation", () => {
     });
     expect(response.status).toBe(403);
     expect((await response.json()).code).toBe("MISSING_PERMISSION");
+  });
+});
+
+// A stale role row can still hold `intakeRequest:create`; identity decides,
+// not the stored capability.
+async function storedSubmitterWorkspace() {
+  const staff = await createWorkspaceMember({ role: "member" });
+  const { project } = await createProjectFixture({
+    workspaceId: staff.workspace.id,
+  });
+  await enableIntake(project.id);
+  await db.insert(schema.workspaceRoleTable).values({
+    workspaceId: staff.workspace.id,
+    role: "submitter",
+    permission: JSON.stringify({
+      intakeRequest: ["create", "read"],
+      workspace: ["read"],
+    }),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+  await db
+    .update(schema.workspaceUserTable)
+    .set({ role: "submitter" })
+    .where(eq(schema.workspaceUserTable.userId, staff.user.id));
+  mockAuthenticatedSession(staff.user);
+  return { staff, project };
+}
+
+describe("intake submission belongs to guests", () => {
+  it("refuses a staff role that still holds the create action", async () => {
+    const { staff, project } = await storedSubmitterWorkspace();
+
+    const response = await postIntakeRequest(staff.workspace.id, {
+      projectId: project.id,
+      title: "X",
+    });
+    expect(response.status).toBe(403);
+    expect((await response.json()).message).toBe(
+      "Only guests can submit intake requests",
+    );
+  });
+
+  it("refuses the guest project picker for staff too", async () => {
+    const { staff } = await storedSubmitterWorkspace();
+
+    const response = await createApp().app.request(
+      `/api/intake/workspaces/${staff.workspace.id}/intake-projects`,
+    );
+    expect(response.status).toBe(403);
   });
 });
 

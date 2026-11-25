@@ -1,8 +1,9 @@
 import { createHmac } from "node:crypto";
-import { sendNotificationEmail } from "@kaneo/email";
+import { isSmtpConfigured, sendNotificationEmail } from "@kaneo/email";
 import { and, eq } from "drizzle-orm";
 import db from "../database";
 import {
+  intakeRequestTable,
   notificationTable,
   projectTable,
   taskTable,
@@ -28,6 +29,7 @@ type ResolvedNotificationContext = {
   taskId: string | null;
   taskTitle: string | null;
   taskUrl: string | null;
+  requestTitle: string | null;
 };
 
 type DeliveryContent = {
@@ -41,6 +43,14 @@ function getClientUrl() {
 
 function buildTaskUrl(workspaceId: string, projectId: string, taskId: string) {
   return `${getClientUrl()}/dashboard/workspace/${workspaceId}/project/${projectId}/task/${taskId}`;
+}
+
+function buildIntakeUrl(
+  workspaceId: string,
+  projectId: string,
+  requestId: string,
+) {
+  return `${getClientUrl()}/dashboard/workspace/${workspaceId}/project/${projectId}/intake/${requestId}`;
 }
 
 function getStringValue(
@@ -247,6 +257,7 @@ async function resolveNotificationContext(notification: {
       taskId: task.taskId,
       taskTitle: task.taskTitle,
       taskUrl: buildTaskUrl(task.workspaceId, task.projectId, task.taskId),
+      requestTitle: null,
     };
   }
 
@@ -272,6 +283,48 @@ async function resolveNotificationContext(notification: {
       taskId: null,
       taskTitle: null,
       taskUrl: null,
+      requestTitle: null,
+    };
+  }
+
+  if (notification.resourceType === "intake_request") {
+    const [request] = await db
+      .select({
+        requestTitle: intakeRequestTable.title,
+        projectId: projectTable.id,
+        projectName: projectTable.name,
+        workspaceId: workspaceTable.id,
+        workspaceName: workspaceTable.name,
+      })
+      .from(intakeRequestTable)
+      .innerJoin(
+        projectTable,
+        eq(intakeRequestTable.projectId, projectTable.id),
+      )
+      .innerJoin(
+        workspaceTable,
+        eq(projectTable.workspaceId, workspaceTable.id),
+      )
+      .where(eq(intakeRequestTable.id, notification.resourceId))
+      .limit(1);
+
+    if (!request) {
+      return null;
+    }
+
+    return {
+      workspaceId: request.workspaceId,
+      workspaceName: request.workspaceName,
+      projectId: request.projectId,
+      projectName: request.projectName,
+      taskId: null,
+      taskTitle: null,
+      requestTitle: request.requestTitle,
+      taskUrl: buildIntakeUrl(
+        request.workspaceId,
+        request.projectId,
+        notification.resourceId,
+      ),
     };
   }
 
@@ -364,6 +417,46 @@ async function sendWebhookNotification(input: {
   );
 }
 
+// A guest has no notification preferences and no delivery rules, so the mail
+// that tells them their request moved is transactional: it goes out whenever
+// SMTP is configured, exactly like an invitation. Staff rows still flow through
+// the preference and rule gates below.
+const TRANSACTIONAL_TYPES = new Set(["intake_request_status_changed"]);
+
+async function sendTransactionalMail(
+  notification: typeof notificationTable.$inferSelect,
+  context: ResolvedNotificationContext,
+  user: { email: string; name: string; locale: string | null },
+) {
+  if (!isSmtpConfigured() || !user.email) {
+    return;
+  }
+
+  const content = buildDeliveryContent(
+    {
+      type: notification.type,
+      title: notification.title ?? null,
+      content: notification.content ?? null,
+      eventData:
+        notification.eventData && typeof notification.eventData === "object"
+          ? (notification.eventData as Record<string, unknown>)
+          : null,
+    },
+    user.locale ?? null,
+  );
+
+  await sendNotificationEmail(user.email, content.title, {
+    title: content.title,
+    message: content.body,
+    actionUrl: context.taskUrl,
+    locale: user.locale ?? null,
+    breadcrumb: context.projectName
+      ? `${context.workspaceName} / ${context.projectName}`
+      : context.workspaceName,
+    settingsUrl: `${getClientUrl()}/dashboard/settings/account/notifications`,
+  });
+}
+
 export async function deliverNotification(
   notificationId: string,
 ): Promise<void> {
@@ -406,6 +499,11 @@ export async function deliverNotification(
     .limit(1);
 
   if (!user) {
+    return;
+  }
+
+  if (TRANSACTIONAL_TYPES.has(notification.type)) {
+    await sendTransactionalMail(notification, context, user);
     return;
   }
 

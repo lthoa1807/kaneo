@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import db from "../database";
+import staffRecipientsForIntake from "../intake/shared/intake-notification-recipients";
 import { projectTable, taskTable } from "../database/schema";
 import { subscribeToEvent } from "../events";
 import {
@@ -403,6 +404,87 @@ subscribeToEvent<{
       resourceId: data.taskId,
       resourceType: "task",
     });
+  }
+});
+
+// Statuses the requester hears about, and the ones staff hear about. Every
+// other transition is internal work in progress.
+const INTAKE_GUEST_STATUSES = new Set(["rejected", "delivered"]);
+const INTAKE_STAFF_STATUSES = new Set(["needs_revision", "confirmed"]);
+
+async function intakeWorkspaceId(projectId: string) {
+  const [project] = await db
+    .select({ workspaceId: projectTable.workspaceId })
+    .from(projectTable)
+    .where(eq(projectTable.id, projectId))
+    .limit(1);
+  return project?.workspaceId ?? null;
+}
+
+type IntakeEvent = {
+  id: string;
+  projectId: string;
+  createdById: string;
+  number: number;
+  title: string;
+  currentUserId?: string;
+  to?: string;
+};
+
+function intakeEventData(data: IntakeEvent, workspaceId: string) {
+  return {
+    requestNumber: data.number,
+    requestTitle: data.title,
+    status: data.to ?? null,
+    projectId: data.projectId,
+    workspaceId,
+  };
+}
+
+async function notifyIntakeStaff(data: IntakeEvent, type: string) {
+  const workspaceId = await intakeWorkspaceId(data.projectId);
+  if (!workspaceId) return;
+
+  const recipients = await staffRecipientsForIntake({
+    projectId: data.projectId,
+    workspaceId,
+    excludeUserId: data.currentUserId,
+  });
+  await Promise.all(
+    recipients.map((userId) =>
+      createNotification({
+        userId,
+        type,
+        eventData: intakeEventData(data, workspaceId),
+        resourceId: data.id,
+        resourceType: "intake_request",
+      }),
+    ),
+  );
+}
+
+subscribeToEvent<IntakeEvent>("intake_request.created", async (data) => {
+  await notifyIntakeStaff(data, "intake_request_created");
+});
+
+subscribeToEvent<IntakeEvent>("intake_request.updated", async (data) => {
+  if (!data.to) return;
+
+  if (INTAKE_GUEST_STATUSES.has(data.to)) {
+    const workspaceId = await intakeWorkspaceId(data.projectId);
+    if (!workspaceId) return;
+    await createNotification({
+      userId: data.createdById,
+      type: "intake_request_status_changed",
+      eventData: intakeEventData(data, workspaceId),
+      resourceId: data.id,
+      resourceType: "intake_request",
+    });
+    return;
+  }
+
+  if (INTAKE_STAFF_STATUSES.has(data.to)) {
+    await notifyIntakeStaff(data, "intake_request_guest_reply");
   }
 });
 

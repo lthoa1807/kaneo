@@ -81,6 +81,13 @@ export function getNotificationTitle(
           ...eventData,
           defaultValue: notification.title ?? notification.type,
         });
+      case "intake_request_created":
+      case "intake_request_guest_reply":
+      case "intake_request_status_changed":
+        return t(`notifications:events.${notification.type}.title`, {
+          ...eventData,
+          defaultValue: notification.title ?? notification.type,
+        });
       default:
         break;
     }
@@ -147,6 +154,16 @@ export function getNotificationContent(
       case "task_overdue":
         return t("notifications:events.task_overdue.content", {
           ...eventData,
+          defaultValue: notification.content ?? "",
+        });
+      case "intake_request_created":
+      case "intake_request_guest_reply":
+      case "intake_request_status_changed":
+        return t(`notifications:events.${notification.type}.content`, {
+          ...eventData,
+          status: t(`intake:status.${String(eventData.status ?? "")}`, {
+            defaultValue: String(eventData.status ?? ""),
+          }),
           defaultValue: notification.content ?? "",
         });
       default:

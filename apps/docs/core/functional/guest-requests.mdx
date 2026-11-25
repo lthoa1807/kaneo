@@ -1,0 +1,75 @@
+---
+title: "Guest requests"
+description: "Let people outside the workspace ask for work, and keep every request visible from first ask to confirmation."
+---
+
+Intake is a small queue in front of your board. A guest who cannot see your tasks sends a request; your team triages it, turns it into a task when it is worth doing, and the guest sees the answer in the same place they asked.
+
+Guests and tasks never mix. A guest only ever sees the requests they sent, never the project, its board, or the tasks linked to their request.
+
+## Turn intake on for a project
+
+1. Open the project's **Settings** and choose **General**.
+2. Turn on **Accept guest requests**.
+
+The hint under the switch is worth reading: turning it off keeps every request that was already made. Nothing is deleted, and the project stays usable for everyone else.
+
+With intake on, the project gains an **Intake** tab next to the board for people who can manage requests.
+
+## Invite a guest
+
+1. Open **Members** in the workspace sidebar.
+2. Choose **Invite guest** and enter their email address.
+3. Under **Project access**, pick the projects they may send requests to. Only **Selected projects** is available: a guest cannot be given every project.
+4. Send the invitation and share the link.
+
+The guest signs up with the invited address and accepts. They then land in **My requests**, not on a board. The workspace sidebar shows their requests and nothing else: no task list, no search, no project list.
+
+Guests cannot be assigned tasks. They do not appear in the assignee picker, and the API rejects an assignment to them.
+
+## The request lifecycle
+
+Every request moves through the same eight states. The guest sees the state, the activity line for each change, and any note attached to it.
+
+| State | Who moves it | What it means |
+| --- | --- | --- |
+| New | Guest | Sent, waiting for your team to look at it |
+| Triaged | Staff | Seen and understood, not yet decided |
+| Approved | Staff | Worth doing; a task will carry the work |
+| Rejected | Staff | Not doing it; the reason appears in the guest's activity |
+| In progress | Staff | Work started, usually with a linked task |
+| Delivered | Staff | Work finished; the guest has the last word |
+| Needs revision | Guest | The guest is not satisfied and says what to change |
+| Confirmed | Guest | The guest accepts the delivery; the request is closed |
+
+A guest can only move their own request, and only along the guest's two edges: **Request changes** from `Delivered`, and **Looks good, confirm** from `Delivered`. Everything else belongs to staff.
+
+A revision sends the request back to the staff: it sits in **Needs revision** until the team starts work on it again, with the guest's note in the activity.
+
+## Work the staff side
+
+Open the project's **Intake** tab. Requests are grouped by what they need next: **Needs triage**, **In progress**, **Awaiting guest**, and **Closed**.
+
+A request that has sat in **Needs triage** is the one to look at first. From the request you can:
+
+- **Mark triaged** once you have read it.
+- **Reject** with a note. The note is what the guest reads, so write it for them.
+- **Approve**, which opens the actions that carry the work.
+- **Start work**, and later **Mark delivered**.
+- **Attach task**, which creates a task from the request text and links it back.
+
+The linked task shows its key, such as `KAN-12`, so staff can jump to the board, and the guest sees progress without seeing the task itself. You can attach more than one task; the guest reads it as "2 of 3 tasks done". Attaching is offered only while the request is approved, in progress, or needs revision.
+
+## What a guest never sees
+
+- Other guests' requests, even in the same project.
+- The project, its board, or any task.
+- Internal activity on a request. Notes written for staff stay with staff.
+
+If a guest opens a request they did not send, the API answers as if it does not exist. That is deliberate: a different answer would let someone probe for requests in workspaces they do not belong to.
+
+## When a request changes
+
+When a teammate rejects or delivers the request, Kaneo emails the guest, provided the instance has SMTP configured. The guest's page also refreshes on its own within about half a minute, and immediately when they act, so the new status appears without a reload. There is no live push yet, so a teammate watching the same request in two windows may see a status change on one side first. Reloading always brings the current state.
+
+If two people change the same request at nearly the same moment, the later action is refused with a message that the request changed, and the page reloads rather than overwriting the other person's decision.

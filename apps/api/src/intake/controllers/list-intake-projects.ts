@@ -2,8 +2,10 @@ import { and, asc, eq } from "drizzle-orm";
 import db from "../../database";
 import { projectTable } from "../../database/schema";
 import { findInaccessibleProjectIds } from "../../project-access/find-inaccessible-project-ids";
+import { assertGuestMember } from "../../workspace-members/is-guest-role";
 
 async function listIntakeProjects(workspaceId: string, userId: string) {
+  await assertGuestMember(workspaceId, userId);
   const candidates = await db
     .select({ id: projectTable.id, name: projectTable.name })
     .from(projectTable)

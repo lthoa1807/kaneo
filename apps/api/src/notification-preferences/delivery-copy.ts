@@ -30,6 +30,7 @@ type Bundle = {
     events: Record<string, Record<string, string>>;
     reminderLeadTime: Record<string, string>;
   };
+  intake: { status: Record<string, string> };
   tasks: { status: Record<string, string> };
 };
 
@@ -95,6 +96,13 @@ function statusLabel(bundle: Bundle, status: unknown) {
     : toDisplayCase(value);
 }
 
+function intakeStatusLabel(bundle: Bundle, status: unknown) {
+  const value = String(status ?? "");
+  return Object.hasOwn(bundle.intake.status, value)
+    ? bundle.intake.status[value]
+    : toDisplayCase(value);
+}
+
 function leadTime(bundle: Bundle, eventData: Vars, locale: SupportedLocale) {
   const forms = bundle.notifications.reminderLeadTime;
   const minutes = Number(eventData.leadTimeMinutes ?? 1440);
@@ -141,6 +149,14 @@ export function getLocalizedDeliveryContent(
     };
   } else if (type === "due_date_reminder") {
     vars = { ...eventData, leadTime: leadTime(bundle, eventData, resolved) };
+  } else if (
+    type === "intake_request_status_changed" ||
+    type === "intake_request_guest_reply"
+  ) {
+    vars = {
+      ...eventData,
+      status: intakeStatusLabel(bundle, eventData.status),
+    };
   } else if (type === "time_entry_created") {
     content = eventData.taskTitle
       ? copy.contentWithTask
