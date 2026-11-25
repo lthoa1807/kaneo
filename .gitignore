@@ -62,3 +62,4 @@ apps/web/.tanstack/
 # TypeScript incremental build state
 *.tsbuildinfo
 .vitest/
+.env.uat

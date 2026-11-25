@@ -179,6 +179,40 @@ then optionally the database:
 docker stop kaneo-dev-pg
 ```
 
+## UAT from the published image
+
+Runs the image GitHub Actions built, next to the dev environment, on port 5174
+with its own database and `.env.uat` (copy `.env.uat.sample` once).
+
+```sh
+./scripts/stack/up.sh uat ghcr.io/lthoa1807/kaneo-fork:sha-<12>
+```
+
+- Image refs: `ghcr.io/lthoa1807/kaneo-fork:latest` follows `main`; pin
+  `sha-<12>` for anything you intend to test properly. A branch gets one with
+  `gh workflow run fork-images.yml --ref <branch> -f tag=uat-<name>`.
+- Dev keeps running: UAT uses 5174, 1337 and 5173 stay free. The script only
+  refuses when its own port is taken or RAM is under 1200 MiB free.
+- Reaching it from Windows works through WSL mirrored networking at
+  `http://localhost:5174`; from the tailnet use the same port on the WSL address.
+  Set `KANEO_CLIENT_URL` in `.env.uat` to whichever URL testers use.
+- Roll back by running the same command with the previous image ref.
+- Populate it with the synthetic prod-like dataset (4 users, 8 projects, 600
+  tasks, labels, comments, activity) so migrations run against a database that
+  already has data. Logins are `uat1`..`uat4@example.test`:
+
+```sh
+./scripts/stack/seed-uat.sh 'some-demo-password'
+```
+
+- Tear down, keeping data:
+
+```sh
+docker compose -p kaneo-uat --env-file .env.uat -f compose.yml -f compose.uat.yml down
+```
+
+Add `-v` to that to drop the UAT database as well.
+
 ## Troubleshooting
 
 | Symptom | Check |

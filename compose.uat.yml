@@ -1,0 +1,15 @@
+# UAT on the production host: same compose.yml, own project name, own volumes,
+# own port, own env file. Dev (DEV_RUNBOOK.md) must be stopped first.
+#
+#   scripts/stack/up.sh uat ghcr.io/<owner>/kaneo-fork:sha-<12>
+#
+# `!override` is required: compose appends lists such as ports and env_file.
+services:
+  postgres:
+    env_file: !override [".env.uat"]
+
+  kaneo:
+    image: ${KANEO_IMAGE:?set by scripts/stack/up.sh, e.g. ghcr.io/<owner>/kaneo-fork:sha-<12>}
+    pull_policy: always
+    env_file: !override [".env.uat"]
+    ports: !override ["5174:5173"]
