@@ -3127,6 +3127,18 @@
 			"task_overdue": {
 				"title": "작업 기한 초과",
 				"content": "{{taskTitle}}이(가) 마감일을 지났습니다"
+			},
+			"intake_request_created": {
+				"content": "{{requestTitle}} was submitted",
+				"title": "New request from a guest"
+			},
+			"intake_request_guest_reply": {
+				"content": "{{requestTitle}} is now {{status}}",
+				"title": "Guest replied to a request"
+			},
+			"intake_request_status_changed": {
+				"content": "{{requestTitle}} is now {{status}}",
+				"title": "Request status changed"
 			}
 		},
 		"reminderLeadTime": {

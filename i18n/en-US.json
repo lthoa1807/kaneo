@@ -3186,6 +3186,18 @@
 				"title": "Time tracking started",
 				"contentWithTask": "Time tracking started on task: {{taskTitle}}",
 				"contentWithoutTask": "Time tracking started on a task"
+			},
+			"intake_request_created": {
+				"title": "New request from a guest",
+				"content": "{{requestTitle}} was submitted"
+			},
+			"intake_request_status_changed": {
+				"title": "Request status changed",
+				"content": "{{requestTitle}} is now {{status}}"
+			},
+			"intake_request_guest_reply": {
+				"title": "Guest replied to a request",
+				"content": "{{requestTitle}} is now {{status}}"
 			}
 		},
 		"inbox": {

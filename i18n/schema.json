@@ -13069,6 +13069,45 @@
 								}
 							},
 							"required": ["title", "contentWithTask", "contentWithoutTask"]
+						},
+						"intake_request_created": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"title": {
+									"type": "string"
+								},
+								"content": {
+									"type": "string"
+								}
+							},
+							"required": ["title", "content"]
+						},
+						"intake_request_status_changed": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"title": {
+									"type": "string"
+								},
+								"content": {
+									"type": "string"
+								}
+							},
+							"required": ["title", "content"]
+						},
+						"intake_request_guest_reply": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"title": {
+									"type": "string"
+								},
+								"content": {
+									"type": "string"
+								}
+							},
+							"required": ["title", "content"]
 						}
 					},
 					"required": [
@@ -13080,7 +13119,10 @@
 						"task_comment",
 						"due_date_reminder",
 						"task_overdue",
-						"time_entry_created"
+						"time_entry_created",
+						"intake_request_created",
+						"intake_request_status_changed",
+						"intake_request_guest_reply"
 					]
 				},
 				"inbox": {

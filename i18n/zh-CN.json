@@ -3132,6 +3132,18 @@
 				"title": "已开始计时",
 				"contentWithTask": "已开始为任务 {{taskTitle}} 计时",
 				"contentWithoutTask": "已开始为某个任务计时"
+			},
+			"intake_request_created": {
+				"content": "{{requestTitle}} was submitted",
+				"title": "New request from a guest"
+			},
+			"intake_request_guest_reply": {
+				"content": "{{requestTitle}} is now {{status}}",
+				"title": "Guest replied to a request"
+			},
+			"intake_request_status_changed": {
+				"content": "{{requestTitle}} is now {{status}}",
+				"title": "Request status changed"
 			}
 		},
 		"inbox": {

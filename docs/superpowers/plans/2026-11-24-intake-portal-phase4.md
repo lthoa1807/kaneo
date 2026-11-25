@@ -47,100 +47,100 @@ preferences for guests (they get transactional mail only), any WebSocket change
 
 Test first: `tests/api-integration/intake-notification-access.test.ts`
 
-- [ ] A guest with project access can be given a notification whose
+- [x] A guest with project access can be given a notification whose
       `resourceType` is `intake_request` and `resourceId` is their own request.
-- [ ] A guest cannot be given a notification for another guest's request.
-- [ ] A staff member without project access cannot be given one.
-- [ ] A guest reading `GET /notification` sees only their own intake row.
+- [x] A guest cannot be given a notification for another guest's request.
+- [x] A staff member without project access cannot be given one.
+- [x] A guest reading `GET /notification` sees only their own intake row.
 
 Then:
 
-- [ ] `apps/api/src/notification/resource-access.ts`: add the
+- [x] `apps/api/src/notification/resource-access.ts`: add the
       `intake_request` branch to `notificationResourceAccess` (join
       `intake_request` → `project` → `workspace_member`, plus
       `projectAccessCondition`).
-- [ ] `canReceiveResourceNotification`: resolve `workspaceId` for
+- [x] `canReceiveResourceNotification`: resolve `workspaceId` for
       `intake_request` in the existing `CASE`, and require
       `{ intakeRequest: ["read"] }` instead of `{ workspace: ["read"] }`.
-- [ ] Commit: `feat(api): let intake requests carry notifications`.
+- [x] Commit: `feat(api): let intake requests carry notifications`.
 
 ## Task 2 — who gets one
 
 Test first: unit test beside the helper,
 `apps/api/src/intake/shared/intake-notification-recipients.test.ts`
 
-- [ ] Managers of the project's workspace with `intakeRequest:manage` are
+- [x] Managers of the project's workspace with `intakeRequest:manage` are
       returned; a member without that permission, a guest, and the actor are
       not.
-- [ ] A manager without project access is not returned.
+- [x] A manager without project access is not returned.
 
 Then:
 
-- [ ] `apps/api/src/intake/shared/intake-notification-recipients.ts`:
+- [x] `apps/api/src/intake/shared/intake-notification-recipients.ts`:
       `staffRecipientsForIntake({ projectId, workspaceId, excludeUserId })` —
       one query over membership + roles + `projectAccessCondition`, reusing the
       permission-check helpers the intake routes already use.
-- [ ] Commit: `feat(api): find the staff who should hear about a request`.
+- [x] Commit: `feat(api): find the staff who should hear about a request`.
 
 ## Task 3 — the three events
 
 Test first: `tests/api-integration/intake-notifications.test.ts`
 
-- [ ] Guest creates a request → every manager has one unread `intake_request`
+- [x] Guest creates a request → every manager has one unread `intake_request`
       notification; the guest has none.
-- [ ] Staff rejects it → the guest has one, the staff member does not.
-- [ ] Guest asks for a revision → managers have one; guest does not.
-- [ ] Staff delivering and the guest confirming produce exactly the rows above,
+- [x] Staff rejects it → the guest has one, the staff member does not.
+- [x] Guest asks for a revision → managers have one; guest does not.
+- [x] Staff delivering and the guest confirming produce exactly the rows above,
       once each (no duplicates when a transition is retried).
 
 Then:
 
-- [ ] `apps/api/src/notification/index.ts`: three `subscribeToEvent` blocks, in
+- [x] `apps/api/src/notification/index.ts`: three `subscribeToEvent` blocks, in
       the file's existing shape:
       `intake_request.created`, `intake_request.updated` (branch on the new
       status: `rejected`/`delivered` → owner; `needs_revision`/`confirmed` →
       staff), with `resourceType: "intake_request"`.
-- [ ] Publish the two missing events if they are not already there — the
+- [x] Publish the two missing events if they are not already there — the
       transition and create services publish `intake_request.created` /
       `intake_request.updated` with `fromStatus`, `toStatus`, `createdById`,
       `projectId`, `workspaceId`, `actorId`, `requestNumber`, `title`.
-- [ ] Commit: `feat(api): notify staff and guests about intake events`.
+- [x] Commit: `feat(api): notify staff and guests about intake events`.
 
 ## Task 4 — copy in 21 locales
 
-- [ ] `notifications.events.intake_request_created`,
+- [x] `notifications.events.intake_request_created`,
       `intake_request_status_changed`, `intake_request_guest_reply` in
       `i18n/en-US.json` (tab-indented, exact edits — never re-dump the file).
-- [ ] Run `pnpm i18n:check:fix`, then `pnpm i18n:schema`, then
+- [x] Run `pnpm i18n:check:fix`, then `pnpm i18n:schema`, then
       `pnpm i18n:check`.
-- [ ] `apps/api/src/notification-preferences/delivery-copy.ts`: map the three
+- [x] `apps/api/src/notification-preferences/delivery-copy.ts`: map the three
       types to their bundle keys, including the status name from
       `intake.status.*` rather than a raw slug.
-- [ ] Commit: `feat(i18n): intake notification copy`.
+- [x] Commit: `feat(i18n): intake notification copy`.
 
 ## Task 5 — the guest's mail
 
-- [ ] `packages/email`: one template, `intake-status-changed`, in the style of
+- [x] `packages/email`: one template, `intake-status-changed`, in the style of
       the existing invitation mail (request title, new status, project name, a
       link to the request).
-- [ ] `apps/api/src/notification-preferences/delivery.ts`: intake types are
+- [x] `apps/api/src/notification-preferences/delivery.ts`: intake types are
       transactional — sent regardless of preference rows, only when SMTP is
       configured and the recipient has an address. Record the reason in a
       comment; the portal has no preference UI for guests.
-- [ ] Test: with preferences all off, the guest status mail still resolves; the
+- [x] Test: with preferences all off, the guest status mail still resolves; the
       staff in-app row still respects preferences.
-- [ ] Commit: `feat(email): tell a guest when their request changes`.
+- [x] Commit: `feat(email): tell a guest when their request changes`.
 
 ## Task 6 — docs and the PR
 
-- [ ] `apps/docs/core/functional/account-notifications.mdx`: one paragraph
+- [x] `apps/docs/core/functional/account-notifications.mdx`: one paragraph
       naming the intake events, and which of them a guest receives.
-- [ ] `apps/docs/core/functional/guest-requests.mdx`: replace "There is no live
+- [x] `apps/docs/core/functional/guest-requests.mdx`: replace "There is no live
       push yet" with what the guest actually gets (mail on reject/deliver, the
       page refreshing on its own).
-- [ ] Update the PR body: notifications shipped, realtime still polling by
+- [x] Update the PR body: notifications shipped, realtime still polling by
       design.
-- [ ] Commit: `docs: intake notifications`.
+- [x] Commit: `docs: intake notifications`.
 
 ## Review focus
 
