@@ -57,3 +57,14 @@ pnpm exec vp check $(git diff --name-only)
 # i18n key sync (cheap)
 pnpm i18n:check
 ```
+
+## The web app lists workspaces through better-auth, not `/api/workspace`
+
+`apps/web/src/fetchers/workspace/get-workspaces.ts` calls
+`authClient.organization.list()`. The dashboard's landing-page decision reads
+that list, and `apps/api/src/auth.ts` filters it with
+`readableNativeOrganizations()` (workspace:read). Changing
+`canReadWorkspace()` / `list-workspaces` does **not** move that redirect — a
+guest whose role lacks workspace:read still got `/onboarding` after the first
+attempt. Check `/api/auth/organization/list` in the browser when a workspace is
+missing from the UI.

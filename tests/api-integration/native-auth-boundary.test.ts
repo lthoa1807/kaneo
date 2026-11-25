@@ -388,6 +388,41 @@ describe("native organization scope and current workspace grants", () => {
     expect(await list()).toEqual([fallback.id]);
   });
 
+  it("lists a guest's own workspace without opening the member reads", async () => {
+    const { app, viewer, workspace } = await fixture();
+    const guest = await signUpWithSession(app, {
+      email: "guest@example.com",
+      name: "Guest",
+      role: "user",
+    });
+    await db
+      .update(schema.workspaceUserTable)
+      .set({ role: "guest" })
+      .where(eq(schema.workspaceUserTable.userId, viewer.userId));
+
+    const list = await app.request("/api/auth/organization/list", {
+      headers: { cookie: guest.cookies },
+    });
+    expect(list.status).toBe(200);
+    expect(await list.json()).toEqual([]);
+
+    const own = await app.request("/api/auth/organization/list", {
+      headers: { cookie: viewer.cookies },
+    });
+    expect(own.status).toBe(200);
+    expect(
+      ((await own.json()) as { id: string }[]).map((row) => row.id),
+    ).toEqual([workspace.id]);
+
+    for (const operation of ["get-full-organization", "list-members"]) {
+      const response = await app.request(
+        `/api/auth/organization/${operation}?organizationId=${workspace.id}`,
+        { headers: { cookie: viewer.cookies } },
+      );
+      expect(response.status, operation).toBe(403);
+    }
+  });
+
   it.each([false, true])(
     "denies limited roles through IDs, slugs and active workspace (bearer=%s)",
     async (bearer) => {
