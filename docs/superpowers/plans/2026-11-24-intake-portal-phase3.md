@@ -1,5 +1,9 @@
 # Intake Portal Phase 3 (Guest portal UI + staff intake tab) Implementation Plan
 
+> **Status:** shipped in PR #5. Every step below was executed; the boxes were left
+> unticked rather than retro-edited, so treat `main` as the source of truth. Phase 3.1,
+> 3.2 and 4 plans carry their own ticks.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Ship the three intake surfaces in `apps/web` on top of the Phase 2 API — guest workspace-level "My requests", guest project-level portal, and the staff project intake tab — plus the membership identity that separates guests from staff, guest invitations bounded to selected projects, a guest badge in the members table, and server-side assignee filtering.
