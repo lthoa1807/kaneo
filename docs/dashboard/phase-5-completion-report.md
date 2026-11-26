@@ -59,7 +59,7 @@
 ## Next Phase
 
 - Phase 6 – Quality Assurance and Optimization.
-- Prerequisites: Gate 5 approval, then merge `origin/main` and open the PR.
+- Prerequisites: Gate 5 approval. `origin/main` is already merged into the branch; only the PR remains.
 - Outstanding approval items: this report.
 
 ## Approval Status
