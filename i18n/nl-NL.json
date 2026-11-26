@@ -2452,7 +2452,8 @@
 				"taskDescriptionChanged": "De beschrijving verandert",
 				"taskPriorityChanged": "De prioriteit verandert",
 				"taskStatusChanged": "De status verandert",
-				"taskTitleChanged": "De titel verandert"
+				"taskTitleChanged": "De titel verandert",
+				"intakeRequestCreated": "Guest request received"
 			},
 			"optional": "Optioneel",
 			"postWhen": "Plaatsen wanneer",

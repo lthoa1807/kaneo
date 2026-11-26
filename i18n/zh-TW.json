@@ -2410,7 +2410,8 @@
 				"taskDescriptionChanged": "說明變更時",
 				"taskPriorityChanged": "優先順序變更時",
 				"taskStatusChanged": "狀態變更時",
-				"taskTitleChanged": "標題變更時"
+				"taskTitleChanged": "標題變更時",
+				"intakeRequestCreated": "Guest request received"
 			},
 			"optional": "選填",
 			"postWhen": "發佈時機",

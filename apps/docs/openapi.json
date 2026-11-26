@@ -24301,6 +24301,9 @@
                       },
                       "taskCommentCreated": {
                         "type": "boolean"
+                      },
+                      "intakeRequestCreated": {
+                        "type": "boolean"
                       }
                     }
                   }
@@ -24433,6 +24436,9 @@
                         "type": "boolean"
                       },
                       "taskCommentCreated": {
+                        "type": "boolean"
+                      },
+                      "intakeRequestCreated": {
                         "type": "boolean"
                       }
                     }

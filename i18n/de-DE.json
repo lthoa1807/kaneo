@@ -2452,7 +2452,8 @@
 				"taskDescriptionChanged": "Beschreibungsänderungen",
 				"taskPriorityChanged": "Prioritätsänderungen",
 				"taskStatusChanged": "Statusänderungen",
-				"taskTitleChanged": "Titeländerungen"
+				"taskTitleChanged": "Titeländerungen",
+				"intakeRequestCreated": "Guest request received"
 			},
 			"optional": "Optional",
 			"postWhen": "Posten bei",
