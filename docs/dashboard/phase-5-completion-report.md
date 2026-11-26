@@ -46,6 +46,11 @@
   - Drilldown: "Urgent" opens 2 rows, no truncation footer under the 50 row cap,
     close returns focus to the legend button.
   - One `h1`, five card `h2`s, 17 drill triggers, donut `aria-hidden`.
+  - Follow-up pass on the same workspace: the priority legend prints the share
+    (2/2/3/3/0 → 20/20/30/30/0%), a backdrop click closes the drilldown, a row
+    opens its task on the project board with the task sheet, and "View all
+    intake requests" reaches the workspace-wide intake list (320 px: no
+    overflow).
 - Build: covered by the CI run above.
 
 ## Risks and Limitations
