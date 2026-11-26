@@ -4,6 +4,7 @@ import { sql } from "drizzle-orm";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { Client } from "pg";
 import db from "../../../apps/api/src/database";
+import { retryOnDeadlock } from "./deadlock-retry";
 
 const currentDir = dirname(fileURLToPath(import.meta.url));
 const migrationsFolder = resolve(currentDir, "../../../apps/api/drizzle");
@@ -108,7 +109,7 @@ export async function resetTestDatabase() {
 
   const formattedTableNames = tableNames.map(quoteIdentifier).join(", ");
 
-  await db.execute(
-    sql.raw(`TRUNCATE TABLE ${formattedTableNames} RESTART IDENTITY CASCADE`),
-  );
+  const statement = `TRUNCATE TABLE ${formattedTableNames} RESTART IDENTITY CASCADE`;
+
+  await retryOnDeadlock(() => db.execute(sql.raw(statement)));
 }
