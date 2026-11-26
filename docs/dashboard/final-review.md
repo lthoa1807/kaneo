@@ -4,6 +4,7 @@
 > Date: 2026-11-27
 > Branch: `feature/ui-development`
 > PR: https://github.com/lthoa1807/kaneo/pull/15
+> CI: Fork CI run `45898349301` green on `727f6614` (lint, i18n, OpenAPI, typecheck, build, API integration ×4)
 > Status: **AWAITING GATE 6 APPROVAL**
 
 ## 1. What Phase 6 covered
@@ -58,7 +59,7 @@ No API, schema, route or permission change. No dependency added.
    and CLS is 0, but a deployed trace is still the honest proof.
 2. **Integration tests run only in CI.** Locally they would reset the shared
    development database, so authorization/archived-project coverage relies on
-   the Fork CI run.
+   the green Fork CI run above.
 3. **Browser coverage is Chromium only** (Orca + Playwright). Firefox/Safari
    were not exercised; the dashboard uses only Baseline features (container
    queries since 2023, native `<dialog>`, CSS grid).

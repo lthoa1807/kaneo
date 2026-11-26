@@ -18,7 +18,7 @@
   performance metrics only; visual verification stayed in Orca.
 - Integration tests (`tests/api-integration/*`) were **not** run locally because
   they call `resetTestDatabase` and would wipe this development database. They
-  run in Fork CI (run `45891067627`, head `aeb2cf88`) and are green.
+  run in Fork CI (run `45898349301`, head `727f6614`) and are green.
 
 ## 2. Functional testing
 
