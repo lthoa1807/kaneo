@@ -1,9 +1,20 @@
 # Kaneo Dashboard — Implementation Plan (Phase 1)
 
 > Phase: 1 – Architecture and Functional Specification
-> Status: Executed through T9. Gates green in CI (run 45868094980); widget tests and the browser pass are recorded in `phase-5-completion-report.md`. Gate 5 approved 2026-11-27.
+> Status: Executed through T9. Gates green in CI (run 45868094980); widget tests and the browser pass are recorded in `phase-5-completion-report.md`. Gate 5 approved 2026-11-27. Phase 6 QA executed 2026-11-27; results in `test-report.md`, `performance-report.md` and `final-review.md`.
 > Branch: `feature/ui-development` (already checked out)
 > Order matters: API first, then client, then widgets, then gates.
+
+## Phase 6 execution status (2026-11-27)
+
+| Task | State |
+| --- | --- |
+| Functional QA | Done: auth 401/404 live, drilldown/nav/data consistency in Orca, 403/archived in CI integration tests. |
+| Visual QA | Done at 320/768/1024/1280 in light and dark. Found and fixed the priority legend collapse at 1024–1279 px; fixed the hardcoded "open" label. |
+| Performance QA | Done: API p50 21 ms, dashboard route chunk 25.17 kB / 8.09 kB gzip, CLS 0; dev-mode LCP and missing Lighthouse documented in `performance-report.md`. |
+| Regression | Done: web 13 files / 44 tests, API 5 files / 48 tests, route smoke with 0 console errors. |
+| Gate 6 | Reports written; awaiting owner approval. |
+
 
 ## 0. Execution status (2026-11-26)
 
