@@ -41,9 +41,9 @@ async function getWorkspaceDashboard(request: {
   );
 
   const bucketConditions = {
-    mineOverdue: and(eq(taskTable.userId, userId), overdue),
-    overdueUrgent: and(overdue, urgentTask),
-    dueSoon,
+    mineOverdue: and(eq(taskTable.userId, userId), overdue)!,
+    overdueUrgent: and(overdue, urgentTask)!,
+    dueSoon: dueSoon!,
     unassigned: isNull(taskTable.userId),
   };
 
@@ -55,7 +55,7 @@ async function getWorkspaceDashboard(request: {
       mineOverdue: countFilter(bucketConditions.mineOverdue),
       overdueUrgent: countFilter(bucketConditions.overdueUrgent),
       dueSoon: countFilter(bucketConditions.dueSoon),
-      dueSoonUrgent: countFilter(and(bucketConditions.dueSoon, urgentTask)),
+      dueSoonUrgent: countFilter(and(bucketConditions.dueSoon, urgentTask)!),
       unassigned: countFilter(bucketConditions.unassigned),
     })
     .from(taskTable)
