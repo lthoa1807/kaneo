@@ -127,6 +127,23 @@ export type ExternalMetadata = {
   metadata: Record<string, unknown>;
 };
 
+export type IntakeRequestCreatedEvent = {
+  requestId: string;
+  projectId: string;
+  number: number;
+  title: string;
+  status: string;
+  sourceType: string;
+  requesterName: string | null;
+  requesterEmail: string | null;
+  createdById: string;
+};
+
+export type IntakeRequestEventHandler = (
+  event: IntakeRequestCreatedEvent,
+  context: PluginContext,
+) => Promise<void>;
+
 export type TaskEventHandler<T extends TaskEvent = TaskEvent> = (
   event: T,
   context: PluginContext,
@@ -161,6 +178,9 @@ export type IntegrationPlugin = {
   onTaskDueDateChanged?: TaskEventHandler<TaskDueDateChangedEvent>;
   onTaskAssigneeChanged?: TaskEventHandler<TaskAssigneeChangedEvent>;
   onTaskUnassigned?: TaskEventHandler<TaskUnassignedEvent>;
+  // Intake is a request queue in front of the board, not a task surface, so it
+  // gets its own hook instead of riding on the task events.
+  onIntakeRequestCreated?: IntakeRequestEventHandler;
 
   handleWebhook?: WebhookHandler;
   getTaskMetadata?: MetadataProvider;
