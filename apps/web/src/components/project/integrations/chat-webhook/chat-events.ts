@@ -37,7 +37,7 @@ export const CHAT_EVENT_ITEMS: EventChecklistItem<keyof ChatEvents>[] = [
 ];
 
 export type TelegramEvents = ChatEvents & {
-  intakeRequestCreated?: boolean;
+  intakeRequestCreated: boolean;
 };
 
 // Telegram carries intake requests; the generic webhook has no intake handler, so
