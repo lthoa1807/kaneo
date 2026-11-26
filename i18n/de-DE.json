@@ -2963,7 +2963,8 @@
 			"home": "Startseite",
 			"inbox": "Posteingang",
 			"invitePeople": "Personen einladen",
-			"myTasks": "Meine Aufgaben"
+			"myTasks": "Meine Aufgaben",
+			"overview": "Overview"
 		},
 		"projectList": {
 			"viewProject": "Projekt ansehen",
@@ -5473,5 +5474,54 @@
 			"title": "Intake requests",
 			"truncated": "Showing {{shown}} of {{total}} requests — filter by status to narrow"
 		}
+	},
+	"dashboard": {
+		"charts": {
+			"byPriority": "Open tasks by priority",
+			"byPriorityHint": "{{count}} open tasks · click a priority",
+			"byProject": "Open tasks by project",
+			"byProjectHint": "Where the work sits right now",
+			"dueLoad": "Due load · next 7 days",
+			"dueLoadHint": "Open tasks by due date, today onward"
+		},
+		"drill": {
+			"cap": "Showing the first {{shown}} of {{total}}.",
+			"close": "Close",
+			"empty": "No tasks match this filter right now.",
+			"title": "Tasks",
+			"loading": "Loading tasks…"
+		},
+		"error": {
+			"retry": "Retry",
+			"title": "Couldn't load"
+		},
+		"intake": {
+			"age": {
+				"days": "{{count}} days",
+				"today": "today"
+			},
+			"empty": "No intake requests in this group.",
+			"hint": "Requests waiting for triage or already being worked on",
+			"inProgress": "In progress",
+			"title": "Intake queue",
+			"viewAll": "View all intake requests",
+			"waiting": "Waiting"
+		},
+		"risk": {
+			"dueSoon": "Due in {{days}} days",
+			"hint": "Open tasks only · urgent = high or urgent priority",
+			"overdue": "Overdue and urgent",
+			"title": "Deadline risk",
+			"urgentShare": "{{count}} urgent"
+		},
+		"subtitle": "{{workspace}} at a glance",
+		"tiles": {
+			"members": "Members",
+			"myOpen": "My open tasks",
+			"myOverdue": "My overdue",
+			"projects": "Projects",
+			"unassigned": "Unassigned tasks"
+		},
+		"title": "Overview"
 	}
 }

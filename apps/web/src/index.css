@@ -1895,3 +1895,42 @@ input:-webkit-autofill:active {
   }
 
 }
+
+/* Overview page only: Dusk afterglow behind smoked-glass cards
+   (docs/dashboard/design-spec.md §1). Scoped here so Home keeps flat cards.
+   Gradients are light, never surfaces; the card stays opaque enough to read
+   on its own if the glow is removed. */
+.overview-atmosphere {
+	position: fixed;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	background:
+		radial-gradient(
+			60rem 40rem at 0% 0%,
+			color-mix(in oklab, var(--info) 18%, transparent),
+			transparent 70%
+		),
+		radial-gradient(
+			50rem 36rem at 100% 0%,
+			color-mix(in oklab, var(--warning) 14%, transparent),
+			transparent 70%
+		),
+		linear-gradient(
+			to bottom,
+			transparent 60%,
+			color-mix(in oklab, var(--info) 8%, transparent)
+		);
+}
+
+.overview-card {
+	background: color-mix(in oklab, var(--card) 82%, transparent);
+	-webkit-backdrop-filter: blur(20px) saturate(135%);
+	backdrop-filter: blur(20px) saturate(135%);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+	.overview-card {
+		background: var(--card);
+	}
+}

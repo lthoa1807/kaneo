@@ -29,3 +29,19 @@ export const updateMemberProjectAccessBody = z.object({
       'Projects the member can access when projectAccess is "selected".',
   }),
 });
+
+export const dashboardDrilldownQuery = z.object({
+  priority: z
+    .enum(["no-priority", "low", "medium", "high", "urgent"])
+    .optional()
+    .openapi({ description: "Only tasks with this priority." }),
+  projectId: z
+    .string()
+    .optional()
+    .openapi({ description: "Only tasks in this project." }),
+  day: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional()
+    .openapi({ description: "Only tasks due on this UTC day (YYYY-MM-DD)." }),
+});

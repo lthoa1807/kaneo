@@ -4551,6 +4551,251 @@
           "role"
         ]
       },
+      "WorkspaceDashboard": {
+        "type": "object",
+        "properties": {
+          "generatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "tasks": {
+            "$ref": "#/components/schemas/DashboardTaskCounts"
+          },
+          "charts": {
+            "$ref": "#/components/schemas/DashboardCharts"
+          }
+        },
+        "required": [
+          "generatedAt",
+          "tasks",
+          "charts"
+        ]
+      },
+      "DashboardTaskCounts": {
+        "type": "object",
+        "properties": {
+          "mineOverdue": {
+            "$ref": "#/components/schemas/DashboardTaskBucket"
+          },
+          "overdueUrgent": {
+            "$ref": "#/components/schemas/DashboardTaskBucket"
+          },
+          "dueSoon": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Exact number of matching tasks, independent of items.length."
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DashboardTask"
+                },
+                "maxItems": 50,
+                "description": "First page of matching tasks, at most 50."
+              },
+              "truncated": {
+                "type": "boolean",
+                "description": "True when total is larger than items.length."
+              },
+              "urgent": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "withinDays": {
+                "type": "number",
+                "enum": [
+                  3
+                ]
+              }
+            },
+            "required": [
+              "total",
+              "items",
+              "truncated",
+              "urgent",
+              "withinDays"
+            ]
+          },
+          "unassigned": {
+            "$ref": "#/components/schemas/DashboardTaskBucket"
+          }
+        },
+        "required": [
+          "mineOverdue",
+          "overdueUrgent",
+          "dueSoon",
+          "unassigned"
+        ]
+      },
+      "DashboardTaskBucket": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Exact number of matching tasks, independent of items.length."
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DashboardTask"
+            },
+            "maxItems": 50,
+            "description": "First page of matching tasks, at most 50."
+          },
+          "truncated": {
+            "type": "boolean",
+            "description": "True when total is larger than items.length."
+          }
+        },
+        "required": [
+          "total",
+          "items",
+          "truncated"
+        ]
+      },
+      "DashboardTask": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "ticket": {
+            "type": "string",
+            "description": "Project key and task number, e.g. BILL-12."
+          },
+          "title": {
+            "type": "string"
+          },
+          "projectId": {
+            "type": "string"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "assigneeId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "assigneeName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "priority": {
+            "type": "string",
+            "description": "One of: no-priority, low, medium, high, urgent."
+          },
+          "dueDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "ticket",
+          "title",
+          "projectId",
+          "projectName",
+          "assigneeId",
+          "assigneeName",
+          "priority",
+          "dueDate"
+        ]
+      },
+      "DashboardCharts": {
+        "type": "object",
+        "properties": {
+          "byPriority": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "priority": {
+                  "type": "string",
+                  "enum": [
+                    "urgent",
+                    "high",
+                    "medium",
+                    "low",
+                    "no-priority"
+                  ]
+                },
+                "count": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "priority",
+                "count"
+              ]
+            }
+          },
+          "dueByDay": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "type": "string",
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                },
+                "count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "urgent": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "date",
+                "count",
+                "urgent"
+              ]
+            }
+          },
+          "byProject": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "projectId": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "count": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "projectId",
+                "name",
+                "count"
+              ]
+            }
+          }
+        },
+        "required": [
+          "byPriority",
+          "dueByDay",
+          "byProject"
+        ]
+      },
       "WorkspaceMember": {
         "type": "object",
         "properties": {
@@ -25659,6 +25904,184 @@
           },
           "404": {
             "description": "Workspace not found, the caller is not a member of it, or none of their roles grants workspace:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
+    "/workspace/{workspaceId}/dashboard": {
+      "get": {
+        "operationId": "getWorkspaceDashboard",
+        "tags": [
+          "Workspaces"
+        ],
+        "summary": "Get workspace dashboard",
+        "description": "Task buckets and chart aggregates for the Overview page: the caller's overdue tasks, overdue urgent tasks, tasks due within three days, unassigned tasks, plus open tasks by priority, by due day and by project. Every count and every row only covers tasks in readable, non-archived projects and leaves out tasks whose status is done or archived.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task buckets and chart aggregates for the dashboard",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceDashboard"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing project:read or task:read, or no access to the workspace",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workspace not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
+    "/workspace/{workspaceId}/dashboard/tasks": {
+      "get": {
+        "operationId": "getWorkspaceDashboardTasks",
+        "tags": [
+          "Workspaces"
+        ],
+        "summary": "Get dashboard task bucket",
+        "description": "First 50 tasks behind one dashboard chart segment, filtered by priority, project or due day. Same scope and ordering as the dashboard counts: readable, non-archived projects, open tasks only.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "no-priority",
+                "low",
+                "medium",
+                "high",
+                "urgent"
+              ],
+              "description": "Only tasks with this priority."
+            },
+            "required": false,
+            "description": "Only tasks with this priority.",
+            "name": "priority",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Only tasks in this project."
+            },
+            "required": false,
+            "description": "Only tasks in this project.",
+            "name": "projectId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Only tasks due on this UTC day (YYYY-MM-DD)."
+            },
+            "required": false,
+            "description": "Only tasks due on this UTC day (YYYY-MM-DD).",
+            "name": "day",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One task bucket",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardTaskBucket"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid priority or day",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing project:read or task:read, or no access to the workspace",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workspace not found",
             "content": {
               "application/json": {
                 "schema": {
