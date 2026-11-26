@@ -2,11 +2,11 @@
 
 | Field | Value |
 | --- | --- |
-| Status | Approved initial specification (source of truth for the initiative) |
+| Status | Closed – initiative complete (2026-11-27); approved initial specification remains the source of truth |
 | Version | 1.0 |
 | Date | 2026-11-26 |
-| Development branch | `feature/ui-development` |
-| Current phase | Phase 6 approved (2026-11-27); dashboard v1 complete, PR #15 merge pending owner decision |
+| Development branch | `feature/ui-development` (merged into `main`) |
+| Current phase | Phase 6 approved; PR #15 merged `bfe3c5e5`, PR #14 merged `c9d92531`; dashboard v1 on `main` |
 
 This document governs the entire Dashboard initiative. It is the input to
 Phase 0 and must not be changed silently. Any requirement change follows
