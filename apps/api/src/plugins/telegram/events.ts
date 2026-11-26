@@ -9,6 +9,7 @@ import {
 } from "../../database/schema";
 import { safeOutboundError } from "../../utils/outbound-request";
 import type {
+  IntakeRequestCreatedEvent,
   PluginContext,
   TaskCommentCreatedEvent,
   TaskCreatedEvent,
@@ -278,4 +279,100 @@ export async function handleTaskCommentCreated(
     title: "New task comment",
     body: truncate(event.comment.replace(/\s+/g, " "), 200),
   }));
+}
+
+function getIntakeRequestUrl(
+  clientUrl: string | undefined,
+  workspaceId: string,
+  projectId: string,
+  requestId: string,
+): string | null {
+  const normalizedClientUrl = clientUrl?.trim();
+  if (!normalizedClientUrl) {
+    return null;
+  }
+
+  try {
+    return new URL(
+      `/dashboard/workspace/${workspaceId}/project/${projectId}/intake/${requestId}`,
+      normalizedClientUrl,
+    ).toString();
+  } catch {
+    return null;
+  }
+}
+
+function describeRequester(event: IntakeRequestCreatedEvent): string {
+  if (event.requesterName && event.requesterEmail) {
+    return `${event.requesterName} (${event.requesterEmail})`;
+  }
+  return event.requesterName ?? event.requesterEmail ?? "a guest";
+}
+
+export async function handleIntakeRequestCreated(
+  event: IntakeRequestCreatedEvent,
+  context: PluginContext,
+): Promise<void> {
+  const validation = validateTelegramConfig(context.config);
+  if (!validation.valid) {
+    console.error("Invalid Telegram plugin config; skipping event dispatch", {
+      reason: "Invalid configuration",
+      featureKey: "intakeRequestCreated",
+      projectId: event.projectId,
+      requestId: event.requestId,
+    });
+    return;
+  }
+
+  const config = normalizeTelegramConfig(context.config as TelegramConfig);
+  if (!isEnabled(config, "intakeRequestCreated")) return;
+
+  const [row] = await db
+    .select({
+      projectName: projectTable.name,
+      projectId: projectTable.id,
+      workspaceId: workspaceTable.id,
+    })
+    .from(projectTable)
+    .innerJoin(workspaceTable, eq(projectTable.workspaceId, workspaceTable.id))
+    .where(eq(projectTable.id, event.projectId))
+    .limit(1);
+  if (!row) return;
+
+  const requestUrl = getIntakeRequestUrl(
+    process.env.KANEO_CLIENT_URL,
+    row.workspaceId,
+    row.projectId,
+    event.requestId,
+  );
+  const label = escapeHtml(`REQ-${event.number} ${truncate(event.title, 120)}`);
+  const requestLine = requestUrl
+    ? `<a href="${escapeHtml(requestUrl)}">${label}</a>`
+    : label;
+
+  const lines = [
+    "<b>New intake request</b>",
+    escapeHtml(truncate(event.title, 120)),
+    "",
+    `<b>Request:</b> ${requestLine}`,
+    `<b>Requester:</b> ${escapeHtml(describeRequester(event))}`,
+    `<b>Project:</b> ${escapeHtml(row.projectName)}`,
+    `<b>Status:</b> ${escapeHtml(toSentenceCase(event.status))}`,
+  ];
+
+  try {
+    await postToTelegram(config.botToken, {
+      chat_id: config.chatId,
+      text: lines.join("\n"),
+      parse_mode: "HTML",
+      disable_web_page_preview: false,
+      message_thread_id: config.threadId,
+    });
+  } catch (error) {
+    console.error("handleIntakeRequestCreated postToTelegram failed", {
+      error: safeOutboundError(error),
+      telegramTarget: getSafeTelegramTargetIdentifier(config),
+      requestUrl,
+    });
+  }
 }
