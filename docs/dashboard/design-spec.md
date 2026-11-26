@@ -79,7 +79,7 @@ Font: Geist Variable with the existing system fallback. No new font.
 | Project / member / my-open / my-overdue tiles | label above, value below; `my-overdue` value uses `--destructive` only when > 0 | `0` in normal foreground |
 | Deadline risk | two labeled counts; a 4 px stacked bar showing overdue vs due-soon share; hint "Open tasks only · urgent = high or urgent priority" | bar hidden at 0/0 |
 | Unassigned | single tile, value + "needs an owner" meta | `0` |
-| By priority | 124 px donut (16 px stroke, 2 px segment gap) with total in the middle; legend rows on the right: swatch, label, count. Segments use urgency tokens, not a new palette | full ring in `--muted` if no open tasks |
+| By priority | 124 px donut (16 px stroke, 2 px segment gap) with total in the middle; legend rows on the right: swatch, label, count, share, so the percentage is visible without hovering (touch has no hover). Segments use urgency tokens, not a new palette | full ring in `--muted` if no open tasks |
 | Due load | 7 equal columns, 68 px plot area, 4 px top radius, count above, weekday below; today's label is bold and marked `aria-current="date"`; columns with an urgent majority use `--warning` | zero columns keep a 2 px `--border` stub |
 | Open by project | horizontal bars scaled to the busiest project; project name, count, bar; no percentage, because the value is a workload not a share | "No open tasks" |
 | Intake queue | two groups ("Waiting", "In progress") side by side; row = title, then a **project chip** plus `REQ-n · from requester`, age right-aligned; the project is a chip, never buried in the meta string | "No intake requests in this group." |
@@ -98,22 +98,27 @@ the click target, so no information lives only in geometry.
 
 ### Drilldown panel
 
-- One native `<dialog>`, `closedby="any"`, `width: min(640px, 92vw)`,
-  `max-height: 82dvh`, header and footer sticky, body scrolls.
-- Header: `h1` = the widget's label (e.g. "Overdue and urgent"), one line of
+- One native `<dialog>`, `width: min(640px, 92vw)`, `max-height: 82dvh`,
+  header and footer sticky, body scrolls. Esc and a click on the backdrop both
+  close it; the backdrop click is handled in JS because the platform does not
+  close a `showModal()` dialog on it.
+- Header: `h2` = the widget's label (e.g. "Overdue and urgent"), one line of
   definition copy ("Open tasks past their due date with high or urgent
   priority."), close button.
 - Body: task rows, 10 px vertical padding, title + key/project/assignee on the
   left, priority pill and relative due date on the right. Ordered by due date
   ascending, no-due-date last.
+- A row opens its task on the project board (`?taskId=`), the same surface
+  search results use; the row handles the pointer and the task title is a
+  `<button>` so the action is also reachable from the keyboard.
 - Footer: only "Showing the first 50 of N." when the bucket is capped. No
   "Open in Tasks" link: My Tasks is assignment-scoped and no other view accepts
   these task filters.
 - Empty: centred "No tasks match this filter right now." — never a blank panel.
 - Over 50 rows: footer adds "Showing the first 50 of N." The total is always
   the exact count from the endpoint.
-- Hover does not underline until the row is hovered; the trigger's focus ring
-  is 2 px `--ring` at 3 px offset.
+- Rows use a pointer cursor and a `--accent` hover background; the trigger's
+  focus ring is 2 px `--ring` at 3 px offset.
 
 ## 6. States
 
@@ -151,7 +156,7 @@ the card switches to the same 7 rows as a list instead of shrinking columns.
 | priority donut | local `PriorityDonut` (SVG, legend buttons) |
 | due-load columns | local `DueLoadChart` (CSS grid of buttons) |
 | project load bars | local `ProjectLoadChart` (progress bars) |
-| intake queue | local `IntakeQueue`; rows are links, not drill triggers |
+| intake queue | local `IntakeQueue`; rows are links, not drill triggers; the footer links to the workspace-wide intake list (`/dashboard/workspace/$workspaceId/intake`) |
 | drilldown | local `TaskDrilldown` wrapping a native `<dialog>`; its own table rows (title, ticket, project, assignee, priority, relative due) |
 | lists | local list rows; `empty` primitive for empty states |
 | skeleton | `skeleton` primitive |
@@ -168,6 +173,8 @@ No primitive is modified. Nothing from Astryx; no chart library.
 - [x] every drill trigger is a real `<button>` with a visible label
 - [x] donut geometry is `aria-hidden`; the legend carries all values
 - [x] dialog has `aria-labelledby` → its `h2`, no `role="dialog"` or focus trap
+- [x] Esc and a backdrop click both close the dialog
+- [x] drilldown rows open the task from the keyboard, not only the mouse
 - [x] focus returns to the triggering widget when the dialog closes (browser)
 - [x] focus ring on every interactive element, not just Retry
 - [x] contrast ≥ 4.5:1 in light, dark, modern for text; ≥ 3:1 for bars (visual check)

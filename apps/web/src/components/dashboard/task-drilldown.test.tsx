@@ -1,12 +1,17 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, expect, it, vi } from "vite-plus/test";
 import TaskDrilldown from "./task-drilldown";
 import type { DashboardBucket, DashboardTaskRow } from "./types";
 
 const hook = vi.hoisted(() => ({ value: {} as { data?: unknown } }));
+const navigate = vi.hoisted(() => vi.fn());
 
 vi.mock("@/hooks/queries/dashboard/use-get-dashboard-drilldown", () => ({
   default: () => hook.value,
+}));
+
+vi.mock("@tanstack/react-router", () => ({
+  useNavigate: () => navigate,
 }));
 
 vi.mock("react-i18next", async (original) => ({
@@ -16,12 +21,14 @@ vi.mock("react-i18next", async (original) => ({
 
 beforeEach(() => {
   hook.value = { data: undefined };
-  // jsdom has no dialog implementation; only the open state matters here.
+  navigate.mockClear();
+  // jsdom has no dialog implementation; only open/close calls matter here.
   HTMLDialogElement.prototype.showModal = vi.fn(function (
     this: HTMLDialogElement,
   ) {
     this.open = true;
   });
+  HTMLDialogElement.prototype.close = vi.fn();
 });
 
 afterEach(cleanup);
@@ -112,4 +119,39 @@ it("shows the empty and loading states", () => {
     />,
   );
   expect(screen.getByText("dashboard:drill.loading")).toBeVisible();
+});
+
+it("opens the clicked task on its project board", () => {
+  render(
+    <TaskDrilldown
+      drill={drill(bucket([row("1")], 1))}
+      workspaceId="w1"
+      onClose={vi.fn()}
+    />,
+  );
+
+  fireEvent.click(screen.getByText("Task 1"));
+
+  expect(navigate).toHaveBeenCalledWith({
+    to: "/dashboard/workspace/$workspaceId/project/$projectId/board",
+    params: { workspaceId: "w1", projectId: "p1" },
+    search: { taskId: "1" },
+  });
+});
+
+it("closes when the click lands outside the panel", () => {
+  render(
+    <TaskDrilldown
+      drill={drill(bucket([row("1")], 1))}
+      workspaceId="w1"
+      onClose={vi.fn()}
+    />,
+  );
+
+  fireEvent.click(screen.getByRole("dialog"));
+  expect(HTMLDialogElement.prototype.close).toHaveBeenCalled();
+
+  vi.mocked(HTMLDialogElement.prototype.close).mockClear();
+  fireEvent.click(screen.getByText("tasks:entity.task"));
+  expect(HTMLDialogElement.prototype.close).not.toHaveBeenCalled();
 });

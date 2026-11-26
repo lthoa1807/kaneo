@@ -1,3 +1,4 @@
+import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import useGetDashboardDrilldown from "@/hooks/queries/dashboard/use-get-dashboard-drilldown";
@@ -7,7 +8,9 @@ import type { DashboardTaskRow, Drill } from "./types";
 
 /**
  * Native <dialog> opened with showModal(): the browser supplies the focus trap,
- * Esc, backdrop and focus return, so no ARIA roles or manual trap are added.
+ * Esc and focus return, so no ARIA roles or manual trap are added. A click on
+ * the dialog element itself is a backdrop click, which the platform does not
+ * handle, so it closes here.
  */
 export default function TaskDrilldown({
   drill,
@@ -19,6 +22,7 @@ export default function TaskDrilldown({
   onClose: () => void;
 }) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const dialog = useRef<HTMLDialogElement>(null);
   // The payload carries rows only for the four count buckets; a chart segment
   // asks for its own bucket when it is opened.
@@ -39,11 +43,26 @@ export default function TaskDrilldown({
     dialog.current?.close();
   };
 
+  // The board route already opens a task from ?taskId, so a row hands the task
+  // to that surface instead of nesting a second modal inside a modal.
+  const openTask = (task: DashboardTaskRow) => {
+    close();
+    void navigate({
+      to: "/dashboard/workspace/$workspaceId/project/$projectId/board",
+      params: { workspaceId, projectId: task.projectId },
+      search: { taskId: task.id },
+    });
+  };
+
   return (
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events -- Esc closes the dialog; the backdrop click is an extra pointer affordance.
     <dialog
       ref={dialog}
       aria-labelledby="drill-title"
       onClose={onClose}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) close();
+      }}
       className="m-auto w-[min(44rem,calc(100vw-2rem))] rounded-xl border bg-background p-0 text-foreground backdrop:bg-black/50 open:flex open:flex-col"
     >
       {drill ? (
@@ -96,12 +115,27 @@ export default function TaskDrilldown({
                 </thead>
                 <tbody>
                   {bucket.items.map((task: DashboardTaskRow) => (
-                    <tr key={task.id} className="border-t">
+                    <tr
+                      key={task.id}
+                      onClick={() => openTask(task)}
+                      className="cursor-pointer border-t hover:bg-accent/50"
+                    >
                       <td className="p-2">
-                        <span className="block truncate">{task.title}</span>
-                        <span className="text-muted-foreground tabular-nums">
-                          {task.ticket}
-                        </span>
+                        {/* The row handles the mouse; this button is the
+                            keyboard/AT entry point for the same action. */}
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            openTask(task);
+                          }}
+                          className="block max-w-full text-left focus-visible:outline-2 focus-visible:outline-ring"
+                        >
+                          <span className="block truncate">{task.title}</span>
+                          <span className="text-muted-foreground tabular-nums">
+                            {task.ticket}
+                          </span>
+                        </button>
                       </td>
                       <td className="p-2">{task.projectName}</td>
                       <td className="p-2">{task.assigneeName ?? "—"}</td>

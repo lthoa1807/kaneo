@@ -91,7 +91,7 @@ export default function IntakeQueue({ workspaceId }: { workspaceId: string }) {
       hint={t("dashboard:intake.hint")}
       footer={
         <Link
-          to="/dashboard/workspace/$workspaceId/projects"
+          to="/dashboard/workspace/$workspaceId/intake"
           params={{ workspaceId }}
           className="text-xs text-muted-foreground underline-offset-2 hover:underline"
         >

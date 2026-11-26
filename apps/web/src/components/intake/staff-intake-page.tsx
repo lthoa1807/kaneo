@@ -27,7 +27,8 @@ export function StaffIntakePage({
   projectId,
 }: {
   workspaceId: string;
-  projectId: string;
+  /** Omitted on the workspace-wide list, which spans every readable project. */
+  projectId?: string;
 }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -122,13 +123,19 @@ export function StaffIntakePage({
                   </h2>
                   <IntakeRequestList
                     items={groupItems}
-                    showProject={false}
-                    onRowClick={(requestId) =>
+                    showProject={!projectId}
+                    onRowClick={(request) => {
+                      const target = request.projectId ?? projectId;
+                      if (!target) return;
                       void navigate({
                         to: "/dashboard/workspace/$workspaceId/project/$projectId/intake/$requestId",
-                        params: { workspaceId, projectId, requestId },
-                      })
-                    }
+                        params: {
+                          workspaceId,
+                          projectId: target,
+                          requestId: request.id,
+                        },
+                      });
+                    }}
                   />
                 </section>
               );

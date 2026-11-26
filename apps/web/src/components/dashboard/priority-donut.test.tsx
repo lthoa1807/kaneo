@@ -29,6 +29,21 @@ it("keeps every value in the legend and the geometry decorative", () => {
   ).toHaveTextContent("0");
 });
 
+it("shows each share by default next to its count", () => {
+  render(<PriorityDonut series={series} onOpen={vi.fn()} />);
+
+  // total 6: 3 urgent, 2 high, 1 low
+  expect(
+    screen.getByRole("button", { name: /tasks:priority\.urgent/ }),
+  ).toHaveTextContent("50%");
+  expect(
+    screen.getByRole("button", { name: /tasks:priority\.high/ }),
+  ).toHaveTextContent("33%");
+  expect(
+    screen.getByRole("button", { name: /tasks:priority\.low/ }),
+  ).toHaveTextContent("17%");
+});
+
 it("opens the segment the legend row names", () => {
   const onOpen = vi.fn();
   render(<PriorityDonut series={series} onOpen={onOpen} />);

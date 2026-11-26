@@ -30,7 +30,7 @@
 
 ## Testing and Validation
 
-- Unit: `apps/web/src/components/dashboard/*.test.tsx` — 8 files, 16 tests
+- Unit: `apps/web/src/components/dashboard/*.test.tsx` — 8 files, 19 tests
   (value, zero, empty, error, truncation, aria, click targets). Pass.
 - API unit: `apps/api/src/workspace/dashboard-series.test.ts` — 9 tests. Pass.
 - Integration: `tests/api-integration/dashboard-summary.test.ts` and

@@ -101,6 +101,9 @@ export default function PriorityDonut({
                   {t(`tasks:priority.${row.priority}`)}
                 </span>
                 <span className="text-xs tabular-nums">{row.count}</span>
+                <span className="w-8 text-right text-[11px] text-muted-foreground tabular-nums">
+                  {total > 0 ? Math.round((row.count / total) * 100) : 0}%
+                </span>
               </button>
             </li>
           ))}
