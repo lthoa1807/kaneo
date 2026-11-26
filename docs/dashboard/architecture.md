@@ -51,7 +51,8 @@ apps/web/src/components/dashboard/
   priority-donut.tsx         priority mix (inline SVG, legend carries values)
   due-load-chart.tsx         seven-day due buckets (CSS columns)
   project-load-chart.tsx     open tasks per project (progress bars)
-  intake-queue.tsx           waiting + in-progress intake requests (three queries)
+  intake-queue.tsx           waiting + in-progress intake requests (three queries);
+                             its footer opens the workspace-wide intake list
   task-drilldown.tsx         native <dialog> task list behind any count
   dashboard-skeleton.tsx     loading grid
   types.ts                   shared Drill / DrillFilters types
