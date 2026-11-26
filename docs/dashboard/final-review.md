@@ -5,7 +5,7 @@
 > Branch: `feature/ui-development`
 > PR: https://github.com/lthoa1807/kaneo/pull/15
 > CI: Fork CI run `45898349301` green on `727f6614` (lint, i18n, OpenAPI, typecheck, build, API integration ×4)
-> Status: **AWAITING GATE 6 APPROVAL**
+> Status: **APPROVED** (Gate 6, 2026-11-27)
 
 ## 1. What Phase 6 covered
 
@@ -66,12 +66,13 @@ No API, schema, route or permission change. No dependency added.
 4. **i18n fallback.** The new centre label is translated in en-US and falls back
    to English in the other 20 locales, like every other new key in this project.
 
-## 6. Gate 6 recommendation
+## 6. Gate 6 decision
 
-Recommend **approval of the final implementation**. All Phase 6 acceptance
-criteria are met; the two defects found are fixed and re-verified; the
-remaining items are documented measurement gaps and pre-existing minor
+`APPROVED` — Gate 6, 2026-11-27, via a Plannotator gate session on this report,
+`test-report.md` and `performance-report.md` (no annotations). All Phase 6
+acceptance criteria are met; the two defects found are fixed and re-verified;
+the remaining items are documented measurement gaps and pre-existing minor
 behavior, not blockers.
 
 Merging PR #15 stays with the owner: the repository rules say releases and
-merges are manual, and Phase 6 approval is the last gate before that decision.
+merges are manual, and this approval decides the implementation, not the merge.

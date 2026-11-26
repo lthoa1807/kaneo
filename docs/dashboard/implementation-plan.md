@@ -13,7 +13,7 @@
 | Visual QA | Done at 320/768/1024/1280 in light and dark. Found and fixed the priority legend collapse at 1024–1279 px; fixed the hardcoded "open" label. |
 | Performance QA | Done: API p50 21 ms, dashboard route chunk 25.17 kB / 8.09 kB gzip, CLS 0; dev-mode LCP and missing Lighthouse documented in `performance-report.md`. |
 | Regression | Done: web 13 files / 44 tests, API 5 files / 48 tests, route smoke with 0 console errors. |
-| Gate 6 | Reports written; awaiting owner approval. |
+| Gate 6 | Approved 2026-11-27 (Plannotator, no annotations). |
 
 
 ## 0. Execution status (2026-11-26)

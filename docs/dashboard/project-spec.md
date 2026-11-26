@@ -6,7 +6,7 @@
 | Version | 1.0 |
 | Date | 2026-11-26 |
 | Development branch | `feature/ui-development` |
-| Current phase | Phase 6 complete (2026-11-27); Gate 6 approval pending |
+| Current phase | Phase 6 approved (2026-11-27); dashboard v1 complete, PR #15 merge pending owner decision |
 
 This document governs the entire Dashboard initiative. It is the input to
 Phase 0 and must not be changed silently. Any requirement change follows
