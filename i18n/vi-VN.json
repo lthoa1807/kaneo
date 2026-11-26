@@ -2410,7 +2410,8 @@
 				"taskDescriptionChanged": "Mô tả thay đổi",
 				"taskPriorityChanged": "Mức ưu tiên thay đổi",
 				"taskStatusChanged": "Trạng thái thay đổi",
-				"taskTitleChanged": "Tiêu đề thay đổi"
+				"taskTitleChanged": "Tiêu đề thay đổi",
+				"intakeRequestCreated": "Guest request received"
 			},
 			"optional": "Không bắt buộc",
 			"postWhen": "Đăng khi",

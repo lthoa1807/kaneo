@@ -2452,7 +2452,8 @@
 				"taskDescriptionChanged": "Təsvir dəyişdikdə",
 				"taskPriorityChanged": "Prioritet dəyişdikdə",
 				"taskStatusChanged": "Vəziyyət dəyişdikdə",
-				"taskTitleChanged": "Başlıq dəyişdikdə"
+				"taskTitleChanged": "Başlıq dəyişdikdə",
+				"intakeRequestCreated": "Guest request received"
 			},
 			"optional": "İstəyə bağlı",
 			"postWhen": "Bu hallarda paylaş",

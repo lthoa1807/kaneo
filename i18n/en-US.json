@@ -2543,7 +2543,8 @@
 				"taskPriorityChanged": "Priority changes",
 				"taskTitleChanged": "Title changes",
 				"taskDescriptionChanged": "Description changes",
-				"taskCommentCreated": "Someone comments"
+				"taskCommentCreated": "Someone comments",
+				"intakeRequestCreated": "Guest request received"
 			},
 			"activeTitle": "Posting to {{provider}}",
 			"activeDescription": "Turn off to pause without losing the setup.",

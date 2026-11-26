@@ -2452,7 +2452,8 @@
 				"taskDescriptionChanged": "Описот е променет",
 				"taskPriorityChanged": "Приоритетот е променет",
 				"taskStatusChanged": "Статусот е променет",
-				"taskTitleChanged": "Насловот е променет"
+				"taskTitleChanged": "Насловот е променет",
+				"intakeRequestCreated": "Guest request received"
 			},
 			"optional": "Опционално",
 			"postWhen": "Објави кога",

@@ -3315,7 +3315,8 @@
 				"taskDescriptionChanged": "Zmieni się opis",
 				"taskPriorityChanged": "Zmieni się priorytet",
 				"taskStatusChanged": "Zmieni się status",
-				"taskTitleChanged": "Zmieni się tytuł"
+				"taskTitleChanged": "Zmieni się tytuł",
+				"intakeRequestCreated": "Guest request received"
 			},
 			"optional": "Opcjonalne",
 			"postWhen": "Publikuj, gdy",

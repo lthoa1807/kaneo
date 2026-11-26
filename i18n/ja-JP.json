@@ -2410,7 +2410,8 @@
 				"taskDescriptionChanged": "説明が変更されたとき",
 				"taskPriorityChanged": "優先度が変更されたとき",
 				"taskStatusChanged": "ステータスが変更されたとき",
-				"taskTitleChanged": "タイトルが変更されたとき"
+				"taskTitleChanged": "タイトルが変更されたとき",
+				"intakeRequestCreated": "Guest request received"
 			},
 			"optional": "任意",
 			"postWhen": "投稿するタイミング",

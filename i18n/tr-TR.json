@@ -2452,7 +2452,8 @@
 				"taskDescriptionChanged": "Açıklama değiştiğinde",
 				"taskPriorityChanged": "Öncelik değiştiğinde",
 				"taskStatusChanged": "Durum değiştiğinde",
-				"taskTitleChanged": "Başlık değiştiğinde"
+				"taskTitleChanged": "Başlık değiştiğinde",
+				"intakeRequestCreated": "Guest request received"
 			},
 			"optional": "İsteğe bağlı",
 			"postWhen": "Şu durumlarda paylaş",
