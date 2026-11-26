@@ -10367,6 +10367,9 @@
 								},
 								"taskCommentCreated": {
 									"type": "string"
+								},
+								"intakeRequestCreated": {
+									"type": "string"
 								}
 							},
 							"required": [
@@ -10375,7 +10378,8 @@
 								"taskPriorityChanged",
 								"taskTitleChanged",
 								"taskDescriptionChanged",
-								"taskCommentCreated"
+								"taskCommentCreated",
+								"intakeRequestCreated"
 							]
 						},
 						"activeTitle": {

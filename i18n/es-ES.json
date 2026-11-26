@@ -2494,7 +2494,8 @@
 				"taskDescriptionChanged": "Cambia la descripción",
 				"taskPriorityChanged": "Cambia la prioridad",
 				"taskStatusChanged": "Cambia el estado",
-				"taskTitleChanged": "Cambia el título"
+				"taskTitleChanged": "Cambia el título",
+				"intakeRequestCreated": "Guest request received"
 			},
 			"optional": "Opcional",
 			"postWhen": "Publicar cuando",

@@ -2544,7 +2544,8 @@
 				"taskDescriptionChanged": "Изменилось описание",
 				"taskPriorityChanged": "Изменился приоритет",
 				"taskStatusChanged": "Изменился статус",
-				"taskTitleChanged": "Изменилось название"
+				"taskTitleChanged": "Изменилось название",
+				"intakeRequestCreated": "Guest request received"
 			},
 			"optional": "Необязательно",
 			"postWhen": "Публиковать, когда",

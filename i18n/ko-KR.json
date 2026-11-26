@@ -2410,7 +2410,8 @@
 				"taskDescriptionChanged": "설명이 변경될 때",
 				"taskPriorityChanged": "우선순위가 변경될 때",
 				"taskStatusChanged": "상태가 변경될 때",
-				"taskTitleChanged": "제목이 변경될 때"
+				"taskTitleChanged": "제목이 변경될 때",
+				"intakeRequestCreated": "Guest request received"
 			},
 			"optional": "선택 사항",
 			"postWhen": "게시 조건",

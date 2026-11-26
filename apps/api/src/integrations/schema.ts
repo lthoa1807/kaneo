@@ -11,6 +11,12 @@ export const integrationEventToggles = z.object({
   taskCommentCreated: z.boolean().optional(),
 });
 
+// Telegram carries intake requests; other chat integrations do not, and the
+// parser strips unknown keys, so the toggle needs its own object here.
+export const telegramEventToggles = integrationEventToggles.extend({
+  intakeRequestCreated: z.boolean().optional(),
+});
+
 export const genericWebhookEventToggles = integrationEventToggles.extend({
   taskDeleted: z.boolean().optional(),
   taskMoved: z.boolean().optional(),

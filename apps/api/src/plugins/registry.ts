@@ -5,6 +5,7 @@ import { integrationTable } from "../database/schema";
 import { subscribeToEvent } from "../events";
 import type {
   IntegrationPlugin,
+  IntakeRequestCreatedEvent,
   PluginContext,
   TaskAssigneeChangedEvent,
   TaskCommentCreatedEvent,
@@ -55,6 +56,30 @@ export function initializeEventSubscriptions(): void {
       priority: data.priority,
       status: data.status,
       number: data.number,
+    });
+  });
+
+  subscribeToEvent<{
+    id: string;
+    projectId: string;
+    number: number;
+    title: string;
+    status: string;
+    sourceType: string;
+    requesterName: string | null;
+    requesterEmail: string | null;
+    createdById: string;
+  }>("intake_request.created", async (data) => {
+    await broadcastIntakeRequestCreated({
+      requestId: data.id,
+      projectId: data.projectId,
+      number: data.number,
+      title: data.title,
+      status: data.status,
+      sourceType: data.sourceType,
+      requesterName: data.requesterName,
+      requesterEmail: data.requesterEmail,
+      createdById: data.createdById,
     });
   });
 
@@ -312,6 +337,28 @@ export async function broadcastTaskCreated(
       await plugin.onTaskCreated(event, context);
     } catch (error) {
       console.error(`Plugin ${plugin.type} error on task.created:`, error);
+    }
+  }
+}
+
+export async function broadcastIntakeRequestCreated(
+  event: IntakeRequestCreatedEvent,
+): Promise<void> {
+  const integrations = await getActiveIntegrations(event.projectId);
+
+  for (const integration of integrations) {
+    const plugin = getPlugin(integration.type);
+    if (!plugin?.onIntakeRequestCreated) continue;
+
+    const context = createContext(integration);
+
+    try {
+      await plugin.onIntakeRequestCreated(event, context);
+    } catch (error) {
+      console.error(
+        `Plugin ${plugin.type} error on intake_request.created:`,
+        error,
+      );
     }
   }
 }

@@ -2452,7 +2452,8 @@
 				"taskDescriptionChanged": "Αλλάζει η περιγραφή",
 				"taskPriorityChanged": "Αλλάζει η προτεραιότητα",
 				"taskStatusChanged": "Αλλάζει η κατάσταση",
-				"taskTitleChanged": "Αλλάζει ο τίτλος"
+				"taskTitleChanged": "Αλλάζει ο τίτλος",
+				"intakeRequestCreated": "Guest request received"
 			},
 			"optional": "Προαιρετικό",
 			"postWhen": "Δημοσίευση όταν",

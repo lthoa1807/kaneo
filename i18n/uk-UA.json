@@ -2536,7 +2536,8 @@
 				"taskDescriptionChanged": "Змінився опис",
 				"taskPriorityChanged": "Змінився пріоритет",
 				"taskStatusChanged": "Змінився статус",
-				"taskTitleChanged": "Змінилася назва"
+				"taskTitleChanged": "Змінилася назва",
+				"intakeRequestCreated": "Guest request received"
 			},
 			"optional": "Необов'язково",
 			"postWhen": "Публікувати, коли",

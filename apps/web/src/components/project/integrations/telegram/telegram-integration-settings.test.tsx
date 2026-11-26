@@ -13,7 +13,7 @@ import {
   it,
   vi,
 } from "vite-plus/test";
-import { toChatEvents } from "@/components/project/integrations/chat-webhook/chat-events";
+import { toTelegramEvents } from "@/components/project/integrations/chat-webhook/chat-events";
 import { TelegramIntegrationSettings } from "./telegram-integration-settings";
 
 const mocks = vi.hoisted(() => ({
@@ -106,6 +106,42 @@ describe("TelegramIntegrationSettings", () => {
     expect(mocks.createIntegration).not.toHaveBeenCalled();
   });
 
+  it("offers the intake toggle and sends it with the rest", async () => {
+    render(<TelegramIntegrationSettings projectId="project-1" />);
+
+    const toggle = screen.getByRole("checkbox", {
+      name: "settings:chatIntegrations.events.intakeRequestCreated",
+    });
+    expect(toggle).toHaveAttribute("aria-checked", "true");
+
+    fireEvent.change(
+      screen.getByLabelText("settings:telegramIntegration.chatIdLabel"),
+      { target: { value: "-1001234567890" } },
+    );
+    fireEvent.change(
+      screen.getByLabelText("settings:telegramIntegration.botTokenLabel"),
+      { target: { value: `12345678:${"x".repeat(35)}` } },
+    );
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "settings:telegramIntegration.connect",
+      }),
+    );
+
+    await waitFor(() =>
+      expect(mocks.createIntegration).toHaveBeenCalledWith({
+        projectId: "project-1",
+        data: {
+          botToken: `12345678:${"x".repeat(35)}`,
+          chatId: "-1001234567890",
+          threadId: undefined,
+          chatLabel: undefined,
+          events: toTelegramEvents(),
+        },
+      }),
+    );
+  });
+
   it("keeps the saved bot token when the field is left empty", async () => {
     mocks.query.data = {
       id: "integration-1",
@@ -115,7 +151,7 @@ describe("TelegramIntegrationSettings", () => {
       chatLabel: "Engineering",
       botTokenConfigured: true,
       maskedBotToken: "1234:…abcd",
-      events: toChatEvents(),
+      events: toTelegramEvents(),
       isActive: true,
       createdAt: "",
       updatedAt: "",
@@ -142,7 +178,7 @@ describe("TelegramIntegrationSettings", () => {
           chatId: "-1001234567890",
           threadId: 7,
           chatLabel: "Engineering",
-          events: toChatEvents(),
+          events: toTelegramEvents(),
         },
       }),
     );

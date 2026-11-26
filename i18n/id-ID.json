@@ -2410,7 +2410,8 @@
 				"taskDescriptionChanged": "Deskripsi berubah",
 				"taskPriorityChanged": "Prioritas berubah",
 				"taskStatusChanged": "Status berubah",
-				"taskTitleChanged": "Judul berubah"
+				"taskTitleChanged": "Judul berubah",
+				"intakeRequestCreated": "Guest request received"
 			},
 			"optional": "Opsional",
 			"postWhen": "Kirim pesan saat",

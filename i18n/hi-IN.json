@@ -2452,7 +2452,8 @@
 				"taskDescriptionChanged": "विवरण बदले",
 				"taskPriorityChanged": "प्राथमिकता बदले",
 				"taskStatusChanged": "स्थिति बदले",
-				"taskTitleChanged": "शीर्षक बदले"
+				"taskTitleChanged": "शीर्षक बदले",
+				"intakeRequestCreated": "Guest request received"
 			},
 			"optional": "वैकल्पिक",
 			"postWhen": "कब पोस्ट करें",
