@@ -1,5 +1,9 @@
 # Intake Portal Phase 2 (API + realtime events) Implementation Plan
 
+> **Status:** shipped in PR #5. Every step below was executed; the boxes were left
+> unticked rather than retro-edited, so treat `main` as the source of truth. Phase 3.1,
+> 3.2 and 4 plans carry their own ticks.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Intake Request API — create, list, detail, edit, transition, activity, and task attachment — with per-route ownership enforcement, the transition map, and `intake_request.*` events published for the WebSocket layer to hook later.

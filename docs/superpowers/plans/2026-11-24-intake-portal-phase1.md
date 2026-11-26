@@ -1,5 +1,9 @@
 # Intake Portal Phase 1 — Migration + Permissions Implementation Plan
 
+> **Status:** shipped in PR #5. Every step below was executed; the boxes were left
+> unticked rather than retro-edited, so treat `main` as the source of truth. Phase 3.1,
+> 3.2 and 4 plans carry their own ticks.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Land the intake data model (`intake_request`, `intake_activity`, `task.intakeRequestId`, `project.intakeEnabled`, `project.lastIntakeRequestNumber`) and the `intakeRequest` permission vocabulary with a seeded `guest` default role — no routes, no UI.

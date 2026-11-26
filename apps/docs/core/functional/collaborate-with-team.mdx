@@ -40,8 +40,11 @@ These are the starting permissions. An administrator can edit the **Viewer**, **
 | Member | Create projects; create and update tasks; manage labels |
 | Admin | Manage projects, tasks, members, and workspace settings |
 | Owner | Full workspace control, including deleting the workspace |
+| Guest | Send intake requests to selected projects, read their own requests, confirm or ask for a revision. Cannot see boards, tasks or the member list |
 
 Task assignment and deletion are separate permissions. A member who can edit a task may still be unable to assign or delete it.
+
+Guest is its own role, not a limited member: a guest never sees the workspace's work, only the requests they sent. Invite one from **Members → Invite guest** and pick the projects they may send requests to; [guest requests](/core/functional/guest-requests) describes that flow end to end. Guests cannot be assigned tasks, so they do not appear in the assignee picker.
 
 ## Limit a member to selected projects
 
