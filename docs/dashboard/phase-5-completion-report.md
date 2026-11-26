@@ -39,7 +39,11 @@
   typecheck, build and API integration (4 shards) all green.
 - Browser pass in Orca's embedded browser against the seeded workspace
   (`Demo Workspace`: 1 project, 10 open tasks):
-  - 320 / 768 / 1280 / 1536 px: `scrollWidth === clientWidth` at every width.
+  - 320 / 768 / 1280 / 1536 px: no horizontal overflow in the page's own
+    scroll container. (The first pass measured `documentElement`, which hides
+    that scroller; at 320 px the implicit `auto` grid track grew to the legend's
+    min-content and pushed the share outside the card. Fixed with `grid-cols-1`
+    and the stacked donut below 640 px.)
   - Light, dark and `modern` palettes: hierarchy holds, values readable.
   - Numbers match SQL: donut 2/2/3/3/0 (total 10), project bar 10,
     overdue+urgent 3, due in 3 days 1, unassigned 4, my open 6, my overdue 2.

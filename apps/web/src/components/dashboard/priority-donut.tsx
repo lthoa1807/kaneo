@@ -53,8 +53,8 @@ export default function PriorityDonut({
       title={t("dashboard:charts.byPriority")}
       hint={t("dashboard:charts.byPriorityHint", { count: total })}
     >
-      <div className="flex items-center gap-4">
-        <div className="relative size-32 shrink-0">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+        <div className="relative mx-auto size-32 shrink-0 sm:mx-0">
           <svg viewBox="0 0 100 100" aria-hidden="true" className="size-32">
             <circle
               cx="50"

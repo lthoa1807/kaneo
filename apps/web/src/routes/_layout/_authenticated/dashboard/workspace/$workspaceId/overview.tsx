@@ -85,7 +85,7 @@ function RouteComponent() {
               <>
                 <section
                   aria-label={t("dashboard:title")}
-                  className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+                  className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
                 >
                   <MetricTile
                     label={t("dashboard:tiles.projects")}
@@ -114,7 +114,7 @@ function RouteComponent() {
                   />
                 </section>
 
-                <section className="grid gap-4 xl:grid-cols-3">
+                <section className="grid grid-cols-1 gap-4 xl:grid-cols-3">
                   <DeadlineRisk
                     className="xl:col-span-2"
                     title={t("dashboard:risk.title")}
@@ -170,7 +170,7 @@ function RouteComponent() {
                   />
                 </section>
 
-                <section className="grid gap-4 lg:grid-cols-3">
+                <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                   {charts ? (
                     <>
                       <PriorityDonut
