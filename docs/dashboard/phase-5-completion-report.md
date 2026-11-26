@@ -3,7 +3,7 @@
 > Phase: 5 – Dashboard Widgets and Integration
 > Date: 2026-11-27
 > Branch: `feature/ui-development`
-> Status: **WAITING FOR HUMAN APPROVAL**
+> Status: **APPROVED** (Gate 5, 2026-11-27)
 
 ## Phase Summary
 
@@ -73,4 +73,5 @@
 
 ## Approval Status
 
-`WAITING FOR HUMAN APPROVAL`
+`APPROVED` — Gate 5, 2026-11-27, via a Plannotator gate session on this report
+(no annotations). Next: merge PR #15, then Phase 6.
