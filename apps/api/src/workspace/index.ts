@@ -12,6 +12,8 @@ import {
   workspacePermissionChecker,
 } from "../utils/require-workspace-permission";
 import { workspaceAccess } from "../utils/workspace-access-middleware";
+import getDashboardSummaryCtrl from "./controllers/get-dashboard-summary";
+import getDashboardTaskDrilldownCtrl from "./controllers/get-dashboard-task-drilldown";
 import getMyCapabilitiesCtrl from "./controllers/get-my-capabilities";
 import getMyMembershipCtrl from "./controllers/get-my-membership";
 import getMyProjectAccessCtrl from "./controllers/get-my-project-access";
@@ -22,13 +24,16 @@ import updateMemberProjectAccessCtrl from "./controllers/update-member-project-a
 import {
   memberProjectAccessListSchema,
   memberProjectAccessSchema,
+  dashboardBucketSchema,
   workspaceCapabilitiesSchema,
+  workspaceDashboardSchema,
   workspaceListSchema,
   workspaceMemberListSchema,
   workspaceMembershipSchema,
   workspaceSchema,
 } from "./response";
 import {
+  dashboardDrilldownQuery,
   updateMemberProjectAccessBody,
   workspaceIdParam,
   workspaceMemberParam,
@@ -68,6 +73,54 @@ const getWorkspaceRoute = createRoute({
     404: errorResponse(
       "Workspace not found, the caller is not a member of it, or none of their roles grants workspace:read",
     ),
+  },
+});
+
+const getWorkspaceDashboardTasksRoute = createRoute({
+  method: "get",
+  operationId: "getWorkspaceDashboardTasks",
+  path: "/{workspaceId}/dashboard/tasks",
+  tags: ["Workspaces"],
+  summary: "Get dashboard task bucket",
+  description:
+    "First 50 tasks behind one dashboard chart segment, filtered by priority, project or due day. Same scope and ordering as the dashboard counts: readable, non-archived projects, open tasks only.",
+  middleware: [
+    workspaceAccess.fromParam("workspaceId"),
+    requireWorkspacePermission({ project: ["read"], task: ["read"] }),
+  ] as const,
+  request: { params: workspaceIdParam, query: dashboardDrilldownQuery },
+  responses: {
+    200: jsonResponse("One task bucket", dashboardBucketSchema),
+    400: errorResponse("Invalid priority or day"),
+    403: errorResponse(
+      "Missing project:read or task:read, or no access to the workspace",
+    ),
+    404: errorResponse("Workspace not found"),
+  },
+});
+
+const getWorkspaceDashboardRoute = createRoute({
+  method: "get",
+  operationId: "getWorkspaceDashboard",
+  path: "/{workspaceId}/dashboard",
+  tags: ["Workspaces"],
+  summary: "Get workspace dashboard",
+  description:
+    "Task buckets and chart aggregates for the Overview page: the caller's overdue tasks, overdue urgent tasks, tasks due within three days, unassigned tasks, plus open tasks by priority, by due day and by project. Every count and every row only covers tasks in readable, non-archived projects and leaves out tasks whose status is done or archived.",
+  middleware: [
+    workspaceAccess.fromParam("workspaceId"),
+    requireWorkspacePermission({ project: ["read"], task: ["read"] }),
+  ] as const,
+  request: { params: workspaceIdParam },
+  responses: {
+    200: jsonResponse(
+      "Task buckets and chart aggregates for the dashboard",
+      workspaceDashboardSchema,
+    ),
+    403: errorResponse(
+      "Missing project:read or task:read, or no access to the workspace",
+    ),
+    404: errorResponse("Workspace not found"),
   },
 });
 
@@ -210,6 +263,25 @@ const workspace = apiRouter<BaseVariables & { workspaceId: string }>()
   .openapi(getWorkspaceRoute, async (c) =>
     c.json(
       await getWorkspaceCtrl(c.req.valid("param").workspaceId, c.get("userId")),
+      200,
+    ),
+  )
+  .openapi(getWorkspaceDashboardRoute, async (c) =>
+    c.json(
+      await getDashboardSummaryCtrl({
+        workspaceId: c.get("workspaceId"),
+        userId: c.get("userId"),
+      }),
+      200,
+    ),
+  )
+  .openapi(getWorkspaceDashboardTasksRoute, async (c) =>
+    c.json(
+      await getDashboardTaskDrilldownCtrl({
+        workspaceId: c.get("workspaceId"),
+        userId: c.get("userId"),
+        ...c.req.valid("query"),
+      }),
       200,
     ),
   )

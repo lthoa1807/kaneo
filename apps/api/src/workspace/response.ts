@@ -3,7 +3,8 @@ import {
   type WorkspaceCapability,
 } from "@kaneo/permissions";
 import { PROJECT_ACCESS_MODES } from "../project-access/project-access-mode";
-import { responseTimestamp, z } from "../openapi";
+import { nullableResponseTimestamp, responseTimestamp, z } from "../openapi";
+import { BUCKET_ITEM_LIMIT, DUE_SOON_DAYS } from "./dashboard-series";
 
 export const workspaceSchema = z
   .object({
@@ -82,3 +83,89 @@ export const workspaceMembershipSchema = z
     description:
       "The caller's own membership in the workspace. Guests hold no workspace:* permission, so this is the only answer they can read.",
   });
+const dashboardTaskShape = {
+  id: z.string(),
+  ticket: z.string().openapi({
+    description: "Project key and task number, e.g. BILL-12.",
+  }),
+  title: z.string(),
+  projectId: z.string(),
+  projectName: z.string(),
+  assigneeId: z.string().nullable(),
+  assigneeName: z.string().nullable(),
+  priority: z.string().openapi({
+    description: "One of: no-priority, low, medium, high, urgent.",
+  }),
+  dueDate: nullableResponseTimestamp,
+};
+
+const dashboardTaskSchema = z
+  .object(dashboardTaskShape)
+  .openapi("DashboardTask");
+
+const dashboardBucketShape = {
+  total: z.number().int().nonnegative().openapi({
+    description: "Exact number of matching tasks, independent of items.length.",
+  }),
+  items: z
+    .array(dashboardTaskSchema)
+    .max(BUCKET_ITEM_LIMIT)
+    .openapi({ description: "First page of matching tasks, at most 50." }),
+  truncated: z.boolean().openapi({
+    description: "True when total is larger than items.length.",
+  }),
+};
+
+export const dashboardBucketSchema = z
+  .object(dashboardBucketShape)
+  .openapi("DashboardTaskBucket");
+
+export const dashboardTaskCountsSchema = z
+  .object({
+    mineOverdue: dashboardBucketSchema,
+    overdueUrgent: dashboardBucketSchema,
+    dueSoon: z.object({
+      ...dashboardBucketShape,
+      urgent: z.number().int().nonnegative(),
+      withinDays: z.literal(DUE_SOON_DAYS),
+    }),
+    unassigned: dashboardBucketSchema,
+  })
+  .openapi("DashboardTaskCounts");
+
+export const dashboardChartsSchema = z
+  .object({
+    byPriority: z
+      .array(
+        z.object({
+          priority: z.enum(["urgent", "high", "medium", "low", "no-priority"]),
+          count: z.number().int().nonnegative(),
+        }),
+      )
+      .length(5),
+    dueByDay: z
+      .array(
+        z.object({
+          date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+          count: z.number().int().nonnegative(),
+          urgent: z.number().int().nonnegative(),
+        }),
+      )
+      .length(7),
+    byProject: z.array(
+      z.object({
+        projectId: z.string(),
+        name: z.string(),
+        count: z.number().int().nonnegative(),
+      }),
+    ),
+  })
+  .openapi("DashboardCharts");
+
+export const workspaceDashboardSchema = z
+  .object({
+    generatedAt: responseTimestamp,
+    tasks: dashboardTaskCountsSchema,
+    charts: dashboardChartsSchema,
+  })
+  .openapi("WorkspaceDashboard");

@@ -1,0 +1,1511 @@
+<!doctype html>
+<html lang="en" data-palette="modern" data-atmosphere="dusk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kaneo · Overview — prototype</title>
+    <style>
+      /* Tokens copied from apps/web/src/index.css. The prototype adds none. */
+      :root {
+        color-scheme: light;
+        --radius: 0.625rem;
+        --background: #fff;
+        --foreground: #262626;
+        --card: #fff;
+        --card-foreground: #262626;
+        --muted: rgb(0 0 0 / 4%);
+        --muted-foreground: #737373;
+        --border: rgb(0 0 0 / 8%);
+        --primary: #262626;
+        --primary-foreground: #fafafa;
+        --ring: #a3a3a3;
+        --destructive: #ef4444;
+        --destructive-foreground: #b91c1c;
+        --warning: #f59e0b;
+        --warning-foreground: #b45309;
+        --success: #10b981;
+        --success-foreground: #047857;
+        --info: #3b82f6;
+        --info-foreground: #1d4ed8;
+        --chart-1: #ea580c;
+        --sidebar: #fafafa;
+        --sidebar-foreground: #525252;
+        --sidebar-active: #f5f5f5;
+        --p-urgent: #ef4444;
+        --p-high: #f59e0b;
+        --p-medium: #3b82f6;
+        --p-low: #10b981;
+        --p-no-priority: #a3a3a3;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          color-scheme: dark;
+          --background: #0a0a0a;
+          --foreground: #f5f5f5;
+          --card: #121212;
+          --card-foreground: #f5f5f5;
+          --muted: rgb(255 255 255 / 4%);
+          --muted-foreground: #8a8a8a;
+          --border: rgb(255 255 255 / 6%);
+          --primary: #f5f5f5;
+          --primary-foreground: #262626;
+          --ring: #737373;
+          --destructive: #f87171;
+          --destructive-foreground: #fca5a5;
+          --warning: #f59e0b;
+          --warning-foreground: #fbbf24;
+          --success: #10b981;
+          --success-foreground: #34d399;
+          --info: #3b82f6;
+          --info-foreground: #60a5fa;
+          --chart-1: #1d4ed8;
+          --sidebar: #0d0d0d;
+          --sidebar-foreground: #9a9a9a;
+          --sidebar-active: rgb(255 255 255 / 6%);
+          --p-urgent: #f87171;
+          --p-high: #f59e0b;
+          --p-medium: #3b82f6;
+          --p-low: #10b981;
+          --p-no-priority: #6b6b6b;
+        }
+      }
+      /* The modern OKLCH palette, copied verbatim from index.css. */
+      :root[data-palette="modern"] {
+        --background: oklch(0.985 0.004 265);
+        --card: oklch(1 0 0);
+        --card-foreground: oklch(0.28 0.015 265);
+        --foreground: oklch(0.22 0.015 265);
+        --muted: oklch(0.22 0.015 265 / 0.04);
+        --muted-foreground: oklch(0.5 0.015 265);
+        --border: oklch(0.22 0.015 265 / 0.1);
+        --primary: oklch(0.52 0.17 275);
+        --primary-foreground: oklch(0.99 0.002 265);
+        --ring: oklch(0.55 0.18 275);
+        --destructive: oklch(0.58 0.21 22);
+        --destructive-foreground: oklch(0.45 0.19 22);
+        --warning: oklch(0.75 0.15 75);
+        --warning-foreground: oklch(0.5 0.13 70);
+        --success: oklch(0.62 0.14 160);
+        --success-foreground: oklch(0.45 0.12 160);
+        --info: oklch(0.6 0.16 255);
+        --info-foreground: oklch(0.48 0.15 258);
+        --chart-1: oklch(0.62 0.19 35);
+        --sidebar: oklch(0.972 0.005 265);
+        --sidebar-foreground: oklch(0.38 0.015 265);
+        --sidebar-active: oklch(0.22 0.015 265 / 0.05);
+        --p-urgent: oklch(0.58 0.21 22);
+        --p-high: oklch(0.75 0.15 75);
+        --p-medium: oklch(0.6 0.16 255);
+        --p-low: oklch(0.62 0.14 160);
+        --p-no-priority: oklch(0.62 0.01 265);
+      }
+      :root[data-palette="modern"]:not([data-theme="light"]) {
+        color-scheme: dark;
+        --background: oklch(0.16 0.01 265);
+        --card: oklch(0.2 0.012 265);
+        --card-foreground: oklch(0.93 0.005 265);
+        --foreground: oklch(0.93 0.005 265);
+        --muted: oklch(1 0 0 / 0.05);
+        --muted-foreground: oklch(0.66 0.01 265);
+        --border: oklch(1 0 0 / 0.09);
+        --primary: oklch(0.72 0.14 275);
+        --primary-foreground: oklch(0.16 0.01 265);
+        --ring: oklch(0.7 0.15 275);
+        --destructive: oklch(0.68 0.19 22);
+        --destructive-foreground: oklch(0.78 0.13 22);
+        --warning: oklch(0.8 0.14 75);
+        --warning-foreground: oklch(0.85 0.1 75);
+        --success: oklch(0.7 0.13 160);
+        --success-foreground: oklch(0.8 0.1 160);
+        --info: oklch(0.7 0.13 255);
+        --info-foreground: oklch(0.8 0.1 255);
+        --chart-1: oklch(0.72 0.16 35);
+        --sidebar: oklch(0.14 0.01 265);
+        --sidebar-foreground: oklch(0.66 0.01 265);
+        --sidebar-active: oklch(1 0 0 / 0.06);
+        --p-urgent: oklch(0.68 0.19 22);
+        --p-high: oklch(0.8 0.14 75);
+        --p-medium: oklch(0.7 0.13 255);
+        --p-low: oklch(0.7 0.13 160);
+        --p-no-priority: oklch(0.6 0.01 265);
+      }
+      :root[data-theme="light"] {
+        color-scheme: light;
+      }
+      :root[data-theme="dark"] {
+        color-scheme: dark;
+        --background: #0a0a0a;
+        --foreground: #f5f5f5;
+        --card: #121212;
+        --card-foreground: #f5f5f5;
+        --muted: rgb(255 255 255 / 4%);
+        --muted-foreground: #8a8a8a;
+        --border: rgb(255 255 255 / 6%);
+        --primary: #f5f5f5;
+        --primary-foreground: #262626;
+        --ring: #737373;
+        --destructive: #f87171;
+        --destructive-foreground: #fca5a5;
+        --warning: #f59e0b;
+        --warning-foreground: #fbbf24;
+        --success: #10b981;
+        --success-foreground: #34d399;
+        --info: #3b82f6;
+        --info-foreground: #60a5fa;
+        --chart-1: #1d4ed8;
+        --sidebar: #0d0d0d;
+        --sidebar-foreground: #9a9a9a;
+        --sidebar-active: rgb(255 255 255 / 6%);
+        --p-urgent: #f87171;
+        --p-high: #f59e0b;
+        --p-medium: #3b82f6;
+        --p-low: #10b981;
+        --p-no-priority: #6b6b6b;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+      }
+      body {
+        background: var(--background);
+        color: var(--foreground);
+        font: 400 14px/1.45 Geist, ui-sans-serif, system-ui, -apple-system,
+          "Segoe UI", sans-serif;
+        font-variant-numeric: tabular-nums;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* Dusk borrow: an afterglow over the paper — cool (periwinkle, finished
+         work) on the left, warm (apricot, live work) on the right — never a
+         gradient used as a surface. Cards sit on it in smoked glass. */
+      :root {
+        --glow-cool: color-mix(in oklab, var(--info) 30%, transparent);
+        --glow-warm: color-mix(in oklab, var(--warning) 26%, transparent);
+        --glass-card: color-mix(in oklab, var(--card) 62%, transparent);
+        --glass-hi: inset 0 1px 0 color-mix(in oklab, #fff 45%, transparent);
+        --shadow-card: 0 28px 56px -40px color-mix(in oklab, #000 55%, transparent);
+      }
+      :root[data-theme="dark"],
+      :root[data-palette="modern"]:not([data-theme="light"]) {
+        --glow-cool: color-mix(in oklab, var(--info) 34%, transparent);
+        --glow-warm: color-mix(in oklab, var(--warning) 30%, transparent);
+        --glass-card: color-mix(in oklab, var(--card) 56%, transparent);
+        --glass-hi: inset 0 1px 0 color-mix(in oklab, #fff 12%, transparent);
+        --shadow-card: 0 32px 64px -40px color-mix(in oklab, #000 80%, transparent);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --glow-cool: color-mix(in oklab, var(--info) 34%, transparent);
+          --glow-warm: color-mix(in oklab, var(--warning) 30%, transparent);
+          --glass-card: color-mix(in oklab, var(--card) 56%, transparent);
+          --glass-hi: inset 0 1px 0 color-mix(in oklab, #fff 12%, transparent);
+          --shadow-card: 0 32px 64px -40px color-mix(in oklab, #000 80%, transparent);
+        }
+      }
+      .atmosphere {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        overflow: clip;
+        background:
+          radial-gradient(54% 42% at 4% -6%, var(--glow-cool), transparent 68%),
+          radial-gradient(44% 38% at 98% -2%, var(--glow-warm), transparent 66%),
+          radial-gradient(80% 30% at 50% 108%, var(--glow-cool), transparent 72%);
+      }
+      /* A slow tide so the glow reads as light, not as a printed gradient.
+         One transform on an oversized layer; nothing repaints the cards. */
+      .atmosphere::after {
+        content: "";
+        position: absolute;
+        inset: -25%;
+        background:
+          radial-gradient(38% 30% at 30% 30%, var(--glow-warm), transparent 70%),
+          radial-gradient(42% 32% at 72% 62%, var(--glow-cool), transparent 72%);
+        opacity: 0.55;
+        animation: dusk-drift 48s ease-in-out infinite alternate;
+      }
+      @keyframes dusk-drift {
+        from {
+          transform: translate3d(-2%, -1%, 0) scale(1);
+        }
+        to {
+          transform: translate3d(3%, 2%, 0) scale(1.08);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .atmosphere::after {
+          animation: none;
+        }
+      }
+      :root[data-atmosphere="dusk"] .card,
+      :root[data-atmosphere="dusk"] .sidebar {
+        background: var(--glass-card);
+        -webkit-backdrop-filter: blur(20px) saturate(135%);
+        backdrop-filter: blur(20px) saturate(135%);
+        box-shadow: var(--glass-hi), var(--shadow-card);
+      }
+      @supports not (backdrop-filter: blur(1px)) {
+        :root[data-atmosphere="dusk"] .card,
+        :root[data-atmosphere="dusk"] .sidebar {
+          background: var(--card);
+        }
+      }
+      h1,
+      h2,
+      p {
+        margin: 0;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      /* Every drill trigger is a real button: keyboard and screen readers first. */
+      button {
+        font: inherit;
+        color: inherit;
+      }
+      .drill {
+        display: block;
+        width: 100%;
+        text-align: left;
+        background: none;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+        border-radius: 6px;
+      }
+      .drill:hover .drill-name {
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+      .drill:focus-visible {
+        outline: 2px solid var(--ring);
+        outline-offset: 3px;
+      }
+
+      .app {
+        display: grid;
+        grid-template-columns: 248px minmax(0, 1fr);
+        min-height: 100dvh;
+      }
+
+      /* Sidebar — only enough of the shell to judge the page in context. */
+      .sidebar {
+        background: var(--sidebar);
+        border-right: 1px solid var(--border);
+        padding: 12px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .workspace {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 8px;
+      }
+      .workspace-mark {
+        display: grid;
+        place-items: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        background: var(--primary);
+        color: var(--primary-foreground);
+        font-weight: 600;
+        font-size: 13px;
+      }
+      .workspace-name {
+        font-weight: 600;
+        font-size: 13px;
+      }
+      .workspace-sub {
+        font-size: 11px;
+        color: var(--sidebar-foreground);
+      }
+      .nav {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .nav a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 7px 8px;
+        border-radius: 7px;
+        color: var(--sidebar-foreground);
+        font-size: 13px;
+        font-weight: 500;
+      }
+      .nav a[aria-current="page"] {
+        background: var(--sidebar-active);
+        color: var(--foreground);
+      }
+      .nav svg {
+        width: 16px;
+        height: 16px;
+        flex: none;
+        opacity: 0.8;
+      }
+      .nav .count {
+        margin-left: auto;
+        font-size: 11px;
+        color: var(--sidebar-foreground);
+      }
+      .proto-chip {
+        margin-top: auto;
+        font-size: 10.5px;
+        color: var(--sidebar-foreground);
+        border: 1px dashed var(--border);
+        border-radius: 6px;
+        padding: 6px 8px;
+      }
+
+      .main {
+        padding: 28px clamp(16px, 3vw, 40px) 56px;
+        min-width: 0;
+      }
+      .page-head {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+      }
+      .page-head h1 {
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+      .page-head p {
+        color: var(--muted-foreground);
+        font-size: 12.5px;
+        margin-top: 2px;
+      }
+      .tools {
+        margin-left: auto;
+        display: flex;
+        gap: 6px;
+      }
+      .tools button {
+        font-size: 11.5px;
+        padding: 5px 9px;
+        border-radius: 7px;
+        border: 1px solid var(--border);
+        background: var(--card);
+        color: var(--muted-foreground);
+        cursor: pointer;
+      }
+      .tools button:hover {
+        color: var(--foreground);
+      }
+      .tools button:focus-visible {
+        outline: 2px solid var(--ring);
+        outline-offset: 2px;
+      }
+
+      .section {
+        margin-top: 20px;
+      }
+      .grid-tiles {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr));
+        gap: 12px;
+      }
+      .grid-risk {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+        gap: 12px;
+      }
+      .risk-wide {
+        grid-column: span 2;
+      }
+      @media (max-width: 719px) {
+        .risk-wide {
+          grid-column: span 1;
+        }
+      }
+      .chart-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 268px), 1fr));
+        gap: 12px;
+        align-items: start;
+      }
+
+      .card {
+        background: var(--card);
+        color: var(--card-foreground);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px;
+      }
+      /* A button's content is centred by the UA; cards stay top-aligned. */
+      .card.drill {
+        display: grid;
+        align-content: start;
+        justify-items: start;
+      }
+      .card h2 {
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .card .hint {
+        color: var(--muted-foreground);
+        font-size: 11.5px;
+        margin-top: 2px;
+      }
+      .card .hint.tap {
+        margin-top: 10px;
+        border-top: 1px solid var(--border);
+        padding-top: 8px;
+        font-size: 11px;
+      }
+
+      .tile-value {
+        display: block;
+        font-size: 28px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        margin-top: 10px;
+      }
+      .tile-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--muted-foreground);
+      }
+      .tile-meta {
+        display: block;
+        font-size: 12px;
+        color: var(--muted-foreground);
+        margin-top: 4px;
+      }
+      .value-danger {
+        color: var(--destructive-foreground);
+      }
+      .risk-counts {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, max-content));
+        justify-content: start;
+        gap: 18px 56px;
+        margin-top: 12px;
+      }
+      .risk-counts .label {
+        font-size: 11.5px;
+        color: var(--muted-foreground);
+      }
+      .risk-counts .value {
+        font-size: 26px;
+        font-weight: 600;
+        line-height: 1.2;
+        margin-top: 2px;
+      }
+      .risk-counts .value.overdue {
+        color: var(--destructive-foreground);
+      }
+      .risk-counts .value.due {
+        color: var(--warning-foreground);
+      }
+      .risk-counts .meta {
+        font-size: 11.5px;
+        color: var(--muted-foreground);
+      }
+      .risk-counts .drill {
+        display: grid;
+        gap: 1px;
+        width: auto;
+      }
+      .risk-counts .drill:hover .value {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      .stack {
+        display: flex;
+        height: 6px;
+        border-radius: 999px;
+        overflow: clip;
+        background: var(--muted);
+        margin-top: 14px;
+      }
+      .stack .overdue {
+        background: var(--destructive);
+      }
+      .stack .due {
+        background: var(--warning);
+      }
+
+      /* --- Priority donut --- */
+      .donut {
+        display: grid;
+        grid-template-columns: 124px minmax(0, 1fr);
+        gap: 14px;
+        align-items: center;
+        margin-top: 10px;
+      }
+      .donut svg {
+        width: 124px;
+        height: 124px;
+        overflow: visible;
+      }
+      /* Presentation attributes do not take var(), and circles default to a black
+         fill. Paint them from CSS so light and dark both hold. */
+      .donut circle {
+        fill: none;
+      }
+      .donut .seg-urgent { stroke: var(--p-urgent); }
+      .donut .seg-high { stroke: var(--p-high); }
+      .donut .seg-medium { stroke: var(--p-medium); }
+      .donut .seg-low { stroke: var(--p-low); }
+      .donut .seg-no-priority { stroke: var(--p-no-priority); }
+      .donut .seg-track { stroke: var(--muted); }
+      .donut .donut-total {
+        fill: var(--foreground);
+        font-size: 21px;
+        font-weight: 600;
+      }
+      .donut .donut-caption {
+        fill: var(--muted-foreground);
+        font-size: 8.5px;
+      }
+      .donut .legend {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        min-width: 0;
+      }
+      .legend-item {
+        display: grid;
+        grid-template-columns: 8px minmax(0, 1fr) auto;
+        gap: 8px;
+        align-items: center;
+        padding: 4px 4px;
+        margin-inline: -4px;
+        border-radius: 6px;
+        font-size: 12px;
+        color: var(--muted-foreground);
+      }
+      .legend-item:hover {
+        background: var(--muted);
+        color: var(--foreground);
+      }
+      .legend-item .swatch {
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
+      }
+      .legend-item .n {
+        font-weight: 600;
+        color: var(--foreground);
+      }
+      @media (max-width: 460px) {
+        .donut {
+          grid-template-columns: minmax(0, 1fr);
+          justify-items: center;
+        }
+        .donut .legend {
+          width: 100%;
+        }
+      }
+
+      /* --- Due-load columns --- */
+      .columns {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 5px;
+        align-items: end;
+        margin-top: 16px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 2px;
+      }
+      .col {
+        display: grid;
+        justify-items: center;
+        gap: 5px;
+        border-radius: 6px;
+        padding: 2px 0 4px;
+      }
+      .col:hover {
+        background: var(--muted);
+      }
+      .col-track {
+        display: flex;
+        align-items: flex-end;
+        width: 100%;
+        height: 68px;
+      }
+      .col-fill {
+        width: 100%;
+        min-height: 2px;
+        border-radius: 4px 4px 0 0;
+        background: var(--info);
+      }
+      .col-fill.urgent {
+        background: var(--warning);
+      }
+      .col-fill.zero {
+        background: var(--border);
+      }
+      .col-val {
+        font-size: 10.5px;
+        color: var(--muted-foreground);
+        font-weight: 600;
+      }
+      .col-day {
+        font-size: 10px;
+        color: var(--muted-foreground);
+      }
+      .col[aria-current="date"] .col-day {
+        color: var(--foreground);
+        font-weight: 600;
+      }
+
+      /* --- Project load bars --- */
+      .bar-line {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 4px 12px;
+        align-items: center;
+        padding: 9px 4px;
+        margin-inline: -4px;
+        border-top: 1px solid var(--border);
+        border-radius: 6px;
+      }
+      .bar-line:first-of-type {
+        border-top: 0;
+      }
+      .bar-line:hover {
+        background: var(--muted);
+      }
+      .bar-name {
+        font-size: 13px;
+        font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .bar-pct {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--muted-foreground);
+      }
+      .bar-line progress {
+        grid-column: 1 / -1;
+      }
+      .bar-line .bar-sub {
+        grid-column: 1 / -1;
+        font-size: 11px;
+        color: var(--muted-foreground);
+        margin-top: -2px;
+      }
+
+      /* Native <progress>, fully customised. appearance: none is required. */
+      progress {
+        appearance: none;
+        border: 0 solid;
+        overflow: clip;
+        inline-size: 100%;
+        block-size: 6px;
+        border-radius: 999px;
+        background: var(--muted);
+      }
+      progress::-webkit-progress-bar {
+        background: transparent;
+      }
+      progress::-webkit-progress-value {
+        background: var(--primary);
+        border-radius: 999px;
+      }
+      progress::-moz-progress-bar {
+        background: var(--primary);
+        border-radius: 999px;
+      }
+
+
+      /* --- Intake queue --- */
+      .intake-groups {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+        gap: 20px;
+        margin-top: 12px;
+      }
+      .intake-groups h3 {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0 0 4px;
+        font-size: 11.5px;
+        font-weight: 600;
+        color: var(--muted-foreground);
+      }
+      .intake-groups h3 .n {
+        color: var(--foreground);
+      }
+      .intake-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .intake-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 7px 4px;
+        margin-inline: -4px;
+        border-top: 1px solid var(--border);
+        border-radius: 6px;
+      }
+      .intake-list li:first-child {
+        border-top: 0;
+      }
+      .intake-list li:hover {
+        background: var(--muted);
+      }
+      .intake-list a {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+      .intake-list a:hover .intake-title {
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+      .intake-title {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+      }
+      .intake-meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        color: var(--muted-foreground);
+        margin-top: 2px;
+      }
+      /* The project is the one thing a queue row must not hide in a meta string. */
+      .project-chip {
+        display: inline-block;
+        padding: 0 6px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--muted);
+        font-size: 10.5px;
+        font-weight: 500;
+        color: var(--foreground);
+        white-space: nowrap;
+      }
+      .intake-age {
+        font-size: 10.5px;
+        color: var(--muted-foreground);
+        white-space: nowrap;
+        padding-top: 2px;
+      }
+      .intake-all {
+        display: inline-block;
+        margin-top: 12px;
+        font-size: 11.5px;
+        font-weight: 600;
+        color: var(--info-foreground);
+      }
+      .intake-all:hover {
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+
+      /* --- Drilldown dialog --- */
+      dialog {
+        width: min(640px, 92vw);
+        max-height: 82dvh;
+        margin: auto;
+        padding: 0;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: var(--card);
+        color: var(--card-foreground);
+        box-shadow: 0 24px 64px rgb(0 0 0 / 0.22);
+      }
+      dialog:modal {
+        overscroll-behavior: contain;
+      }
+      dialog::backdrop {
+        background: rgb(0 0 0 / 0.32);
+        overflow: hidden;
+        overscroll-behavior: contain;
+      }
+      .drill-head {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px 18px 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      .drill-head h1 {
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .drill-head p {
+        font-size: 11.5px;
+        color: var(--muted-foreground);
+        margin-top: 2px;
+      }
+      .drill-head form {
+        margin-left: auto;
+      }
+      .icon-btn {
+        display: grid;
+        place-items: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 7px;
+        border: 1px solid var(--border);
+        background: var(--card);
+        cursor: pointer;
+      }
+      .icon-btn:hover {
+        background: var(--muted);
+      }
+      .icon-btn:focus-visible {
+        outline: 2px solid var(--ring);
+        outline-offset: 2px;
+      }
+      .drill-body {
+        overflow: auto;
+        max-height: calc(82dvh - 118px);
+        padding: 0 18px;
+      }
+      .task-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .task-list li {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px 10px;
+        padding: 10px 0;
+        border-top: 1px solid var(--border);
+      }
+      .task-list li:first-child {
+        border-top: 0;
+      }
+      .task-main {
+        flex: 1 1 210px;
+        min-width: 0;
+      }
+      .task-name {
+        font-size: 13px;
+        font-weight: 500;
+        display: block;
+      }
+      .task-name:hover {
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+      .task-meta {
+        font-size: 11px;
+        color: var(--muted-foreground);
+        display: block;
+        margin-top: 1px;
+      }
+      .due {
+        font-size: 11px;
+        color: var(--muted-foreground);
+        white-space: nowrap;
+      }
+      .due.overdue {
+        color: var(--destructive-foreground);
+        font-weight: 600;
+      }
+      .due.soon {
+        color: var(--warning-foreground);
+        font-weight: 500;
+      }
+      .pill {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        padding: 1px 7px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        color: var(--muted-foreground);
+        white-space: nowrap;
+      }
+      .pill.urgent {
+        color: var(--destructive-foreground);
+        border-color: var(--destructive);
+      }
+      .pill.high {
+        color: var(--warning-foreground);
+        border-color: var(--warning);
+      }
+      .pill.medium {
+        color: var(--info-foreground);
+        border-color: var(--info);
+      }
+      .pill.low {
+        color: var(--success-foreground);
+        border-color: var(--success);
+      }
+      .drill-foot {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 12px;
+        align-items: center;
+        padding: 11px 18px;
+        border-top: 1px solid var(--border);
+        font-size: 11.5px;
+        color: var(--muted-foreground);
+      }
+      .drill-empty {
+        padding: 28px 0 32px;
+        text-align: center;
+        color: var(--muted-foreground);
+        font-size: 12.5px;
+      }
+
+      @media (max-width: 899px) {
+        .app {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .sidebar {
+          flex-direction: row;
+          align-items: center;
+          overflow-x: auto;
+          border-right: 0;
+          border-bottom: 1px solid var(--border);
+        }
+        .workspace {
+          padding: 0;
+        }
+        .nav {
+          flex-direction: row;
+        }
+        .nav .count,
+        .proto-chip,
+        .workspace-sub {
+          display: none;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="atmosphere" aria-hidden="true"></div>
+    <div class="app">
+      <aside class="sidebar" aria-label="Sidebar">
+        <div class="workspace">
+          <span class="workspace-mark" aria-hidden="true">K</span>
+          <div>
+            <div class="workspace-name">Kaneo</div>
+            <div class="workspace-sub">Product team</div>
+          </div>
+        </div>
+        <ul class="nav">
+          <li>
+            <a href="#"
+              ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.5V21h14V9.5" /></svg>Home</a
+            >
+          </li>
+          <li>
+            <a href="#" aria-current="page"
+              ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5" /><rect x="14" y="3" width="7" height="5" rx="1.5" /><rect x="14" y="12" width="7" height="9" rx="1.5" /><rect x="3" y="16" width="7" height="5" rx="1.5" /></svg>Overview</a
+            >
+          </li>
+          <li>
+            <a href="#"
+              ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16v12H4z" /><path d="m4 7 8 6 8-6" /></svg>Inbox<span class="count">3</span></a
+            >
+          </li>
+          <li>
+            <a href="#"
+              ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="m8.5 12.5 2.5 2.5 4.5-5" /></svg>My tasks<span class="count">14</span></a
+            >
+          </li>
+          <li>
+            <a href="#"
+              ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="8" r="3.2" /><path d="M3 20c0-3.3 2.7-5 6-5s6 1.7 6 5" /><path d="M16 5.2a3.2 3.2 0 0 1 0 5.6" /><path d="M17.5 15.2c2.1.6 3.5 2.2 3.5 4.8" /></svg>Members</a
+            >
+          </li>
+        </ul>
+        <p class="proto-chip">Prototype · fixture data</p>
+      </aside>
+
+      <main class="main">
+        <header class="page-head">
+          <div>
+            <h1>Overview</h1>
+            <p>Kaneo · Product team at a glance</p>
+          </div>
+          <div class="tools">
+            <button type="button" id="theme">Dark</button>
+            <button type="button" id="palette">Modern palette</button>
+            <button type="button" id="atmosphere">Dusk background</button>
+          </div>
+        </header>
+
+        <section class="grid-tiles" id="tiles" aria-label="Workspace totals"></section>
+
+        <section class="section grid-risk" id="risk" aria-label="Deadline risk"></section>
+
+        <section class="section chart-grid" id="charts" aria-label="Task breakdown"></section>
+
+        <section class="section card" id="intake" aria-labelledby="intake-title"></section>
+      </main>
+    </div>
+
+    <!-- Modal drilldown. Native <dialog>: focus trap, Esc, backdrop and focus return are free. -->
+    <dialog id="drill" closedby="any" aria-labelledby="drill-title">
+      <header class="drill-head">
+        <div>
+          <h1 id="drill-title">Tasks</h1>
+          <p id="drill-sub"></p>
+        </div>
+        <form method="dialog">
+          <button type="submit" class="icon-btn" aria-label="Close">✕</button>
+        </form>
+      </header>
+      <div class="drill-body" id="drill-body"></div>
+      <footer class="drill-foot">
+        <span>Showing the first 50 of 68.</span>
+      </footer>
+    </dialog>
+
+    <script>
+      /* ---------------------------------------------------------------
+         Fixture data. Every widget below derives its numbers from these
+         rows, so a screenshot cannot disagree with the chart it shows.
+         `due` is a day offset from today: -3 = three days overdue.
+         --------------------------------------------------------------- */
+      const me = "Hoa";
+      const tasks = [
+        { id: "KAN-142", title: "Retry failed payments", project: "Billing revamp", assignee: "Linh", priority: "urgent", due: -1 },
+        { id: "KAN-139", title: "Invoice totals rounding", project: "Billing revamp", assignee: "Mai", priority: "high", due: -4 },
+        { id: "KAN-151", title: "Proration edge cases", project: "Billing revamp", assignee: null, priority: "high", due: 1 },
+        { id: "KAN-156", title: "Dunning email copy", project: "Billing revamp", assignee: "An", priority: "medium", due: 2 },
+        { id: "KAN-158", title: "Tax rate cache", project: "Billing revamp", assignee: "Tuan", priority: "low", due: 9 },
+        { id: "KAN-160", title: "Refund partial amounts", project: "Billing revamp", assignee: null, priority: "medium", due: null },
+        { id: "KAN-147", title: "Webhook retry backoff", project: "Billing revamp", assignee: "Linh", priority: "high", due: 5 },
+        { id: "KAN-121", title: "Billing portal redirect", project: "Billing revamp", assignee: "Mai", priority: "medium", due: -8 },
+        { id: "KAN-163", title: "Currency rounding", project: "Billing revamp", assignee: "Bao", priority: "no-priority", due: 12 },
+        { id: "KAN-166", title: "Refund confirmation email", project: "Billing revamp", assignee: "Bao", priority: "high", due: -5 },
+
+        { id: "KAN-088", title: "Android permission prompt", project: "Mobile onboarding", assignee: "Tuan", priority: "high", due: 0 },
+        { id: "KAN-091", title: "iOS welcome carousel", project: "Mobile onboarding", assignee: "An", priority: "medium", due: 3 },
+        { id: "KAN-095", title: "Skip button state", project: "Mobile onboarding", assignee: null, priority: "low", due: 2 },
+        { id: "KAN-099", title: "Deep link after signup", project: "Mobile onboarding", assignee: "Linh", priority: "urgent", due: -2 },
+        { id: "KAN-102", title: "Push opt-in screen", project: "Mobile onboarding", assignee: "Bao", priority: "medium", due: 6 },
+        { id: "KAN-074", title: "Offline first run", project: "Mobile onboarding", assignee: null, priority: "no-priority", due: null },
+        { id: "KAN-110", title: "Onboarding analytics", project: "Mobile onboarding", assignee: "Mai", priority: "low", due: 14 },
+        { id: "KAN-112", title: "Onboarding video asset", project: "Mobile onboarding", assignee: null, priority: "no-priority", due: null },
+
+        { id: "KAN-201", title: "Filter chip overflow", project: "Search filters", assignee: me, priority: "high", due: 1 },
+        { id: "KAN-198", title: "Saved filter names", project: "Search filters", assignee: "An", priority: "medium", due: 4 },
+        { id: "KAN-205", title: "Empty result copy", project: "Search filters", assignee: null, priority: "low", due: 3 },
+        { id: "KAN-188", title: "Date range picker", project: "Search filters", assignee: me, priority: "medium", due: -6 },
+        { id: "KAN-210", title: "Filter URL sync", project: "Search filters", assignee: "Tuan", priority: "no-priority", due: 8 },
+        { id: "KAN-214", title: "Reset all filters", project: "Search filters", assignee: "Bao", priority: "low", due: null },
+        { id: "KAN-219", title: "Filter performance", project: "Search filters", assignee: me, priority: "urgent", due: 0 },
+
+        { id: "KAN-301", title: "Tokens for charts", project: "Design system", assignee: me, priority: "medium", due: 2 },
+        { id: "KAN-298", title: "Dialog focus ring", project: "Design system", assignee: me, priority: "high", due: -3 },
+        { id: "KAN-305", title: "Table density", project: "Design system", assignee: null, priority: "low", due: 7 },
+        { id: "KAN-288", title: "Icon sizing rules", project: "Design system", assignee: "Mai", priority: "no-priority", due: null },
+        { id: "KAN-311", title: "Dark palette audit", project: "Design system", assignee: "An", priority: "medium", due: 11 },
+        { id: "KAN-313", title: "Contrast fixes", project: "Design system", assignee: "An", priority: "high", due: -2 },
+
+        { id: "KAN-401", title: "Digest email layout", project: "Notifications", assignee: "Linh", priority: "medium", due: 5 },
+        { id: "KAN-404", title: "Mute thread", project: "Notifications", assignee: null, priority: "low", due: 6 },
+        { id: "KAN-397", title: "Badge count drift", project: "Notifications", assignee: "Tuan", priority: "urgent", due: -1 },
+        { id: "KAN-410", title: "Push grouping", project: "Notifications", assignee: "Bao", priority: "no-priority", due: 13 },
+        { id: "KAN-388", title: "Notification settings route", project: "Notifications", assignee: "Mai", priority: "low", due: 4 },
+
+        { id: "KAN-501", title: "CSV export columns", project: "Reporting", assignee: "An", priority: "medium", due: 9 },
+        { id: "KAN-505", title: "Timezone bucketing", project: "Reporting", assignee: null, priority: "high", due: 3 },
+        { id: "KAN-512", title: "Empty report state", project: "Reporting", assignee: me, priority: "low", due: 10 },
+        { id: "KAN-489", title: "Scheduled report cron", project: "Reporting", assignee: "Linh", priority: "no-priority", due: null },
+      ];
+
+      const projects = [
+        { name: "Billing revamp" },
+        { name: "Mobile onboarding" },
+        { name: "Search filters" },
+        { name: "Design system" },
+        { name: "Notifications" },
+        { name: "Reporting" },
+      ];
+
+      /* Intake requests waiting for triage or already being handled.
+         `status` uses the API vocabulary: new | triaged | in_progress. */
+      const intake = [
+        { id: "REQ-218", title: "Bulk import contacts", project: "Reporting", requester: "Nga", status: "new", age: 0 },
+        { id: "REQ-217", title: "Custom dashboard widgets", project: "Design system", requester: "Khanh", status: "new", age: 1 },
+        { id: "REQ-215", title: "SSO for partner portal", project: "Billing revamp", requester: "Minh", status: "new", age: 2 },
+        { id: "REQ-212", title: "Export invoices to Xero", project: "Billing revamp", requester: "Nga", status: "triaged", age: 3 },
+        { id: "REQ-209", title: "Mobile offline mode", project: "Mobile onboarding", requester: "Khanh", status: "triaged", age: 5 },
+        { id: "REQ-206", title: "Saved filter sharing", project: "Search filters", requester: "Mai", status: "in_progress", age: 6 },
+        { id: "REQ-203", title: "Weekly digest email", project: "Notifications", requester: "Linh", status: "in_progress", age: 9 },
+        { id: "REQ-199", title: "CSV column mapping", project: "Reporting", requester: "An", status: "in_progress", age: 12 },
+      ];
+
+      const priorities = [
+        ["urgent", "Urgent"],
+        ["high", "High"],
+        ["medium", "Medium"],
+        ["low", "Low"],
+        ["no-priority", "No priority"],
+      ];
+
+      const DAY = 86400000;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const daysFromNow = (n) => new Date(today.getTime() + n * DAY);
+      const isUrgent = (t) => t.priority === "urgent" || t.priority === "high";
+      const isOverdue = (t) => t.due !== null && t.due < 0;
+      const isDueSoon = (t) => t.due !== null && t.due >= 0 && t.due <= 3;
+
+      const buckets = {
+        overdueUrgent: {
+          title: "Overdue and urgent",
+          hint: "Open tasks past their due date with high or urgent priority.",
+          match: (t) => isOverdue(t) && isUrgent(t),
+        },
+        dueSoon: {
+          title: "Due in the next 3 days",
+          hint: "Open tasks due today or within 3 days, any priority.",
+          match: isDueSoon,
+        },
+        unassigned: {
+          title: "Unassigned tasks",
+          hint: "Open tasks with no owner. Assign one so nothing stalls.",
+          match: (t) => !t.assignee,
+        },
+        mineOverdue: {
+          title: "My overdue tasks",
+          hint: `Open tasks assigned to ${me} past their due date.`,
+          match: (t) => t.assignee === me && isOverdue(t),
+        },
+        myOpen: {
+          title: "My open tasks",
+          hint: `Everything assigned to ${me} that is not done.`,
+          match: (t) => t.assignee === me,
+        },
+        allOpen: {
+          title: "All open tasks",
+          hint: "Open tasks across the projects you can read.",
+          match: () => true,
+        },
+      };
+
+      const priorityLabel = (key) => priorities.find(([k]) => k === key)[1];
+
+      function dueLabel(d) {
+        if (d === null) return { text: "No due date", cls: "" };
+        if (d < -1) return { text: `${-d} days overdue`, cls: "overdue" };
+        if (d === -1) return { text: "1 day overdue", cls: "overdue" };
+        if (d === 0) return { text: "Due today", cls: "soon" };
+        if (d === 1) return { text: "Due tomorrow", cls: "soon" };
+        if (d <= 3) return { text: `Due in ${d} days`, cls: "soon" };
+        return { text: `Due in ${d} days`, cls: "" };
+      }
+
+      function sortTasks(list) {
+        return [...list].sort((a, b) => {
+          const ad = a.due === null ? 9999 : a.due;
+          const bd = b.due === null ? 9999 : b.due;
+          if (ad !== bd) return ad - bd;
+          return b.priority.localeCompare(a.priority);
+        });
+      }
+
+      /* ------------------------------ tiles ------------------------------ */
+      const myOpen = tasks.filter(buckets.myOpen.match).length;
+      const myOverdue = tasks.filter(buckets.mineOverdue.match).length;
+
+      function tile({ label, value, meta, drill, danger }) {
+        const inner = `<span class="tile-label">${label}</span>
+           <span class="tile-value${danger ? " value-danger" : ""}">${value}</span>
+           <span class="tile-meta">${meta}</span>`;
+        return drill
+          ? `<button type="button" class="card drill" data-bucket="${drill}">${inner}</button>`
+          : `<div class="card">${inner}</div>`;
+      }
+
+      document.getElementById("tiles").innerHTML = [
+        tile({ label: "Projects", value: 12, meta: "3 archived" }),
+        tile({ label: "Members", value: 8, meta: "2 guests" }),
+        tile({ label: "My open tasks", value: myOpen, meta: "assigned to you", drill: "myOpen" }),
+        tile({ label: "My overdue", value: myOverdue, meta: "past due date", drill: "mineOverdue", danger: myOverdue > 0 }),
+      ].join("");
+
+      /* --------------------------- deadline risk --------------------------- */
+      const overdueCount = tasks.filter(buckets.overdueUrgent.match).length;
+      const overdueList = tasks.filter(buckets.overdueUrgent.match);
+      const oldestOverdue = overdueList.length
+        ? Math.max(...overdueList.map((t) => -t.due))
+        : 0;
+      const dueSoonList = tasks.filter(buckets.dueSoon.match);
+      const dueSoonUrgent = dueSoonList.filter(isUrgent).length;
+      const unassigned = tasks.filter(buckets.unassigned.match).length;
+
+      document.getElementById("risk").innerHTML = `
+        <div class="card risk-wide">
+          <h2>Deadline risk</h2>
+          <p class="hint">Open tasks only · urgent = high or urgent priority</p>
+          <div class="risk-counts">
+            <button type="button" class="drill" data-bucket="overdueUrgent">
+              <span class="label">Overdue and urgent</span>
+              <span class="value overdue">${overdueCount}</span>
+              <span class="meta">${overdueCount ? `oldest ${oldestOverdue} days` : "nothing overdue"}</span>
+            </button>
+            <button type="button" class="drill" data-bucket="dueSoon">
+              <span class="label">Due in 3 days</span>
+              <span class="value due">${dueSoonList.length}</span>
+              <span class="meta">${dueSoonUrgent} urgent</span>
+            </button>
+          </div>
+          <div class="stack" aria-hidden="true">
+            <span class="overdue" style="width:${(overdueCount / (overdueCount + dueSoonList.length || 1)) * 100}%"></span>
+            <span class="due" style="width:${(dueSoonList.length / (overdueCount + dueSoonList.length || 1)) * 100}%"></span>
+          </div>
+        </div>
+        <button type="button" class="card drill" data-bucket="unassigned">
+          <span class="tile-label">Unassigned tasks</span>
+          <span class="tile-value">${unassigned}</span>
+          <span class="tile-meta">need an owner</span>
+        </button>`;
+
+      /* ----------------------- chart: priority donut ----------------------- */
+      const total = tasks.length;
+      const C = 2 * Math.PI * 46;
+      let offset = 0;
+      const segmentCount = priorities.map(([key]) => tasks.filter((t) => t.priority === key).length);
+      const segments = priorities
+        .map(([key], i) => {
+          const len = (segmentCount[i] / total) * C;
+          const el = `<circle cx="60" cy="60" r="46" class="seg-${key}" stroke-width="16"
+            stroke-dasharray="${Math.max(len - 2, 0)} ${C - Math.max(len - 2, 0)}"
+            stroke-dashoffset="${-offset}" transform="rotate(-90 60 60)" />`;
+          offset += len;
+          return el;
+        })
+        .join("");
+      const legend = priorities
+        .map(([key, label], i) => {
+          const n = segmentCount[i];
+          return `<button type="button" class="drill legend-item" data-priority="${key}">
+            <span class="swatch" style="background:var(--p-${key})" aria-hidden="true"></span>
+            <span class="drill-name">${label}</span>
+            <span class="n">${n}</span>
+          </button>`;
+        })
+        .join("");
+
+      /* -------------------- chart: due load, next 7 days -------------------- */
+      const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      const dayBuckets = Array.from({ length: 7 }, (_, d) => {
+        const list = tasks.filter((t) => t.due === d);
+        return {
+          d,
+          label: d === 0 ? "Today" : weekdays[daysFromNow(d).getDay()],
+          count: list.length,
+          urgent: list.filter(isUrgent).length,
+        };
+      });
+      const maxDay = Math.max(1, ...dayBuckets.map((b) => b.count));
+      const columns = dayBuckets
+        .map(
+          (b) => `<button type="button" class="drill col" data-day="${b.d}" ${b.d === 0 ? 'aria-current="date"' : ""}
+              aria-label="${b.label}: ${b.count} open task${b.count === 1 ? "" : "s"}, ${b.urgent} urgent">
+            <span class="col-val">${b.count || ""}</span>
+            <span class="col-track"><span class="col-fill ${b.urgent > b.count / 2 ? "urgent" : ""} ${b.count ? "" : "zero"}"
+              style="height:${Math.round((b.count / maxDay) * 100)}%"></span></span>
+            <span class="col-day">${b.label}</span>
+          </button>`,
+        )
+        .join("");
+
+      /* ------------------- chart: open tasks per project ------------------- */
+      const projectLoad = projects
+        .map((p) => ({ ...p, open: tasks.filter((t) => t.project === p.name).length }))
+        .sort((a, b) => b.open - a.open);
+      const maxOpen = Math.max(1, ...projectLoad.map((p) => p.open));
+      const projectBars = projectLoad
+        .map(
+          (p) => `<button type="button" class="drill bar-line" data-project="${p.name}">
+            <span class="bar-name">${p.name}</span>
+            <span class="bar-pct">${p.open}</span>
+            <progress max="${maxOpen}" value="${p.open}" aria-label="${p.name}: ${p.open} open tasks"></progress>
+          </button>`,
+        )
+        .join("");
+
+      document.getElementById("charts").innerHTML = `
+        <section class="card" aria-labelledby="prio-title">
+          <h2 id="prio-title">Open tasks by priority</h2>
+          <p class="hint">${total} open tasks · click a priority</p>
+          <div class="donut">
+            <svg viewBox="0 0 120 120" aria-hidden="true" focusable="false">
+              <circle cx="60" cy="60" r="46" class="seg-track" stroke-width="16" />
+              ${segments}
+              <text x="60" y="58" text-anchor="middle" class="donut-total">${total}</text>
+              <text x="60" y="72" text-anchor="middle" class="donut-caption">open tasks</text>
+            </svg>
+            <div class="legend">${legend}</div>
+          </div>
+        </section>
+        <section class="card" aria-labelledby="due-title">
+          <h2 id="due-title">Due load · next 7 days</h2>
+          <p class="hint">Open tasks by due date, today onward</p>
+          <div class="columns">${columns}</div>
+          <p class="hint tap">Overdue work is not in this chart — see Deadline risk.</p>
+        </section>
+        <section class="card" aria-labelledby="load-title">
+          <h2 id="load-title">Open tasks by project</h2>
+          <p class="hint">Where the work sits right now</p>
+          <div>${projectBars}</div>
+        </section>`;
+
+      /* ---------------------------- intake queue ---------------------------- */
+      const ageLabel = (n) => (n === 0 ? "today" : n === 1 ? "1 day" : `${n} days`);
+      const intakeRow = (r) => `<li>
+          <a href="#project/${encodeURIComponent(r.project)}/intake/${r.id}">
+            <span class="intake-title">${r.title}</span>
+            <span class="intake-meta">
+              <span class="project-chip">${r.project}</span>
+              <span>${r.id} · from ${r.requester}</span>
+            </span>
+          </a>
+          <span class="intake-age">${ageLabel(r.age)}</span>
+        </li>`;
+
+      const waiting = intake.filter((r) => r.status === "new" || r.status === "triaged");
+      const inProgress = intake.filter((r) => r.status === "in_progress");
+      const intakeGroup = (title, list) => `<div>
+          <h3>${title} <span class="n">${list.length}</span></h3>
+          <ul class="intake-list">${list.map(intakeRow).join("")}</ul>
+        </div>`;
+
+      document.getElementById("intake").innerHTML = `
+        <h2 id="intake-title">Intake queue</h2>
+        <p class="hint">Requests waiting for triage or already being worked on · click a row to open it</p>
+        <div class="intake-groups">
+          ${intakeGroup("Waiting", waiting)}
+          ${intakeGroup("In progress", inProgress)}
+        </div>
+        <a class="intake-all" href="#requests">View all intake requests</a>`;
+
+      /* ------------------------------- drill ------------------------------- */
+      const dialog = document.getElementById("drill");
+      const dialogTitle = document.getElementById("drill-title");
+      const dialogSub = document.getElementById("drill-sub");
+      const dialogBody = document.getElementById("drill-body");
+
+      function taskRow(t) {
+        const due = dueLabel(t.due);
+        return `<li>
+            <span class="task-main">
+              <a class="task-name" href="#">${t.title}</a>
+              <span class="task-meta">${t.id} · ${t.project} · ${t.assignee || "Unassigned"}</span>
+            </span>
+            <span class="pill ${t.priority}">${priorityLabel(t.priority)}</span>
+            <span class="due ${due.cls}">${due.text}</span>
+          </li>`;
+      }
+
+      function openDrill({ title, hint, list }) {
+        const sorted = sortTasks(list);
+        dialogTitle.textContent = title;
+        dialogSub.textContent = hint;
+        dialogBody.innerHTML = sorted.length
+          ? `<ul class="task-list">${sorted.map(taskRow).join("")}</ul>`
+          : `<p class="drill-empty">No tasks match this filter right now.</p>`;
+        dialog.showModal();
+      }
+
+      document.addEventListener("click", (event) => {
+        const trigger = event.target.closest("[data-bucket], [data-priority], [data-project], [data-day]");
+        if (!trigger) return;
+        const { bucket, priority, project, day } = trigger.dataset;
+
+        if (bucket) {
+          const spec = buckets[bucket];
+          openDrill({ title: spec.title, hint: spec.hint, list: tasks.filter(spec.match) });
+          return;
+        }
+        if (priority !== undefined) {
+          const list = tasks.filter((t) => t.priority === priority);
+          openDrill({
+            title: `${priorityLabel(priority)} priority`,
+            hint: `${list.length} open task${list.length === 1 ? "" : "s"} across your projects.`,
+            list,
+          });
+          return;
+        }
+        if (project) {
+          const list = tasks.filter((t) => t.project === project);
+          openDrill({
+            title: project,
+            hint: `${list.length} open task${list.length === 1 ? "" : "s"} in this project.`,
+            list,
+          });
+          return;
+        }
+        if (day !== undefined) {
+          const d = Number(day);
+          const date = daysFromNow(d);
+          const list = tasks.filter((t) => t.due === d);
+          openDrill({
+            title: d === 0 ? "Due today" : `Due ${date.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}`,
+            hint: `${list.length} open task${list.length === 1 ? "" : "s"} due on this day.`,
+            list,
+          });
+        }
+      });
+
+      /* Review-only controls. Not part of the product page. */
+      const root = document.documentElement;
+      const theme = document.getElementById("theme");
+      const palette = document.getElementById("palette");
+      const atmosphere = document.getElementById("atmosphere");
+      theme.addEventListener("click", () => {
+        const dark =
+          root.dataset.theme === "dark" ||
+          (!root.dataset.theme && matchMedia("(prefers-color-scheme: dark)").matches);
+        root.dataset.theme = dark ? "light" : "dark";
+        theme.textContent = dark ? "Dark" : "Light";
+      });
+      palette.addEventListener("click", () => {
+        root.dataset.palette = root.dataset.palette === "modern" ? "" : "modern";
+        palette.textContent =
+          root.dataset.palette === "modern" ? "Default palette" : "Modern palette";
+      });
+      atmosphere.addEventListener("click", () => {
+        const on = root.dataset.atmosphere === "dusk";
+        root.dataset.atmosphere = on ? "off" : "dusk";
+        atmosphere.textContent = on ? "Dusk background: off" : "Dusk background: on";
+      });
+      /* The prototype opens in the modern glass view; the buttons still reach
+         the plain palette and the flat background for comparison. */
+      palette.textContent = root.dataset.palette === "modern" ? "Default palette" : "Modern palette";
+      atmosphere.textContent =
+        root.dataset.atmosphere === "dusk" ? "Dusk background: off" : "Dusk background: on";
+    </script>
+  </body>
+</html>

@@ -2964,7 +2964,8 @@
 			"home": "Home",
 			"inbox": "Inbox",
 			"myTasks": "My tasks",
-			"invitePeople": "Invite people"
+			"invitePeople": "Invite people",
+			"overview": "Overview"
 		},
 		"projectList": {
 			"viewProject": "View Project",
@@ -5473,6 +5474,56 @@
 		},
 		"permissions": {
 			"photos": "Kaneo uses your photos to attach images to tasks and comments, and for your profile photo."
+		}
+	},
+	"dashboard": {
+		"title": "Overview",
+		"subtitle": "{{workspace}} at a glance",
+		"tiles": {
+			"projects": "Projects",
+			"members": "Members",
+			"myOpen": "My open tasks",
+			"myOverdue": "My overdue",
+			"unassigned": "Unassigned tasks"
+		},
+		"risk": {
+			"title": "Deadline risk",
+			"overdue": "Overdue and urgent",
+			"dueSoon": "Due in {{days}} days",
+			"urgentShare": "{{count}} urgent",
+			"hint": "Open tasks only · urgent = high or urgent priority"
+		},
+		"intake": {
+			"title": "Intake queue",
+			"hint": "Requests waiting for triage or already being worked on",
+			"waiting": "Waiting",
+			"inProgress": "In progress",
+			"age": {
+				"today": "today",
+				"days": "{{count}} days"
+			},
+			"viewAll": "View all intake requests",
+			"empty": "No intake requests in this group."
+		},
+		"charts": {
+			"byPriority": "Open tasks by priority",
+			"byPriorityHint": "{{count}} open tasks · click a priority",
+			"dueLoad": "Due load · next 7 days",
+			"dueLoadHint": "Open tasks by due date, today onward",
+			"byProject": "Open tasks by project",
+			"byProjectHint": "Where the work sits right now",
+			"openTotal": "open"
+		},
+		"drill": {
+			"title": "Tasks",
+			"empty": "No tasks match this filter right now.",
+			"cap": "Showing the first {{shown}} of {{total}}.",
+			"close": "Close",
+			"loading": "Loading tasks…"
+		},
+		"error": {
+			"title": "Couldn't load",
+			"retry": "Retry"
 		}
 	}
 }

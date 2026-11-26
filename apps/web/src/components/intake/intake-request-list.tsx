@@ -8,7 +8,7 @@ type IntakeRequestListProps = {
   items: IntakeRequestListItem[];
   /** Hide the project column when the list already belongs to one project. */
   showProject?: boolean;
-  onRowClick: (requestId: string) => void;
+  onRowClick: (request: IntakeRequestListItem) => void;
 };
 
 export function IntakeRequestList({
@@ -32,7 +32,7 @@ export function IntakeRequestList({
         <li key={item.id}>
           <button
             type="button"
-            onClick={() => onRowClick(item.id)}
+            onClick={() => onRowClick(item)}
             className="flex w-full flex-wrap items-center gap-x-3 gap-y-1 rounded-lg px-2 py-3 text-left transition-colors hover:bg-accent/50 focus-visible:bg-accent/50 focus-visible:outline-none"
           >
             <span className="font-mono text-muted-foreground text-xs">

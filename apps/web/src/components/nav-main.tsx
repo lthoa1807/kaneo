@@ -3,6 +3,7 @@ import {
   CircleCheck,
   House,
   Inbox,
+  LayoutDashboard,
   type LucideIcon,
   Mail,
   Users,
@@ -60,6 +61,11 @@ export function NavMain() {
   const navItems: NavItem[] = nav.staffNav
     ? [
         { title: t("navigation:sidebar.home"), icon: House, url: homeUrl },
+        {
+          title: t("navigation:sidebar.overview"),
+          icon: LayoutDashboard,
+          url: `${homeUrl}/overview`,
+        },
         {
           title: t("navigation:sidebar.inbox"),
           icon: Inbox,

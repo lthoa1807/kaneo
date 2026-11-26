@@ -90,18 +90,15 @@ export function GuestPortalPage({
         <IntakeRequestList
           items={requests.data?.items ?? []}
           showProject={!projectId}
-          onRowClick={(requestId) => {
-            const request = requests.data?.items.find(
-              (item) => item.id === requestId,
-            );
-            const targetProject = request?.projectId ?? projectId;
+          onRowClick={(request) => {
+            const targetProject = request.projectId ?? projectId;
             if (!targetProject) return;
             void navigate({
               to: "/dashboard/workspace/$workspaceId/project/$projectId/requests/$requestId",
               params: {
                 workspaceId,
                 projectId: targetProject,
-                requestId,
+                requestId: request.id,
               },
             });
           }}
