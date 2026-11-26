@@ -162,7 +162,7 @@ controllers in `controllers/get-dashboard-summary.ts` and
 | Authorization and scope | guest 403, member limited to a project counts only that project, archived project and done task excluded | `tests/api-integration/dashboard-summary.test.ts` |
 | Drilldown endpoint | priority/project/day filters, done task excluded, guest 403, invalid day 400 | `tests/api-integration/dashboard-drilldown.test.ts` |
 | Query hook | key, enabled gating, disabled for guests | `apps/web/src/hooks/queries/dashboard/use-get-dashboard-summary.test.tsx` |
-| Widgets | value formatting, zero state, error state, drilldown row/truncation | **outstanding** — co-located `*.test.tsx` before Phase 5 sign-off |
+| Widgets | value formatting, zero state, error state, drilldown row/truncation | co-located `*.test.tsx` in `apps/web/src/components/dashboard/` (8 files, 16 tests) |
 | Gates | `pnpm i18n:check`, `pnpm openapi:check` | CI |
 
 Focused tests locally; heavy suites and `tsc` for `apps/web` go to CI (WSL

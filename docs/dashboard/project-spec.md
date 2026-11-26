@@ -6,7 +6,7 @@
 | Version | 1.0 |
 | Date | 2026-11-26 |
 | Development branch | `feature/ui-development` |
-| Current phase | Phase 5 – Dashboard Widgets and Integration (implementation landed; widget tests and Phase 6 gates outstanding) |
+| Current phase | Phase 5 – Dashboard Widgets and Integration (complete; awaiting Gate 5 approval, then Phase 6) |
 
 This document governs the entire Dashboard initiative. It is the input to
 Phase 0 and must not be changed silently. Any requirement change follows

@@ -1,7 +1,7 @@
 # Kaneo Dashboard — Implementation Plan (Phase 1)
 
 > Phase: 1 – Architecture and Functional Specification
-> Status: Executed through T8 (uncommitted); T9 gates and widget tests outstanding.
+> Status: Executed through T9. Gates green in CI (run 45868094980); widget tests and the browser pass are recorded in `phase-5-completion-report.md`. Awaiting Gate 5 approval.
 > Branch: `feature/ui-development` (already checked out)
 > Order matters: API first, then client, then widgets, then gates.
 
@@ -14,10 +14,10 @@
 | T3 OpenAPI | Done, `apps/docs/openapi.json` has both paths. |
 | T4 Fetcher + hook | Done; drilldown fetcher/hook added too. |
 | T5 Route + nav + i18n | Done; sidebar icon is `LayoutDashboard`. |
-| T6 Widgets | Done with different file names (see `architecture.md` §3); unassigned is a `MetricTile`. Component tests not written. |
-| T7 States + responsive | Skeleton and per-widget error done; the 320/768/1280/1536 + palette browser pass is not recorded. |
+| T6 Widgets | Done with different file names (see `architecture.md` §3); unassigned is a `MetricTile`. Component tests in `apps/web/src/components/dashboard/*.test.tsx` (8 files, 16 tests). |
+| T7 States + responsive | Skeleton and per-widget error done; browser pass recorded 2026-11-27 at 320/768/1280/1536 px in light, dark and `modern` (see `phase-5-completion-report.md`). |
 | T8 Integration | Done (`tests/api-integration/dashboard-summary.test.ts`) for 401/403, done/archived and project scope; no 51-row truncation fixture. Drilldown filters and 400 are covered by `dashboard-drilldown.test.ts`. |
-| T9 Gates + report | Outstanding. |
+| T9 Gates + report | Gates green in CI (run 45868094980: lint, i18n, openapi, typecheck, build, integration); report written to `phase-5-completion-report.md`. |
 
 ## 1. Preconditions
 

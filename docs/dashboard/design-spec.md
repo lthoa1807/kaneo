@@ -32,7 +32,7 @@ chrome stays out of the way.
 | Overdue / urgent | `--destructive` |
 | Due soon | `--warning` |
 | Unassigned | `--info` |
-| Progress fill | `--chart-1` (single series, so one color, not 1–5) |
+| Progress fill | `--primary` (single series, so one color, not 1–5) |
 | Focus | `--ring` |
 | Skeleton | `--muted` |
 
@@ -84,11 +84,12 @@ Font: Geist Variable with the existing system fallback. No new font.
 | Open by project | horizontal bars scaled to the busiest project; project name, count, bar; no percentage, because the value is a workload not a share | "No open tasks" |
 | Intake queue | two groups ("Waiting", "In progress") side by side; row = title, then a **project chip** plus `REQ-n · from requester`, age right-aligned; the project is a chip, never buried in the meta string | "No intake requests in this group." |
 
-Progress bars: use the native `<progress max="100" value="…">` element (6 px
-tall, `appearance: none`, `--muted` track, `--chart-1` fill, radius 999 px),
-labelled with `aria-label` or a visible label. The platform supplies
-`role="progressbar"` and the value announcement; no custom ARIA is added. No
-animation on load; values are state, not entrance.
+Progress bars: the project load bar is a `<span>` track with an inner
+`<span>` fill sized to the busiest project (`--muted` track, `--primary` fill,
+6 px tall, radius 999 px). The whole row is a native `<button>` whose
+`aria-label` states project and count, and the count is also visible text, so
+the platform announces the value once. No animation on load; values are state,
+not entrance.
 
 Charts are SVG/CSS only: one `<svg>` for the donut, CSS grid for the columns,
 `<progress>` for the project load. No chart dependency, no canvas, no
@@ -160,18 +161,18 @@ No primitive is modified. Nothing from Astryx; no chart library.
 
 ## 9. Accessibility checklist
 
-- [ ] one `h1`, `h2` per card
-- [ ] native `<progress>` labelled, value visible as text
-- [ ] tabular numbers, no layout jump on poll
-- [ ] urgency in words, not color alone
-- [ ] every drill trigger is a real `<button>` with a visible label
-- [ ] donut geometry is `aria-hidden`; the legend carries all values
-- [ ] dialog has `aria-labelledby` → its `h1`, no `role="dialog"` or focus trap
-- [ ] focus returns to the triggering widget when the dialog closes (browser)
-- [ ] focus ring on every interactive element, not just Retry
-- [ ] contrast ≥ 4.5:1 in light, dark, modern for text; ≥ 3:1 for bars
-- [ ] no horizontal scroll at 320 px
-- [ ] `prefers-reduced-motion`: no new motion to disable
+- [x] one `h1`, `h2` per card
+- [x] value visible as text next to every bar
+- [x] tabular numbers, no layout jump on poll
+- [x] urgency in words, not color alone
+- [x] every drill trigger is a real `<button>` with a visible label
+- [x] donut geometry is `aria-hidden`; the legend carries all values
+- [x] dialog has `aria-labelledby` → its `h2`, no `role="dialog"` or focus trap
+- [x] focus returns to the triggering widget when the dialog closes (browser)
+- [x] focus ring on every interactive element, not just Retry
+- [x] contrast ≥ 4.5:1 in light, dark, modern for text; ≥ 3:1 for bars (visual check)
+- [x] no horizontal scroll at 320 px
+- [x] `prefers-reduced-motion`: no new motion to disable
 
 ## 10. Review checklist (Gate 2)
 

@@ -724,11 +724,11 @@
         background: transparent;
       }
       progress::-webkit-progress-value {
-        background: var(--chart-1);
+        background: var(--primary);
         border-radius: 999px;
       }
       progress::-moz-progress-bar {
-        background: var(--chart-1);
+        background: var(--primary);
         border-radius: 999px;
       }
 
@@ -969,15 +969,6 @@
         font-size: 11.5px;
         color: var(--muted-foreground);
       }
-      .drill-foot a {
-        margin-left: auto;
-        font-weight: 600;
-        color: var(--info-foreground);
-      }
-      .drill-foot a:hover {
-        text-decoration: underline;
-        text-underline-offset: 2px;
-      }
       .drill-empty {
         padding: 28px 0 32px;
         text-align: center;
@@ -1092,8 +1083,7 @@
       </header>
       <div class="drill-body" id="drill-body"></div>
       <footer class="drill-foot">
-        <span>Filters are carried over, so you land on the same list in Tasks.</span>
-        <a id="drill-link" href="#">Open in Tasks →</a>
+        <span>Showing the first 50 of 68.</span>
       </footer>
     </dialog>
 
@@ -1195,37 +1185,31 @@
           title: "Overdue and urgent",
           hint: "Open tasks past their due date with high or urgent priority.",
           match: (t) => isOverdue(t) && isUrgent(t),
-          link: "due=overdue&priority=high,urgent",
         },
         dueSoon: {
           title: "Due in the next 3 days",
           hint: "Open tasks due today or within 3 days, any priority.",
           match: isDueSoon,
-          link: "due=next-3-days",
         },
         unassigned: {
           title: "Unassigned tasks",
           hint: "Open tasks with no owner. Assign one so nothing stalls.",
           match: (t) => !t.assignee,
-          link: "assignee=none",
         },
         mineOverdue: {
           title: "My overdue tasks",
           hint: `Open tasks assigned to ${me} past their due date.`,
           match: (t) => t.assignee === me && isOverdue(t),
-          link: "assignee=me&due=overdue",
         },
         myOpen: {
           title: "My open tasks",
           hint: `Everything assigned to ${me} that is not done.`,
           match: (t) => t.assignee === me,
-          link: "assignee=me",
         },
         allOpen: {
           title: "All open tasks",
           hint: "Open tasks across the projects you can read.",
           match: () => true,
-          link: "",
         },
       };
 
@@ -1432,7 +1416,6 @@
       const dialogTitle = document.getElementById("drill-title");
       const dialogSub = document.getElementById("drill-sub");
       const dialogBody = document.getElementById("drill-body");
-      const dialogLink = document.getElementById("drill-link");
 
       function taskRow(t) {
         const due = dueLabel(t.due);
@@ -1446,14 +1429,13 @@
           </li>`;
       }
 
-      function openDrill({ title, hint, list, link }) {
+      function openDrill({ title, hint, list }) {
         const sorted = sortTasks(list);
         dialogTitle.textContent = title;
         dialogSub.textContent = hint;
         dialogBody.innerHTML = sorted.length
           ? `<ul class="task-list">${sorted.map(taskRow).join("")}</ul>`
           : `<p class="drill-empty">No tasks match this filter right now.</p>`;
-        dialogLink.href = link ? `#tasks?${link}` : "#tasks";
         dialog.showModal();
       }
 
@@ -1464,7 +1446,7 @@
 
         if (bucket) {
           const spec = buckets[bucket];
-          openDrill({ title: spec.title, hint: spec.hint, list: tasks.filter(spec.match), link: spec.link });
+          openDrill({ title: spec.title, hint: spec.hint, list: tasks.filter(spec.match) });
           return;
         }
         if (priority !== undefined) {
@@ -1473,7 +1455,6 @@
             title: `${priorityLabel(priority)} priority`,
             hint: `${list.length} open task${list.length === 1 ? "" : "s"} across your projects.`,
             list,
-            link: `priority=${priority}`,
           });
           return;
         }
@@ -1483,7 +1464,6 @@
             title: project,
             hint: `${list.length} open task${list.length === 1 ? "" : "s"} in this project.`,
             list,
-            link: `project=${encodeURIComponent(project)}`,
           });
           return;
         }
@@ -1495,7 +1475,6 @@
             title: d === 0 ? "Due today" : `Due ${date.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}`,
             hint: `${list.length} open task${list.length === 1 ? "" : "s"} due on this day.`,
             list,
-            link: `due=${date.toISOString().slice(0, 10)}`,
           });
         }
       });
