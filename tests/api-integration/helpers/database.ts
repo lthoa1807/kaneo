@@ -108,7 +108,25 @@ export async function resetTestDatabase() {
 
   const formattedTableNames = tableNames.map(quoteIdentifier).join(", ");
 
-  await db.execute(
-    sql.raw(`TRUNCATE TABLE ${formattedTableNames} RESTART IDENTITY CASCADE`),
+  await truncateWithRetry(
+    `TRUNCATE TABLE ${formattedTableNames} RESTART IDENTITY CASCADE`,
   );
+}
+
+// A connection left holding a lock by an earlier file makes TRUNCATE wait, and
+// when two sessions wait on each other Postgres answers 40P01. The lock is gone
+// by the next attempt, so retry instead of failing a shard on it.
+async function truncateWithRetry(statement: string, attempts = 3) {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      await db.execute(sql.raw(statement));
+      return;
+    } catch (error) {
+      const code =
+        (error as { code?: string }).code ??
+        (error as { cause?: { code?: string } }).cause?.code;
+      if (code !== "40P01" || attempt >= attempts) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 100 * attempt));
+    }
+  }
 }
