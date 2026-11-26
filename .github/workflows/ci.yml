@@ -3,6 +3,11 @@ name: CI
 on:
   push:
     branches: [main]
+    # Docs-only pushes cannot change runtime behavior; pull requests already
+    # skip the expensive jobs for them, pushes can skip the whole run.
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
   pull_request:
   workflow_dispatch:
   workflow_call:

@@ -4,6 +4,9 @@ on:
   # Fork CI runs on GitHub-hosted runners, so it works on PRs too.
   push:
     branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
   pull_request:
   workflow_dispatch:
 
