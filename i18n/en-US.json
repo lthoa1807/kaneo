@@ -5511,7 +5511,8 @@
 			"dueLoad": "Due load · next 7 days",
 			"dueLoadHint": "Open tasks by due date, today onward",
 			"byProject": "Open tasks by project",
-			"byProjectHint": "Where the work sits right now"
+			"byProjectHint": "Where the work sits right now",
+			"openTotal": "open"
 		},
 		"drill": {
 			"title": "Tasks",

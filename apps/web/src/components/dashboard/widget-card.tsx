@@ -18,7 +18,7 @@ export default function WidgetCard({
   return (
     <section
       className={cn(
-        "overview-card flex flex-col gap-4 rounded-xl border p-4",
+        "@container overview-card flex flex-col gap-4 rounded-xl border p-4",
         className,
       )}
     >

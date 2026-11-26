@@ -53,8 +53,8 @@ export default function PriorityDonut({
       title={t("dashboard:charts.byPriority")}
       hint={t("dashboard:charts.byPriorityHint", { count: total })}
     >
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-        <div className="relative mx-auto size-32 shrink-0 sm:mx-0">
+      <div className="flex flex-col gap-4 @3xs:flex-row @3xs:items-center">
+        <div className="relative mx-auto size-32 shrink-0 @3xs:mx-0">
           <svg viewBox="0 0 100 100" aria-hidden="true" className="size-32">
             <circle
               cx="50"
@@ -81,7 +81,9 @@ export default function PriorityDonut({
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span className="font-semibold text-xl tabular-nums">{total}</span>
-            <span className="text-muted-foreground text-[10px]">open</span>
+            <span className="text-muted-foreground text-[10px]">
+              {t("dashboard:charts.openTotal")}
+            </span>
           </div>
         </div>
 
