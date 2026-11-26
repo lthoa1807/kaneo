@@ -30,7 +30,9 @@ export default function PriorityDonut({
   onOpen,
 }: {
   series: DashboardSummary["charts"]["byPriority"];
-  onOpen: (priority: string) => void;
+  onOpen: (
+    priority: DashboardSummary["charts"]["byPriority"][number]["priority"],
+  ) => void;
 }) {
   const { t } = useTranslation();
   const total = series.reduce((sum, row) => sum + row.count, 0);

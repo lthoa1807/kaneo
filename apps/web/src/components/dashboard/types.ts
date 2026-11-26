@@ -7,9 +7,9 @@ export type DashboardBucket = Awaited<
 >;
 export type DashboardTaskRow = DashboardBucket["items"][number];
 
-/** Same filters the footer link carries into the Tasks page. */
+/** Same filters a chart segment uses to ask for its drilldown bucket. */
 export type DrillFilters = {
-  priority?: string;
+  priority?: DashboardSummary["charts"]["byPriority"][number]["priority"];
   projectId?: string;
   day?: string;
 };
