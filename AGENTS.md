@@ -49,6 +49,14 @@ The common mistake is finishing one path while leaving another stale. Check the 
 
 Use the smallest proof that covers the behavior. Focused tests and the affected package's typecheck usually suffice; use integration tests for routing, authorization, PostgreSQL, and migrations. For realtime changes, check the event-to-WebSocket-to-cache path. Use a real browser for user-visible flows when requested or when it is the only meaningful proof. Run repo-wide checks for broad cross-package changes or before a requested commit or pull request. Report what ran.
 
+After changing `docs/dashboard/prototype/overview.html`, run `plannotator annotate` on it and wait for the owner's feedback before reporting the change as done. The owner asked for this on 2026-11-26 and should not have to ask again.
+
+Every review the owner asks for (prototype, spec, plan, diff) goes through the
+`plannotator` skill, not ad-hoc chat review: load that skill, pick the matching
+command (`annotate` for documents and prototypes, `review` for code), and relay
+its stdout. Reopen a live session with `plannotator sessions --open` when the
+tab was closed; start a new one when it has already ended.
+
 This checkout runs in WSL with about 9.7 GB RAM. Full `apps/web` suites and package-wide `tsc` can exhaust memory and stall the session; run one heavy job at a time and prefer focused tests. See `docs/superpowers/notes/session-learnings.md` before running full-suite, build, or repo-wide lint commands.
 
 Keep comments for constraints and surprising decisions. Update this guide only when a recurring failure shows that an agent needs a durable rule.
