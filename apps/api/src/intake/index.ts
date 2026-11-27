@@ -261,11 +261,12 @@ const intake = apiRouter<BaseVariables & { workspaceId: string }>()
   )
   .openapi(listIntakeRequestsRoute, async (c) => {
     const { workspaceId } = c.req.valid("param");
-    const { projectId, status, page, limit } = c.req.valid("query");
+    const { projectId, status, group, page, limit } = c.req.valid("query");
     return c.json(
       await listIntakeRequests(c, workspaceId, {
         projectId,
         status,
+        group,
         page,
         limit,
       }),

@@ -1,4 +1,5 @@
 import { pagingNumber, z } from "../openapi";
+import { INTAKE_GROUP_VALUES } from "./intake-groups";
 import { intakeStatusSchema } from "./response";
 
 export const requestIdParam = z.object({ requestId: z.string() });
@@ -12,6 +13,10 @@ export const createIntakeRequestBody = z.object({
 export const listIntakeRequestsQuery = z.object({
   projectId: z.string().optional(),
   status: intakeStatusSchema.optional(),
+  group: z.enum(INTAKE_GROUP_VALUES).optional().openapi({
+    description:
+      "Guest portal group. `all` includes finished requests; waiting/in_progress/awaiting only cover open work. Counts ignore this filter.",
+  }),
   page: pagingNumber(1, 1_000_000, 1),
   limit: pagingNumber(1, 100, 20),
 });
