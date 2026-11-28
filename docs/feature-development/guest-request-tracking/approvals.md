@@ -23,7 +23,7 @@ Review: implementation-plan.md (review sheet: review/gate-G3.md)
 
 ## G4 · Final acceptance
 Review: review/final-acceptance-report.md (review sheet: review/gate-G4.md)
-- [ ] **APPROVE G4** | by: ________ | date: ____-__-__ <!-- gate:G4 -->
+- [x] **APPROVE G4** | by: HOALT | date: 2026-11-28 | via: chat | quote: "Approve" <!-- gate:G4 -->
 
 ## P1 · API counts, group filter, list order · authorization (attempt 1)
 Scope: apps/api/src/intake/**, tests/api-integration/intake-list-and-detail.test.ts, apps/docs/openapi.json

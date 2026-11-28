@@ -3,7 +3,7 @@
 Feature: guest-request-tracking
 Profile: full
 Overall Status: IN_PROGRESS
-Stage: S5
+Stage: S6
 Branch: feature/guest-request-tracking
 
 ## Gates (from approvals.md)
@@ -17,9 +17,9 @@ Branch: feature/guest-request-tracking
 |---|---|---|---|
 | P1 | API counts, group filter, list order | APPROVED | 5967b22f0503738e13a93fa97a165e1981547c19 |
 | P2 | Guest portal summary, group filter, show all | APPROVED | 5506af9e21874ce7aa0cc301ffd45ed591a0cf9c |
-| P3 | Guest detail stepper, activity copy, Need feedback loop | REVIEW_REQUIRED | - |
+| P3 | Guest detail stepper, activity copy, Need feedback loop | APPROVED | 5b6aee2a613b47b1a9764f10f13c135c163b06a2 |
 
 ## Waiting for you (edit docs/feature-development/guest-request-tracking/approvals.md)
-- P3 review: tick "P3.review.2.approve" or "P3.review.2.changes" (diff: review/p03-diff.md)
+- (nothing)
 
-Updated: 2026-11-28T09:58:12.545Z
+Updated: 2026-11-28T10:34:09.784Z
