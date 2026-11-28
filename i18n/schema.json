@@ -17731,6 +17731,50 @@
 								"delivered"
 							]
 						},
+						"stepper": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"label": {
+									"type": "string"
+								},
+								"submitted": {
+									"type": "string"
+								},
+								"received": {
+									"type": "string"
+								},
+								"inProgress": {
+									"type": "string"
+								},
+								"awaiting": {
+									"type": "string"
+								},
+								"completed": {
+									"type": "string"
+								},
+								"rejected": {
+									"type": "string"
+								},
+								"revisionNote": {
+									"type": "string"
+								},
+								"rejectedNote": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"label",
+								"submitted",
+								"received",
+								"inProgress",
+								"awaiting",
+								"completed",
+								"rejected",
+								"revisionNote",
+								"rejectedNote"
+							]
+						},
 						"revisionTitle": {
 							"type": "string"
 						},
@@ -17765,6 +17809,7 @@
 					"required": [
 						"descriptionEmpty",
 						"action",
+						"stepper",
 						"revisionTitle",
 						"revisionDescription",
 						"confirmedOn",
@@ -17775,6 +17820,62 @@
 						"tasksProgress",
 						"activity",
 						"activityEmpty"
+					]
+				},
+				"activity": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"you": {
+							"type": "string"
+						},
+						"team": {
+							"type": "string"
+						},
+						"created": {
+							"type": "string"
+						},
+						"received": {
+							"type": "string"
+						},
+						"started": {
+							"type": "string"
+						},
+						"delivered": {
+							"type": "string"
+						},
+						"deliveredWithNote": {
+							"type": "string"
+						},
+						"deliveredAgain": {
+							"type": "string"
+						},
+						"deliveredAgainNoNote": {
+							"type": "string"
+						},
+						"feedback": {
+							"type": "string"
+						},
+						"confirmed": {
+							"type": "string"
+						},
+						"rejected": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"you",
+						"team",
+						"created",
+						"received",
+						"started",
+						"delivered",
+						"deliveredWithNote",
+						"deliveredAgain",
+						"deliveredAgainNoNote",
+						"feedback",
+						"confirmed",
+						"rejected"
 					]
 				},
 				"form": {
@@ -17924,6 +18025,12 @@
 						"priority": {
 							"type": "string"
 						},
+						"deliverTitle": {
+							"type": "string"
+						},
+						"deliverDescription": {
+							"type": "string"
+						},
 						"rejectTitle": {
 							"type": "string"
 						},
@@ -17946,6 +18053,8 @@
 						"taskTitle",
 						"status",
 						"priority",
+						"deliverTitle",
+						"deliverDescription",
 						"rejectTitle",
 						"rejectDescription"
 					]
@@ -17956,6 +18065,7 @@
 				"list",
 				"portal",
 				"detail",
+				"activity",
 				"form",
 				"note",
 				"errors",

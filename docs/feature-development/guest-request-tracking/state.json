@@ -50,26 +50,29 @@
 				"AGENTS.md": "71ead8b44da7c4dffd3e588cd739384a16f632e3",
 				"REPO_MAP.md": "4183b2c36dcab35854ac91fe968671e479396d8d"
 			},
-			"commit": null,
+			"commit": "5506af9e21874ce7aa0cc301ffd45ed591a0cf9c",
 			"blocked_reason": null,
 			"status_before_block": null
 		},
 		{
 			"id": "P3",
 			"name": "Guest detail stepper, activity copy, Need feedback loop",
-			"status": "PENDING",
+			"status": "REVIEW_REQUIRED",
 			"depends_on": [],
-			"scope": ["apps/web/src/components/intake/**", "i18n/en-US.json"],
-			"starts": 0,
-			"rounds": 0,
+			"scope": ["apps/web/src/components/intake/**", "i18n/**"],
+			"starts": 2,
+			"rounds": 2,
 			"blocks": 0,
-			"base_sha": null,
-			"baseline_dirty": [],
-			"baseline_hashes": {},
+			"base_sha": "5506af9e21874ce7aa0cc301ffd45ed591a0cf9c",
+			"baseline_dirty": ["AGENTS.md", "REPO_MAP.md"],
+			"baseline_hashes": {
+				"AGENTS.md": "71ead8b44da7c4dffd3e588cd739384a16f632e3",
+				"REPO_MAP.md": "4183b2c36dcab35854ac91fe968671e479396d8d"
+			},
 			"commit": null,
 			"blocked_reason": null,
 			"status_before_block": null
 		}
 	],
-	"updated_at": "2026-11-28T02:54:37.680Z"
+	"updated_at": "2026-11-28T09:58:12.545Z"
 }

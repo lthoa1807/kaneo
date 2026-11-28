@@ -31,7 +31,7 @@ Scope: apps/api/src/intake/**, tests/api-integration/intake-list-and-detail.test
 
 ## P3 · Guest detail stepper, activity copy, Need feedback loop · authorization (attempt 1)
 Scope: apps/web/src/components/intake/**, i18n/en-US.json
-- [ ] **AUTHORIZE the agent to start P3** | by: ________ | date: ____-__-__ <!-- gate:P3.authorize.1 -->
+- [x] **AUTHORIZE the agent to start P3** | by: HOALT | date: 2026-11-28 | via: chat | quote: "Cho phép bắt đầu P3 (Recommended)" <!-- gate:P3.authorize.1 -->
 
 ## P1 · API counts, group filter, list order · review round 1
 Report: execution/p01.md · diff: review/p01-diff.md · code review: review/p01-review.md
@@ -48,3 +48,19 @@ Report: execution/p02.md · diff: review/p02-diff.md · code review: review/p02-
 - [x] **APPROVE P2** | by: HOALT | date: 2026-11-28 | via: chat | quote: "approve P2" <!-- gate:P2.review.1.approve -->
 - [ ] **REQUEST CHANGES on P2** (write what to change in notes) | by: ________ | date: ____-__-__ | notes: ________ <!-- gate:P2.review.1.changes -->
 - [x] **ALLOW THE AGENT TO COMMIT P2** (optional: leave unticked to commit yourself) | by: HOALT | date: 2026-11-28 | via: chat | quote: "ok" <!-- gate:P2.review.1.commit -->
+
+## P3 · Guest detail stepper, activity copy, Need feedback loop · review round 1
+Report: execution/p03.md · diff: review/p03-diff.md · code review: review/p03-review.md
+- [ ] **APPROVE P3** | by: ________ | date: ____-__-__ <!-- gate:P3.review.1.approve -->
+- [x] **REQUEST CHANGES on P3** (write what to change in notes) | by: HOALT | date: 2026-11-28 | via: chat | quote: "THỰC HIỆN FIX THEO REVIEW" | notes: F1: note ở lần deliver đầu bị ẩn khỏi activity; F2: deliver lại không note render câu cụt 'again: '. Giữ P03-5 (ẩn task_linked) như plan; F3 để nguyên (pre-existing). <!-- gate:P3.review.1.changes -->
+- [ ] **ALLOW THE AGENT TO COMMIT P3** (optional: leave unticked to commit yourself) | by: ________ | date: ____-__-__ <!-- gate:P3.review.1.commit -->
+
+## P3 · Guest detail stepper, activity copy, Need feedback loop · authorization (attempt 2)
+Scope: apps/web/src/components/intake/**, i18n/en-US.json
+- [x] **AUTHORIZE the agent to start P3** | by: HOALT | date: 2026-11-28 | via: chat | quote: "THỰC HIỆN FIX THEO REVIEW" <!-- gate:P3.authorize.2 -->
+
+## P3 · Guest detail stepper, activity copy, Need feedback loop · review round 2
+Report: execution/p03.md · diff: review/p03-diff.md · code review: review/p03-review.md
+- [x] **APPROVE P3** | by: HOALT | date: 2026-11-28 | via: plannotator | quote: "Code review completed — no changes requested." <!-- gate:P3.review.2.approve -->
+- [ ] **REQUEST CHANGES on P3** (write what to change in notes) | by: ________ | date: ____-__-__ | notes: ________ <!-- gate:P3.review.2.changes -->
+- [x] **ALLOW THE AGENT TO COMMIT P3** (optional: leave unticked to commit yourself) | by: HOALT | date: 2026-11-28 | via: chat | quote: "thực hiện commit" <!-- gate:P3.review.2.commit -->

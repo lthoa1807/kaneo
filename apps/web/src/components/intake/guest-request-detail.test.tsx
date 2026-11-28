@@ -63,6 +63,10 @@ vi.mock("@/lib/toast", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
 }));
 
+vi.mock("@/lib/auth-client", () => ({
+  authClient: { useSession: () => ({ data: { user: { id: "guest-1" } } }) },
+}));
+
 const { GuestRequestDetail } = await import("./guest-request-detail");
 
 beforeEach(() => {
@@ -134,6 +138,12 @@ describe("GuestRequestDetail", () => {
     expect(screen.getByText("intake:detail.confirmedOn")).toBeTruthy();
     request.status = "delivered";
     request.confirmedAt = null;
+  });
+
+  it("shows the lifecycle stepper on the guest detail", () => {
+    renderDetail();
+
+    expect(screen.getByText("intake:detail.stepper.label")).toBeTruthy();
   });
 
   it("never renders linked task internals", () => {

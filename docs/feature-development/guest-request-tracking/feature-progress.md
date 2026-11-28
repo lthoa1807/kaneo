@@ -16,10 +16,10 @@ Branch: feature/guest-request-tracking
 | Phase | Name | Status | Commit |
 |---|---|---|---|
 | P1 | API counts, group filter, list order | APPROVED | 5967b22f0503738e13a93fa97a165e1981547c19 |
-| P2 | Guest portal summary, group filter, show all | REVIEW_REQUIRED | - |
-| P3 | Guest detail stepper, activity copy, Need feedback loop | PENDING | - |
+| P2 | Guest portal summary, group filter, show all | APPROVED | 5506af9e21874ce7aa0cc301ffd45ed591a0cf9c |
+| P3 | Guest detail stepper, activity copy, Need feedback loop | REVIEW_REQUIRED | - |
 
 ## Waiting for you (edit docs/feature-development/guest-request-tracking/approvals.md)
-- P2 review: tick "P2.review.1.approve" or "P2.review.1.changes" (diff: review/p02-diff.md)
+- P3 review: tick "P3.review.2.approve" or "P3.review.2.changes" (diff: review/p03-diff.md)
 
-Updated: 2026-11-28T02:54:37.680Z
+Updated: 2026-11-28T09:58:12.545Z

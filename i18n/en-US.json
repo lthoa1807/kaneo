@@ -4248,15 +4248,26 @@
 			"descriptionEmpty": "No description",
 			"action": {
 				"confirmed": "Looks good, confirm",
-				"needs_revision": "Request changes",
+				"needs_revision": "Need feedback",
 				"triaged": "Mark reviewed",
 				"approved": "Approve",
 				"rejected": "Reject",
 				"in_progress": "Start work",
 				"delivered": "Mark delivered"
 			},
-			"revisionTitle": "Request changes",
-			"revisionDescription": "Tell us what needs to change. We will pick the request up again.",
+			"stepper": {
+				"label": "Progress",
+				"submitted": "Submitted",
+				"received": "Received",
+				"inProgress": "In progress",
+				"awaiting": "Awaiting your confirmation",
+				"completed": "Completed",
+				"rejected": "Rejected",
+				"revisionNote": "You sent feedback",
+				"rejectedNote": "This request was rejected"
+			},
+			"revisionTitle": "Need feedback",
+			"revisionDescription": "Tell us what needs to change. We will deliver this request again.",
 			"confirmedOn": "Confirmed on {{date}}",
 			"created": "Request created",
 			"status_changed": "Status changed",
@@ -4265,6 +4276,20 @@
 			"tasksProgress": "{{done}} of {{total}} tasks done",
 			"activity": "Activity",
 			"activityEmpty": "No activity yet"
+		},
+		"activity": {
+			"you": "You",
+			"team": "Team",
+			"created": "{{actor}} created this request",
+			"received": "{{actor}} received this request",
+			"started": "{{actor}} started working on this request",
+			"delivered": "{{actor}} delivered this request for your review",
+			"deliveredWithNote": "{{actor}} delivered this request for your review: {{note}}",
+			"deliveredAgain": "{{actor}} delivered this request again: {{note}}",
+			"deliveredAgainNoNote": "{{actor}} delivered this request again",
+			"feedback": "{{actor}} sent feedback: {{note}}",
+			"confirmed": "{{actor}} confirmed this request",
+			"rejected": "{{actor}} rejected this request: {{note}}"
 		},
 		"form": {
 			"title": "New request",
@@ -4309,6 +4334,8 @@
 			"taskTitle": "Task title",
 			"status": "Status",
 			"priority": "Priority",
+			"deliverTitle": "Deliver request",
+			"deliverDescription": "Add a reply for the guest. They will see it in the activity.",
 			"rejectTitle": "Reject request",
 			"rejectDescription": "Tell the guest why this request is rejected. The note appears in their activity."
 		}

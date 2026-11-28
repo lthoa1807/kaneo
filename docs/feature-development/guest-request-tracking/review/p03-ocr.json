@@ -1,0 +1,140 @@
+{
+	"schema_version": "1",
+	"tool": "open-code-review (delegate mode)",
+	"mode": "delegate",
+	"delegate_commands": [
+		"ocr delegate preview --format json --exclude 'docs/feature-development,AGENTS.md,REPO_MAP.md'",
+		"ocr delegate rule --format json apps/web/src/components/intake i18n/en-US.json"
+	],
+	"delegate_spec": {
+		"preview": "/tmp/opencode/p03-ocr-preview.json",
+		"rules": "/tmp/opencode/p03-ocr-rules.json",
+		"rule_groups": 2
+	},
+	"repository": "/home/hoalt/ghcr/kaneo",
+	"base_commit": "5506af9e21874ce7aa0cc301ffd45ed591a0cf9c",
+	"scope": [
+		"apps/web/src/components/intake/**",
+		"i18n/en-US.json",
+		"i18n/schema.json",
+		"i18n/*.json (i18n:check:fix)"
+	],
+	"reviewed_by": "delegated host agent (tokenRouter-Deepseek4.1flash-free)",
+	"findings": [
+		{
+			"id": "P03-1",
+			"severity": "Medium",
+			"file": "apps/web/src/components/intake/intake-activity-list.tsx",
+			"line": 87,
+			"problem": "The component tracks delivery order with a counter that is reassigned inside the render callback, so React Compiler refuses to optimize the component and `vp check` reports an immutability error.",
+			"why": "The phase gate runs lint; a repo-wide gate would fail on this file.",
+			"fix": "Precompute a Map<id, ordinal> with a plain for loop before returning, and read from it inside the map.",
+			"resolved": true,
+			"source": "own reading (vp check)"
+		},
+		{
+			"id": "P03-2",
+			"severity": "Low",
+			"file": "apps/web/src/components/intake/intake-activity-list.tsx",
+			"line": 52,
+			"problem": "An unmapped status_changed without a note returned null, so a future transition would silently disappear from the guest timeline.",
+			"why": "The activity timeline is the guest's only record of the request; dropping an entry is worse than a generic label.",
+			"fix": "Fall back to the existing `intake:detail.status_changed` label instead of null.",
+			"resolved": true,
+			"source": "own reading (forward compatibility)"
+		},
+		{
+			"id": "P03-3",
+			"severity": "Low",
+			"file": "apps/web/src/components/intake/guest-request-detail.tsx",
+			"line": 35,
+			"problem": "The loading state did not reserve a line for the stepper, although the approved ui-spec lists a one-line stepper skeleton to avoid layout shift.",
+			"why": "The detail jumps by roughly one block when the request lands.",
+			"fix": "Added one `h-4 w-1/2` skeleton between title and body.",
+			"resolved": true,
+			"source": "own reading (ui-spec Loading row)"
+		},
+		{
+			"id": "P03-4",
+			"severity": "Low",
+			"file": "apps/web/src/components/intake/intake-stepper.tsx",
+			"line": 28,
+			"problem": "The rejected branch always marks Submitted and Received as done, even when a request is rejected directly from `new` (before triage).",
+			"why": "The prototype and ui-spec prescribe exactly this three-step branch, but the detail response carries only the current status, so the UI cannot know where the rejection happened.",
+			"fix": "Kept as designed (ui-spec v14, prototype stepStates). Changing it needs an approved design change; the activity timeline still shows the true transition.",
+			"resolved": false,
+			"accepted": true,
+			"source": "own reading (design compliance)"
+		},
+		{
+			"id": "P03-5",
+			"severity": "Low",
+			"file": "apps/web/src/components/intake/intake-activity-list.tsx",
+			"line": 70,
+			"problem": "`task_linked` is now filtered out for staff as well, because the list component is shared. Requirement §9 allows only the optional-note dialog as a staff change.",
+			"why": "Staff lose one activity line about linking a task, although the linked-tasks section still lists every linked task.",
+			"fix": "Kept because the P3 plan says to hide `task_linked` and the guest API already filters it; listed here so the gate can decide. Adding a guest-only prop is the alternative.",
+			"resolved": false,
+			"accepted": true,
+			"source": "own reading (scope)"
+		},
+		{
+			"id": "P03-6",
+			"severity": "Low",
+			"file": "apps/web/src/components/intake/intake-request-detail.tsx",
+			"line": 26,
+			"problem": "The shared detail now reads the session to map activity actors, so both guest and staff detail mount `authClient.useSession()`.",
+			"why": "One extra session read per detail; better-auth serves it from its store, and no request data crosses the boundary.",
+			"fix": "Accepted: the actor cannot be derived from the intake response (it holds only `createdById`), and this is the same hook other web components use.",
+			"resolved": false,
+			"accepted": true,
+			"source": "own reading (performance)"
+		},
+		{
+			"id": "P03-7",
+			"severity": "Low",
+			"file": "i18n/en-US.json",
+			"line": 4269,
+			"problem": "The guest dialog keys are still named `revisionTitle`/`revisionDescription` while the copy is now \"Need feedback\"; `i18n/schema.json` was stale after adding keys.",
+			"why": "Names no longer match the vocabulary the product uses.",
+			"fix": "Kept the key names to avoid churn across 20 locales (values changed only), and regenerated `i18n/schema.json` with `pnpm i18n:schema`.",
+			"resolved": false,
+			"accepted": true,
+			"source": "own reading (maintainability)"
+		},
+		{
+			"id": "F1",
+			"severity": "Medium",
+			"file": "apps/web/src/components/intake/intake-activity-list.tsx",
+			"line": 51,
+			"problem": "The staff dialog invites a reply on every delivery, but the activity only rendered the note for the second and later deliveries; a first-delivery note was stored and never shown to the guest.",
+			"why": "The guest could not read a reply the UI explicitly asked staff to write (AC-17).",
+			"fix": "`delivered` with a note now uses `intake:activity.deliveredWithNote` (`…for your review: {{note}}`).",
+			"resolved": true,
+			"source": "round 2 (user asked for open code review)"
+		},
+		{
+			"id": "F2",
+			"severity": "Medium",
+			"file": "apps/web/src/components/intake/intake-activity-list.tsx",
+			"line": 43,
+			"problem": "The deliver note is optional, so a repeat delivery without a note rendered `\"Team delivered this request again: \"` with a dangling colon.",
+			"why": "Copy bug visible in the guest timeline whenever staff re-delivered without a reply.",
+			"fix": "Added `intake:activity.deliveredAgainNoNote`; the code now picks the copy from the note.",
+			"resolved": true,
+			"source": "round 2 (user asked for open code review)"
+		},
+		{
+			"id": "F3",
+			"severity": "Low",
+			"file": "apps/web/src/components/intake/intake-activity-list.tsx",
+			"line": 73,
+			"problem": "Types without a copy key (`revision_requested`, `note_added`) fall back to `intake:detail.<type>` and would render the raw key.",
+			"why": "The API never writes those types today, so it cannot happen yet.",
+			"fix": "Left as-is; pre-existing, recorded for a later cleanup.",
+			"resolved": false,
+			"accepted": true,
+			"source": "round 2 (pre-existing)"
+		}
+	]
+}
