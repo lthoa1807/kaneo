@@ -5338,7 +5338,14 @@
 		"list": {
 			"empty": "No requests yet",
 			"loadError": "Could not load requests",
-			"retry": "Try again"
+			"retry": "Try again",
+			"columns": {
+				"id": "ID",
+				"project": "Project",
+				"received": "Received",
+				"request": "Request",
+				"status": "Status"
+			}
 		},
 		"note": {
 			"confirm": "Confirm",
@@ -5358,7 +5365,23 @@
 			"all": "All",
 			"nav": "My requests",
 			"newRequest": "New request",
-			"title": "My requests"
+			"title": "My requests",
+			"active": "active",
+			"banner_other": "{{count}} requests are ready for your confirmation",
+			"bannerAction": "Review",
+			"emptyGroup": "No requests in this group.",
+			"group": {
+				"all": "All requests",
+				"awaiting": "Awaiting your confirmation",
+				"in_progress": "In progress",
+				"waiting": "Waiting for review"
+			},
+			"overview": "Overview",
+			"overviewHint_other": "{{count}} requests",
+			"showAll": "Show all {{total}} requests",
+			"showAllLoading": "Loading…",
+			"bannerTitle": "Requests awaiting your confirmation",
+			"legendName_other": "{{label}}: {{count}} requests"
 		},
 		"staff": {
 			"attachDescription": "Create the task that fulfils this request. It stays linked to the request.",

@@ -25,28 +25,31 @@
 				"AGENTS.md": "71ead8b44da7c4dffd3e588cd739384a16f632e3",
 				"REPO_MAP.md": "4183b2c36dcab35854ac91fe968671e479396d8d"
 			},
-			"commit": null,
+			"commit": "5967b22f0503738e13a93fa97a165e1981547c19",
 			"blocked_reason": null,
 			"status_before_block": null
 		},
 		{
 			"id": "P2",
 			"name": "Guest portal summary, group filter, show all",
-			"status": "PENDING",
+			"status": "REVIEW_REQUIRED",
 			"depends_on": ["P1"],
 			"scope": [
 				"apps/web/src/components/intake/**",
 				"apps/web/src/fetchers/intake/**",
 				"apps/web/src/hooks/queries/intake/**",
 				"apps/web/src/routes/**",
-				"i18n/en-US.json"
+				"i18n/**"
 			],
-			"starts": 0,
-			"rounds": 0,
+			"starts": 1,
+			"rounds": 1,
 			"blocks": 0,
-			"base_sha": null,
-			"baseline_dirty": [],
-			"baseline_hashes": {},
+			"base_sha": "5967b22f0503738e13a93fa97a165e1981547c19",
+			"baseline_dirty": ["AGENTS.md", "REPO_MAP.md"],
+			"baseline_hashes": {
+				"AGENTS.md": "71ead8b44da7c4dffd3e588cd739384a16f632e3",
+				"REPO_MAP.md": "4183b2c36dcab35854ac91fe968671e479396d8d"
+			},
 			"commit": null,
 			"blocked_reason": null,
 			"status_before_block": null
@@ -68,5 +71,5 @@
 			"status_before_block": null
 		}
 	],
-	"updated_at": "2026-11-27T17:45:20.210Z"
+	"updated_at": "2026-11-28T02:54:37.680Z"
 }

@@ -12152,6 +12152,9 @@
 						},
 						"invitePeople": {
 							"type": "string"
+						},
+						"overview": {
+							"type": "string"
 						}
 					},
 					"required": [
@@ -12163,7 +12166,8 @@
 						"home",
 						"inbox",
 						"myTasks",
-						"invitePeople"
+						"invitePeople",
+						"overview"
 					]
 				},
 				"projectList": {
@@ -17532,9 +17536,31 @@
 						},
 						"retry": {
 							"type": "string"
+						},
+						"columns": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"id": {
+									"type": "string"
+								},
+								"request": {
+									"type": "string"
+								},
+								"project": {
+									"type": "string"
+								},
+								"status": {
+									"type": "string"
+								},
+								"received": {
+									"type": "string"
+								}
+							},
+							"required": ["id", "request", "project", "status", "received"]
 						}
 					},
-					"required": ["empty", "loadError", "retry"]
+					"required": ["empty", "loadError", "retry", "columns"]
 				},
 				"portal": {
 					"type": "object",
@@ -17551,9 +17577,116 @@
 						},
 						"newRequest": {
 							"type": "string"
+						},
+						"overview": {
+							"type": "string"
+						},
+						"overviewHint_one": {
+							"type": "string"
+						},
+						"overviewHint_zero": {
+							"type": "string"
+						},
+						"overviewHint_two": {
+							"type": "string"
+						},
+						"overviewHint_few": {
+							"type": "string"
+						},
+						"overviewHint_many": {
+							"type": "string"
+						},
+						"overviewHint_other": {
+							"type": "string"
+						},
+						"active": {
+							"type": "string"
+						},
+						"group": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"waiting": {
+									"type": "string"
+								},
+								"in_progress": {
+									"type": "string"
+								},
+								"awaiting": {
+									"type": "string"
+								},
+								"all": {
+									"type": "string"
+								}
+							},
+							"required": ["waiting", "in_progress", "awaiting", "all"]
+						},
+						"banner_one": {
+							"type": "string"
+						},
+						"banner_zero": {
+							"type": "string"
+						},
+						"banner_two": {
+							"type": "string"
+						},
+						"banner_few": {
+							"type": "string"
+						},
+						"banner_many": {
+							"type": "string"
+						},
+						"banner_other": {
+							"type": "string"
+						},
+						"bannerTitle": {
+							"type": "string"
+						},
+						"bannerAction": {
+							"type": "string"
+						},
+						"legendName_one": {
+							"type": "string"
+						},
+						"legendName_zero": {
+							"type": "string"
+						},
+						"legendName_two": {
+							"type": "string"
+						},
+						"legendName_few": {
+							"type": "string"
+						},
+						"legendName_many": {
+							"type": "string"
+						},
+						"legendName_other": {
+							"type": "string"
+						},
+						"showAll": {
+							"type": "string"
+						},
+						"showAllLoading": {
+							"type": "string"
+						},
+						"emptyGroup": {
+							"type": "string"
 						}
 					},
-					"required": ["nav", "title", "all", "newRequest"]
+					"required": [
+						"nav",
+						"title",
+						"all",
+						"newRequest",
+						"overview",
+						"active",
+						"group",
+						"bannerTitle",
+						"bannerAction",
+						"showAll",
+						"showAllLoading",
+						"emptyGroup"
+					]
 				},
 				"detail": {
 					"type": "object",
@@ -22677,6 +22810,248 @@
 				"labels",
 				"permissions"
 			]
+		},
+		"dashboard": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"title": {
+					"type": "string"
+				},
+				"subtitle": {
+					"type": "string"
+				},
+				"tiles": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"projects": {
+							"type": "string"
+						},
+						"members": {
+							"type": "string"
+						},
+						"myOpen": {
+							"type": "string"
+						},
+						"myOverdue": {
+							"type": "string"
+						},
+						"unassigned": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"projects",
+						"members",
+						"myOpen",
+						"myOverdue",
+						"unassigned"
+					]
+				},
+				"risk": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"overdue": {
+							"type": "string"
+						},
+						"dueSoon": {
+							"type": "string"
+						},
+						"urgentShare": {
+							"type": "string"
+						},
+						"urgentShare_zero": {
+							"type": "string"
+						},
+						"urgentShare_one": {
+							"type": "string"
+						},
+						"urgentShare_two": {
+							"type": "string"
+						},
+						"urgentShare_few": {
+							"type": "string"
+						},
+						"urgentShare_many": {
+							"type": "string"
+						},
+						"urgentShare_other": {
+							"type": "string"
+						},
+						"hint": {
+							"type": "string"
+						}
+					},
+					"required": ["title", "overdue", "dueSoon", "hint"]
+				},
+				"intake": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"hint": {
+							"type": "string"
+						},
+						"waiting": {
+							"type": "string"
+						},
+						"inProgress": {
+							"type": "string"
+						},
+						"age": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"today": {
+									"type": "string"
+								},
+								"days": {
+									"type": "string"
+								},
+								"days_zero": {
+									"type": "string"
+								},
+								"days_one": {
+									"type": "string"
+								},
+								"days_two": {
+									"type": "string"
+								},
+								"days_few": {
+									"type": "string"
+								},
+								"days_many": {
+									"type": "string"
+								},
+								"days_other": {
+									"type": "string"
+								}
+							},
+							"required": ["today"]
+						},
+						"viewAll": {
+							"type": "string"
+						},
+						"empty": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"title",
+						"hint",
+						"waiting",
+						"inProgress",
+						"age",
+						"viewAll",
+						"empty"
+					]
+				},
+				"charts": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"byPriority": {
+							"type": "string"
+						},
+						"byPriorityHint": {
+							"type": "string"
+						},
+						"byPriorityHint_zero": {
+							"type": "string"
+						},
+						"byPriorityHint_one": {
+							"type": "string"
+						},
+						"byPriorityHint_two": {
+							"type": "string"
+						},
+						"byPriorityHint_few": {
+							"type": "string"
+						},
+						"byPriorityHint_many": {
+							"type": "string"
+						},
+						"byPriorityHint_other": {
+							"type": "string"
+						},
+						"dueLoad": {
+							"type": "string"
+						},
+						"dueLoadHint": {
+							"type": "string"
+						},
+						"byProject": {
+							"type": "string"
+						},
+						"byProjectHint": {
+							"type": "string"
+						},
+						"openTotal": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"byPriority",
+						"dueLoad",
+						"dueLoadHint",
+						"byProject",
+						"byProjectHint",
+						"openTotal"
+					]
+				},
+				"drill": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"empty": {
+							"type": "string"
+						},
+						"cap": {
+							"type": "string"
+						},
+						"close": {
+							"type": "string"
+						},
+						"loading": {
+							"type": "string"
+						}
+					},
+					"required": ["title", "empty", "cap", "close", "loading"]
+				},
+				"error": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"retry": {
+							"type": "string"
+						}
+					},
+					"required": ["title", "retry"]
+				}
+			},
+			"required": [
+				"title",
+				"subtitle",
+				"tiles",
+				"risk",
+				"intake",
+				"charts",
+				"drill",
+				"error"
+			]
 		}
 	},
 	"required": [
@@ -22694,6 +23069,7 @@
 		"publicProject",
 		"press",
 		"landing",
-		"mobile"
+		"mobile",
+		"dashboard"
 	]
 }

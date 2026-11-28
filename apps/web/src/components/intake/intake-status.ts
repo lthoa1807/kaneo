@@ -19,10 +19,11 @@ export function isIntakeStatus(value: string): value is IntakeStatus {
   return (INTAKE_STATUSES as readonly string[]).includes(value);
 }
 
-// Badge tone per status; the label always comes from `intake:status.*`.
+// Badge tone per status; the label defaults to `intake:status.*` and can be
+// overridden by callers that show group wording to guests.
 export const INTAKE_STATUS_TONES = {
   new: "outline",
-  triaged: "info",
+  triaged: "outline",
   rejected: "error",
   approved: "success",
   in_progress: "warning",

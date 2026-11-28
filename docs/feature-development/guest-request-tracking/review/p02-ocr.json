@@ -1,0 +1,180 @@
+{
+	"schema_version": "1",
+	"tool": "open-code-review v1.14.4",
+	"mode": "delegate",
+	"delegate_commands": [
+		"ocr delegate preview --format json --exclude 'docs/feature-development,AGENTS.md,REPO_MAP.md'",
+		"ocr delegate rule --format json --exclude 'docs/feature-development,AGENTS.md,REPO_MAP.md' <P2 paths>"
+	],
+	"delegate_spec": {
+		"preview": "/tmp/opencode/p02-ocr-preview.json",
+		"rules": "/tmp/opencode/p02-ocr-rules.json",
+		"rule_groups": 2
+	},
+	"repository": "/home/hoalt/ghcr/kaneo",
+	"base_commit": "5967b22f0503738e13a93fa97a165e1981547c19",
+	"scope": [
+		"apps/web/src/components/intake/**",
+		"apps/web/src/fetchers/intake/**",
+		"apps/web/src/hooks/queries/intake/**",
+		"apps/web/src/routes/**",
+		"i18n/**"
+	],
+	"reviewed_by": "delegated host agent (tokenRouter-Deepseek4.1flash-free)",
+	"findings": [
+		{
+			"id": "P02-1",
+			"severity": "Medium",
+			"file": "apps/web/src/hooks/queries/intake/use-get-intake-requests.ts",
+			"line": 32,
+			"problem": "placeholderData was added to the shared hook, so every consumer keeps the previous response when the query key changes, not only GuestPortalPage. StaffIntakePage changes status and IntakeQueue changes workspaceId; with placeholder data isLoading stays false and neither consumer renders isPlaceholderData, so rows from the old filter are displayed as if they belong to the new one.",
+			"why": "Selecting 'Rejected' briefly shows rows of the previous tab with no loading or dimming affordance. On a slow self-hosted instance this can last seconds and a reviewer can act on the wrong list.",
+			"fix": "Opt in only for the guest portal, e.g. placeholderData: group === undefined ? undefined : (previousData) => previousData (staff never passes group), or add an explicit keepPreviousData argument passed only by GuestPortalPage; alternatively dim the staff list with isPlaceholderData.",
+			"source": "own reading (staff-consumer regression check)"
+		},
+		{
+			"id": "P02-2",
+			"severity": "Low",
+			"file": "apps/web/src/components/intake/guest-portal-page.tsx",
+			"line": 50,
+			"problem": "Page-1 items and extra-page items are merged without deduplicating across the two sources; the dedupe in useGetIntakeRequestPages only covers pages 2..N. Page 1 and page 2 poll independently every 30s, so a status change between the two responses can put the same request on both pages.",
+			"why": "Renders the request twice and produces a duplicate React key warning; items.length can also exceed the real row count used by the show-all condition. Transient but visible while polling.",
+			"fix": "Dedupe the merged list by id in GuestPortalPage before rendering and before the items.length < total check, e.g. [...new Map([...(requests.data?.items ?? []), ...(showAll ? extraPages.items : [])].map((item) => [item.id, item])).values()].",
+			"source": "own reading (pagination/polling race)"
+		},
+		{
+			"id": "P02-3",
+			"severity": "Low",
+			"file": "apps/web/src/components/intake/intake-summary.tsx",
+			"line": 100,
+			"problem": "The 'All requests' legend row hides its percent (showPercent = group !== 'all'), while the approved behaviour says each of the 4 filter buttons shows count and percent. Group percentages use the open-work total (total={active}) while the header count is counts.all, which includes finished requests.",
+			"why": "The summary shows one row without the promised percent, and percentages that do not relate to the total shown next to the heading; a guest with finished requests sees numbers that do not add up.",
+			"fix": "Confirm the approved design: render the All row's percent (100%) and label the denominator, or document that percents are shares of open work.",
+			"source": "own reading (spec compliance)"
+		},
+		{
+			"id": "P02-4",
+			"severity": "Low",
+			"file": "i18n/schema.json",
+			"line": 17556,
+			"problem": "The generated locale schema was not regenerated after adding the P2 keys. intake.portal.required is still ['nav','title','all','newRequest'] and has no properties for overview/group/banner/legend/showAll/emptyGroup or the new list columns, although CONTRIBUTING.md asks to run pnpm i18n:schema before a PR and earlier i18n commits updated this file.",
+			"why": "The published schema (editor/tooling validation, additionalProperties:false) rejects every new key, so translation tooling and editors report false errors. CI only runs i18n:check, so nothing catches it.",
+			"fix": "Run pnpm i18n:schema and commit the regenerated i18n/schema.json.",
+			"source": "own reading (repo convention)"
+		},
+		{
+			"id": "P02-5",
+			"severity": "Low",
+			"file": "apps/web/src/components/intake/guest-request-list.tsx",
+			"line": 42,
+			"problem": "The column header uses grid grid-cols-2 with five labels below the sm breakpoint, while each data row is flex flex-wrap; at 375px the labels land in a 2-column grid ('ID | Request', 'Project | Status', 'Received') that does not line up with the row content order.",
+			"why": "The header is misleading on phones: 'Status' sits next to 'Project' and 'Received' is orphaned, so the labels no longer identify the row fields.",
+			"fix": "Hide the header on small screens (hidden sm:grid) and keep the labels from sm up, where the five-column template applies; or give rows the same 2-column grid at mobile.",
+			"source": "own reading (375px layout check)"
+		},
+		{
+			"id": "P02-6",
+			"severity": "Low",
+			"file": "apps/web/src/components/intake/intake-status.ts",
+			"line": 22,
+			"problem": "The comment above INTAKE_STATUS_TONES still says 'the label always comes from intake:status.*', but IntakeStatusBadge now accepts a label override and the guest list passes intake:portal.group.* labels.",
+			"why": "A stale comment misleads the next reader about where badge text comes from (OCR delegate rule: comments should explain the code).",
+			"fix": "Update the comment to say the tone comes from the status while the label may be overridden (guest group wording).",
+			"source": "OCR delegate rule (Code Comments)"
+		},
+		{
+			"id": "P02-7",
+			"severity": "Low",
+			"file": "apps/web/src/components/intake/guest-portal-page.tsx",
+			"line": 154,
+			"problem": "A failed extra-page fetch is invisible: the pages hook combine exposes only items/isFetching/refetch, so when pages 2..N error the show-all button silently returns to its normal label and the loaded rows stay partial.",
+			"why": "Guests with more than one page get no error or retry hint when the second request fails (OCR delegate rule: null/error checks), and the 'Show all N requests' button looks like it did nothing.",
+			"fix": "Expose isError from the pages combine and render the existing intake:list.loadError + retry (or keep the button disabled with an error label) when it is set.",
+			"source": "OCR delegate rule (Null Checks) + own reading"
+		},
+		{
+			"id": "P02-8",
+			"severity": "Low",
+			"file": "apps/web/src/hooks/queries/intake/use-get-intake-request-pages.ts",
+			"line": 48,
+			"problem": "The new pages hook (page math + id dedupe) has no test; guest-portal-page.test.tsx mocks the hook away, so M3's dedupe and the 2..N page range are only exercised indirectly.",
+			"why": "The most bug-prone new logic (offsets, dedupe, empty totalPages) is the only P2 logic without a regression test.",
+			"fix": "Add a small unit test for the combine/page math (or renderHook with a mocked fetcher) covering totalPages 0/1/3 and a duplicated id.",
+			"source": "own reading (test coverage)"
+		}
+	],
+	"fixed_verification": [
+		{
+			"id": "M1",
+			"status": "FIXED",
+			"evidence": "guest-portal-page.tsx:52 ...(showAll ? extraPages.items : [])"
+		},
+		{
+			"id": "M2",
+			"status": "FIXED",
+			"evidence": "use-get-intake-requests.ts:32 placeholderData; guest-portal-page.tsx:128 opacity-60, :154 hide while isPlaceholderData (staff side effect filed as P02-1)"
+		},
+		{
+			"id": "M3",
+			"status": "FIXED",
+			"evidence": "use-get-intake-request-pages.ts:51-57 Map keyed by item.id in combine (page-1 overlap filed as P02-2)"
+		},
+		{
+			"id": "L1",
+			"status": "FIXED",
+			"evidence": "guest-portal-page.tsx:75-81 section aria-labelledby + sr-only h2#intake-banner-heading"
+		},
+		{
+			"id": "L2",
+			"status": "FIXED",
+			"evidence": "guest-portal-page.tsx:77 bg-secondary/40; :87 variant=ghost"
+		},
+		{
+			"id": "L3",
+			"status": "FIXED",
+			"evidence": "intake-summary.tsx:109 t('intake:portal.legendName', { label, count }); en-US legendName_one/_other"
+		},
+		{
+			"id": "L4",
+			"status": "FIXED",
+			"evidence": "intake-summary.tsx:112 touch-hitbox + focus-visible:outline-offset-2"
+		},
+		{
+			"id": "L5",
+			"status": "FIXED",
+			"evidence": "guest-portal-page.tsx:100 h-11 skeleton vs 44px rows; intake-summary.tsx:153/156 h-8 vs min-h-8 buttons"
+		},
+		{
+			"id": "L6",
+			"status": "FIXED",
+			"evidence": "intake-status.ts:25 triaged: 'outline'"
+		},
+		{
+			"id": "L7",
+			"status": "FIXED",
+			"evidence": "intake-groups.test.ts and guest-portal-page.test.tsx (filter/keep counts, show-all reset, list content); 35 tests pass"
+		}
+	],
+	"checks": {
+		"tests": {
+			"command": "cd apps/web && pnpm exec vp test run src/components/intake src/components/dashboard/intake-queue.test.tsx",
+			"result": "7 files, 35 tests passed"
+		},
+		"i18n_check": {
+			"command": "pnpm i18n:check",
+			"result": "all locale files in sync with en-US"
+		},
+		"i18n_json": {
+			"result": "22 JSON files parse; no duplicate keys; plural categories and placeholders intact in 21 locales"
+		},
+		"lint_format": {
+			"command": "pnpm exec vp check <changed web paths>",
+			"result": "33 files correctly formatted, no warnings or lint errors"
+		},
+		"not_run": [
+			"apps/web typecheck (known memory trap on this WSL box; left to CI)",
+			"real browser render at 375px/960px"
+		]
+	},
+	"verdict": "CHANGES NEEDED"
+}

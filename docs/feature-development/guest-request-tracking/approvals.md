@@ -38,3 +38,13 @@ Report: execution/p01.md · diff: review/p01-diff.md · code review: review/p01-
 - [x] **APPROVE P1** | by: HOALT | date: 2026-11-27 | via: plannotator | quote: "Code review completed — no changes requested." <!-- gate:P1.review.1.approve -->
 - [ ] **REQUEST CHANGES on P1** (write what to change in notes) | by: ________ | date: ____-__-__ | notes: ________ <!-- gate:P1.review.1.changes -->
 - [x] **ALLOW THE AGENT TO COMMIT P1** (optional: leave unticked to commit yourself) | by: HOALT | date: 2026-11-27 | via: chat | quote: "commit phase 1" <!-- gate:P1.review.1.commit -->
+
+## P2 · Guest portal summary, group filter, show all · authorization (attempt 1)
+Scope: apps/web/src/components/intake/**, apps/web/src/fetchers/intake/**, apps/web/src/hooks/queries/intake/**, apps/web/src/routes/**, i18n/en-US.json
+- [x] **AUTHORIZE the agent to start P2** | by: HOALT | date: 2026-11-28 | via: chat | quote: "ok hãy thực hiện P2" <!-- gate:P2.authorize.1 -->
+
+## P2 · Guest portal summary, group filter, show all · review round 1
+Report: execution/p02.md · diff: review/p02-diff.md · code review: review/p02-review.md
+- [x] **APPROVE P2** | by: HOALT | date: 2026-11-28 | via: chat | quote: "approve P2" <!-- gate:P2.review.1.approve -->
+- [ ] **REQUEST CHANGES on P2** (write what to change in notes) | by: ________ | date: ____-__-__ | notes: ________ <!-- gate:P2.review.1.changes -->
+- [x] **ALLOW THE AGENT TO COMMIT P2** (optional: leave unticked to commit yourself) | by: HOALT | date: 2026-11-28 | via: chat | quote: "ok" <!-- gate:P2.review.1.commit -->
