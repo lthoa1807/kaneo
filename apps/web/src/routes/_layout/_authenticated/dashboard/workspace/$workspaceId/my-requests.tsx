@@ -22,7 +22,7 @@ function RouteComponent() {
       <PageTitle title={t("intake:portal.title")} />
       <WorkspaceLayout title={t("intake:portal.title")}>
         <div className="h-full overflow-y-auto">
-          <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6">
+          <div className="mx-auto w-full max-w-[60rem] px-4 py-6 sm:px-6">
             <IntakeAccessGate
               allowed={surfaces.guestPortal}
               ready={ready}

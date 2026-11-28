@@ -50,6 +50,17 @@ export const intakeRequestListItemSchema = intakeRequestSchema.extend({
 export const intakeRequestListSchema = z.object({
   items: z.array(intakeRequestListItemSchema),
   total: z.number(),
+  counts: z
+    .object({
+      all: z.number(),
+      waiting: z.number(),
+      in_progress: z.number(),
+      awaiting: z.number(),
+    })
+    .openapi({
+      description:
+        "Totals for the guest summary: same access scope and projectId, ignoring group/status filters and pagination. `all` includes finished requests; the other three only count open work.",
+    }),
   page: z.number(),
   pageSize: z.number(),
   totalPages: z.number(),

@@ -14,6 +14,7 @@ export type ListIntakeRequestsRequest = {
   workspaceId: string;
   projectId?: string;
   status?: IntakeRequestListItem["status"];
+  group?: "all" | "waiting" | "in_progress" | "awaiting";
   page?: number;
   limit?: number;
 };
@@ -22,6 +23,7 @@ async function listIntakeRequests({
   workspaceId,
   projectId,
   status,
+  group,
   page,
   limit,
 }: ListIntakeRequestsRequest) {
@@ -32,6 +34,7 @@ async function listIntakeRequests({
     query: {
       ...(projectId ? { projectId } : {}),
       ...(status ? { status } : {}),
+      ...(group && group !== "all" ? { group } : {}),
       page: page ? String(page) : undefined,
       limit: limit ? String(limit) : undefined,
     },

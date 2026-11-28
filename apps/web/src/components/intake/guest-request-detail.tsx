@@ -32,6 +32,7 @@ export function GuestRequestDetail({
       <div className="flex flex-col gap-3">
         <Skeleton className="h-5 w-24" />
         <Skeleton className="h-7 w-2/3" />
+        <Skeleton className="h-4 w-1/2" />
         <Skeleton className="h-24 w-full" />
       </div>
     );
@@ -94,7 +95,7 @@ export function GuestRequestDetail({
 
   return (
     <>
-      <IntakeRequestDetail request={data} actions={actions} />
+      <IntakeRequestDetail request={data} actions={actions} showStepper />
       {data.confirmedAt ? (
         <p className="text-muted-foreground text-xs">
           {t("intake:detail.confirmedOn", {

@@ -68,3 +68,14 @@ that list, and `apps/api/src/auth.ts` filters it with
 guest whose role lacks workspace:read still got `/onboarding` after the first
 attempt. Check `/api/auth/organization/list` in the browser when a workspace is
 missing from the UI.
+
+## Intake portal E2E: reuse the runbook, do not rebuild the setup
+
+`docs/feature-development/guest-request-tracking/review/e2e-runbook.md` has the
+working recipe: dev DB container, the `tsc EBUSY` build workaround, the three
+dev accounts (owner/member/guest) and their workspace/project ids, the
+`agent-browser` session + stream commands, the click-by-click scenario with the
+AC assertions, the 150-row pagination seed and its cleanup, and the gotchas
+(guest role promotion, seeded request numbers, no assignee in "Attach a task").
+Start from that file on the next run and only recreate data if the dev database
+was reset.

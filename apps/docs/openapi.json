@@ -15492,6 +15492,22 @@
           },
           {
             "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "waiting",
+                "in_progress",
+                "awaiting"
+              ],
+              "description": "Guest portal group. `all` includes finished requests; waiting/in_progress/awaiting only cover open work. Counts ignore this filter."
+            },
+            "required": false,
+            "description": "Guest portal group. `all` includes finished requests; waiting/in_progress/awaiting only cover open work. Counts ignore this filter.",
+            "name": "group",
+            "in": "query"
+          },
+          {
+            "schema": {
               "type": "integer",
               "minimum": 1,
               "maximum": 1000000,
@@ -15646,6 +15662,30 @@
                     "total": {
                       "type": "number"
                     },
+                    "counts": {
+                      "type": "object",
+                      "properties": {
+                        "all": {
+                          "type": "number"
+                        },
+                        "waiting": {
+                          "type": "number"
+                        },
+                        "in_progress": {
+                          "type": "number"
+                        },
+                        "awaiting": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "all",
+                        "waiting",
+                        "in_progress",
+                        "awaiting"
+                      ],
+                      "description": "Totals for the guest summary: same access scope and projectId, ignoring group/status filters and pagination. `all` includes finished requests; the other three only count open work."
+                    },
                     "page": {
                       "type": "number"
                     },
@@ -15659,6 +15699,7 @@
                   "required": [
                     "items",
                     "total",
+                    "counts",
                     "page",
                     "pageSize",
                     "totalPages"

@@ -82,6 +82,21 @@ export function StaffRequestDetail({
     );
   };
 
+  // Delivering again is also the staff reply in the feedback loop, so the
+  // note is optional there; rejecting still needs a reason.
+  const noteDialog =
+    pendingAction?.to === "rejected"
+      ? {
+          title: t("intake:staff.rejectTitle"),
+          description: t("intake:staff.rejectDescription"),
+          required: true,
+        }
+      : {
+          title: t("intake:staff.deliverTitle"),
+          description: t("intake:staff.deliverDescription"),
+          required: false,
+        };
+
   // A viewer holds intake:read only; the API would answer 403 to every
   // transition, so render none.
   const actions = canUpdateIntake()
@@ -92,7 +107,8 @@ export function StaffRequestDetail({
           variant={action.to === "rejected" ? "outline" : "default"}
           disabled={transition.isPending}
           onClick={() => {
-            if (action.noteRequired) setPendingAction(action);
+            if (action.noteRequired || action.to === "delivered")
+              setPendingAction(action);
             else runTransition(action);
           }}
         >
@@ -153,13 +169,13 @@ export function StaffRequestDetail({
         onOpenChange={(open) => {
           if (!open) setPendingAction(null);
         }}
-        title={t("intake:staff.rejectTitle")}
-        description={t("intake:staff.rejectDescription")}
-        required
+        title={noteDialog.title}
+        description={noteDialog.description}
+        required={noteDialog.required}
         pending={transition.isPending}
         onConfirm={(note) => {
           if (!pendingAction) return;
-          runTransition(pendingAction, note);
+          runTransition(pendingAction, note || undefined);
         }}
       />
 

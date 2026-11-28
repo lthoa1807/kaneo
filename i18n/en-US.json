@@ -4199,7 +4199,7 @@
 	"intake": {
 		"status": {
 			"new": "New",
-			"triaged": "Triaged",
+			"triaged": "Reviewed",
 			"rejected": "Rejected",
 			"approved": "Approved",
 			"in_progress": "In progress",
@@ -4210,27 +4210,64 @@
 		"list": {
 			"empty": "No requests yet",
 			"loadError": "Could not load requests",
-			"retry": "Try again"
+			"retry": "Try again",
+			"columns": {
+				"id": "ID",
+				"request": "Request",
+				"project": "Project",
+				"status": "Status",
+				"received": "Received"
+			}
 		},
 		"portal": {
 			"nav": "My requests",
 			"title": "My requests",
 			"all": "All",
-			"newRequest": "New request"
+			"newRequest": "New request",
+			"overview": "Overview",
+			"overviewHint_one": "{{count}} request",
+			"overviewHint_other": "{{count}} requests",
+			"active": "active",
+			"group": {
+				"waiting": "Waiting for review",
+				"in_progress": "In progress",
+				"awaiting": "Awaiting your confirmation",
+				"all": "All requests"
+			},
+			"banner_one": "{{count}} request is ready for your confirmation",
+			"banner_other": "{{count}} requests are ready for your confirmation",
+			"bannerTitle": "Requests awaiting your confirmation",
+			"bannerAction": "Review",
+			"legendName_one": "{{label}}: {{count}} request",
+			"legendName_other": "{{label}}: {{count}} requests",
+			"showAll": "Show all {{total}} requests",
+			"showAllLoading": "Loading…",
+			"emptyGroup": "No requests in this group."
 		},
 		"detail": {
 			"descriptionEmpty": "No description",
 			"action": {
 				"confirmed": "Looks good, confirm",
-				"needs_revision": "Request changes",
-				"triaged": "Mark triaged",
+				"needs_revision": "Need feedback",
+				"triaged": "Mark reviewed",
 				"approved": "Approve",
 				"rejected": "Reject",
 				"in_progress": "Start work",
 				"delivered": "Mark delivered"
 			},
-			"revisionTitle": "Request changes",
-			"revisionDescription": "Tell us what needs to change. We will pick the request up again.",
+			"stepper": {
+				"label": "Progress",
+				"submitted": "Submitted",
+				"received": "Received",
+				"inProgress": "In progress",
+				"awaiting": "Awaiting your confirmation",
+				"completed": "Completed",
+				"rejected": "Rejected",
+				"revisionNote": "You sent feedback",
+				"rejectedNote": "This request was rejected"
+			},
+			"revisionTitle": "Need feedback",
+			"revisionDescription": "Tell us what needs to change. We will deliver this request again.",
 			"confirmedOn": "Confirmed on {{date}}",
 			"created": "Request created",
 			"status_changed": "Status changed",
@@ -4239,6 +4276,20 @@
 			"tasksProgress": "{{done}} of {{total}} tasks done",
 			"activity": "Activity",
 			"activityEmpty": "No activity yet"
+		},
+		"activity": {
+			"you": "You",
+			"team": "Team",
+			"created": "{{actor}} created this request",
+			"received": "{{actor}} received this request",
+			"started": "{{actor}} started working on this request",
+			"delivered": "{{actor}} delivered this request for your review",
+			"deliveredWithNote": "{{actor}} delivered this request for your review: {{note}}",
+			"deliveredAgain": "{{actor}} delivered this request again: {{note}}",
+			"deliveredAgainNoNote": "{{actor}} delivered this request again",
+			"feedback": "{{actor}} sent feedback: {{note}}",
+			"confirmed": "{{actor}} confirmed this request",
+			"rejected": "{{actor}} rejected this request: {{note}}"
 		},
 		"form": {
 			"title": "New request",
@@ -4267,7 +4318,7 @@
 			"tab": "Intake",
 			"title": "Intake requests",
 			"group": {
-				"triage": "Needs triage",
+				"triage": "Needs review",
 				"progress": "In progress",
 				"awaiting": "Awaiting guest",
 				"closed": "Closed"
@@ -4283,6 +4334,8 @@
 			"taskTitle": "Task title",
 			"status": "Status",
 			"priority": "Priority",
+			"deliverTitle": "Deliver request",
+			"deliverDescription": "Add a reply for the guest. They will see it in the activity.",
 			"rejectTitle": "Reject request",
 			"rejectDescription": "Tell the guest why this request is rejected. The note appears in their activity."
 		}
@@ -5495,7 +5548,7 @@
 		},
 		"intake": {
 			"title": "Intake queue",
-			"hint": "Requests waiting for triage or already being worked on",
+			"hint": "Requests waiting for review or already being worked on",
 			"waiting": "Waiting",
 			"inProgress": "In progress",
 			"age": {

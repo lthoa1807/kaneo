@@ -21,12 +21,19 @@ async function enableIntake(projectId: string) {
 
 const numberByProject = new Map<string, number>();
 
-async function createIntakeRequestRow(projectId: string, createdById: string) {
+async function createIntakeRequestRow(
+  projectId: string,
+  createdById: string,
+  overrides: {
+    status?: (typeof schema.intakeRequestTable.$inferInsert)["status"];
+    createdAt?: Date;
+  } = {},
+) {
   const number = (numberByProject.get(projectId) ?? 0) + 1;
   numberByProject.set(projectId, number);
   const [row] = await db
     .insert(schema.intakeRequestTable)
-    .values({ projectId, createdById, title: "Request", number })
+    .values({ projectId, createdById, title: "Request", number, ...overrides })
     .returning();
   if (!row) throw new Error("intake request insert failed");
   return row;
@@ -78,6 +85,12 @@ describe("intake request list", () => {
     expect(body.items[0].completedTaskCount).toBe(1);
     expect(body.items[0].projectName).toBe("Alpha");
     expect(body.total).toBe(1);
+    expect(body.counts).toEqual({
+      all: 1,
+      waiting: 1,
+      in_progress: 0,
+      awaiting: 0,
+    });
   });
 
   it("shows manage actors every request in projects they can access", async () => {
@@ -95,6 +108,12 @@ describe("intake request list", () => {
     const body = await response.json();
     expect(body.items).toHaveLength(2);
     expect(body.total).toBe(2);
+    expect(body.counts).toEqual({
+      all: 2,
+      waiting: 2,
+      in_progress: 0,
+      awaiting: 0,
+    });
   });
 
   it("filters by projectId and status and paginates", async () => {
@@ -106,32 +125,35 @@ describe("intake request list", () => {
       workspaceId: member.workspace.id,
     });
     await enableIntake(project.id);
-    const first = await createIntakeRequestRow(project.id, member.user.id);
-    const second = await createIntakeRequestRow(project.id, member.user.id);
+    const first = await createIntakeRequestRow(project.id, member.user.id, {
+      createdAt: new Date("2026-11-01T10:00:00Z"),
+    });
+    const second = await createIntakeRequestRow(project.id, member.user.id, {
+      createdAt: new Date("2026-11-02T10:00:00Z"),
+      status: "triaged",
+    });
     const inOther = await createIntakeRequestRow(
       other.project.id,
       member.user.id,
+      { createdAt: new Date("2026-11-03T10:00:00Z") },
     );
-    await db
-      .update(schema.intakeRequestTable)
-      .set({ status: "triaged" })
-      .where(eq(schema.intakeRequestTable.id, second.id));
     mockAuthenticatedSession(member.user);
 
+    // Oldest waiting first, across the whole accessible scope.
     const byStatus = await (
       await listRequests(member.workspace.id, "?status=new")
     ).json();
     expect(byStatus.items.map((item: { id: string }) => item.id)).toEqual([
-      inOther.id,
       first.id,
+      inOther.id,
     ]);
 
     const byProject = await (
       await listRequests(member.workspace.id, `?projectId=${project.id}`)
     ).json();
     expect(byProject.items.map((item: { id: string }) => item.id)).toEqual([
-      second.id,
       first.id,
+      second.id,
     ]);
 
     const page2 = await (
@@ -141,11 +163,124 @@ describe("intake request list", () => {
       )
     ).json();
     expect(page2.items.map((item: { id: string }) => item.id)).toEqual([
-      first.id,
+      second.id,
     ]);
     expect(page2.total).toBe(2);
     expect(page2.page).toBe(2);
     expect(page2.totalPages).toBe(2);
+  });
+
+  it("returns group counts that ignore the group filter and keep finished work in all", async () => {
+    const guest = await createWorkspaceMember({ role: "guest" });
+    const { project } = await createProjectFixture({
+      workspaceId: guest.workspace.id,
+    });
+    const other = await createProjectFixture({
+      workspaceId: guest.workspace.id,
+    });
+    await enableIntake(project.id);
+    await createIntakeRequestRow(project.id, guest.user.id, {
+      createdAt: new Date("2026-11-01T10:00:00Z"),
+      status: "new",
+    });
+    await createIntakeRequestRow(project.id, guest.user.id, {
+      createdAt: new Date("2026-11-02T10:00:00Z"),
+      status: "triaged",
+    });
+    await createIntakeRequestRow(project.id, guest.user.id, {
+      createdAt: new Date("2026-11-03T10:00:00Z"),
+      status: "in_progress",
+    });
+    await createIntakeRequestRow(project.id, guest.user.id, {
+      createdAt: new Date("2026-11-04T10:00:00Z"),
+      status: "delivered",
+    });
+    const finished = await createIntakeRequestRow(project.id, guest.user.id, {
+      createdAt: new Date("2026-11-05T10:00:00Z"),
+      status: "confirmed",
+    });
+    const rejected = await createIntakeRequestRow(project.id, guest.user.id, {
+      createdAt: new Date("2026-11-06T10:00:00Z"),
+      status: "rejected",
+    });
+    await createIntakeRequestRow(other.project.id, guest.user.id);
+
+    mockAuthenticatedSession(guest.user);
+
+    const response = await listRequests(
+      guest.workspace.id,
+      `?projectId=${project.id}`,
+    );
+    const body = await response.json();
+    expect(body.counts).toEqual({
+      all: 6,
+      waiting: 2,
+      in_progress: 1,
+      awaiting: 1,
+    });
+    expect(body.total).toBe(6);
+
+    const awaiting = await (
+      await listRequests(
+        guest.workspace.id,
+        `?projectId=${project.id}&group=awaiting`,
+      )
+    ).json();
+    expect(
+      awaiting.items.map((item: { status: string }) => item.status),
+    ).toEqual(["delivered"]);
+    expect(awaiting.counts).toEqual(body.counts);
+    expect(awaiting.total).toBe(1);
+
+    const waiting = await (
+      await listRequests(
+        guest.workspace.id,
+        `?projectId=${project.id}&group=waiting`,
+      )
+    ).json();
+    expect(waiting.items).toHaveLength(2);
+    expect(waiting.counts).toEqual(body.counts);
+
+    const inProgress = await (
+      await listRequests(
+        guest.workspace.id,
+        `?projectId=${project.id}&group=in_progress`,
+      )
+    ).json();
+    expect(inProgress.items).toHaveLength(1);
+    expect(inProgress.items[0].status).toBe("in_progress");
+
+    const allGroup = await (
+      await listRequests(
+        guest.workspace.id,
+        `?projectId=${project.id}&group=all`,
+      )
+    ).json();
+    expect(allGroup.items).toHaveLength(6);
+    expect(allGroup.counts).toEqual(body.counts);
+
+    // Counts describe the scope, not the filter or the page.
+    const byStatus = await (
+      await listRequests(
+        guest.workspace.id,
+        `?projectId=${project.id}&status=new&limit=1`,
+      )
+    ).json();
+    expect(byStatus.items).toHaveLength(1);
+    expect(byStatus.counts).toEqual(body.counts);
+
+    const invalid = await listRequests(
+      guest.workspace.id,
+      `?projectId=${project.id}&group=closed`,
+    );
+    expect(invalid.status).toBe(400);
+
+    const all = await (
+      await listRequests(guest.workspace.id, `?projectId=${project.id}`)
+    ).json();
+    const ids = all.items.map((item: { id: string }) => item.id);
+    expect(ids.slice(-2)).toEqual([finished.id, rejected.id]);
+    expect(ids).toHaveLength(6);
   });
 
   it("hides a guest's own requests in projects they can no longer access", async () => {
@@ -170,6 +305,7 @@ describe("intake request list", () => {
     expect(
       body.items.some((item: { id: string }) => item.id === hidden.id),
     ).toBe(false);
+    expect(body.counts.all).toBe(1);
   });
 });
 

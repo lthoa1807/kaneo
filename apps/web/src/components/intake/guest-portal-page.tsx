@@ -2,18 +2,17 @@ import { useNavigate } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { IntakeRequestList } from "@/components/intake/intake-request-list";
+import { GuestRequestList } from "@/components/intake/guest-request-list";
+import type { IntakeGroupFilter } from "@/components/intake/intake-groups";
 import { IntakeRequestFormModal } from "@/components/intake/intake-request-form-modal";
-import {
-  INTAKE_STATUSES,
-  type IntakeStatus,
-} from "@/components/intake/intake-status";
+import { IntakeSummary } from "@/components/intake/intake-summary";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import useGetIntakeRequestPages from "@/hooks/queries/intake/use-get-intake-request-pages";
 import useGetIntakeRequests from "@/hooks/queries/intake/use-get-intake-requests";
 import { cn } from "@/lib/cn";
 
-type StatusFilter = IntakeStatus | "all";
+const PAGE_LIMIT = 100;
 
 export function GuestPortalPage({
   workspaceId,
@@ -25,18 +24,48 @@ export function GuestPortalPage({
 }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [status, setStatus] = useState<StatusFilter>("all");
+  const [group, setGroup] = useState<IntakeGroupFilter>("all");
+  const [showAll, setShowAll] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
+
   const requests = useGetIntakeRequests({
     workspaceId,
     projectId,
-    status: status === "all" ? undefined : status,
+    group,
+    limit: PAGE_LIMIT,
+  });
+  const extraPages = useGetIntakeRequestPages({
+    workspaceId,
+    projectId,
+    group,
+    limit: PAGE_LIMIT,
+    totalPages: requests.data?.totalPages ?? 0,
+    enabled: showAll,
   });
 
-  const filters: StatusFilter[] = ["all", ...INTAKE_STATUSES];
+  const counts = requests.data?.counts;
+  const total = requests.data?.total ?? 0;
+  // Cached pages stay in the query cache after a group switch; only append
+  // them while the user is in "show all" mode, otherwise stale rows return.
+  // Page 1 and the extra pages poll separately, so merge by id too.
+  const items = [
+    ...new Map(
+      [
+        ...(requests.data?.items ?? []),
+        ...(showAll ? extraPages.items : []),
+      ].map((item) => [item.id, item]),
+    ).values(),
+  ];
+  const awaiting = counts?.awaiting ?? 0;
+
+  // A new group is a new list: page 2 of the previous group must not leak in.
+  const selectGroup = (next: IntakeGroupFilter) => {
+    setGroup(next);
+    setShowAll(false);
+  };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-semibold text-2xl tracking-tight">
           {t("intake:portal.title")}
@@ -47,31 +76,35 @@ export function GuestPortalPage({
         </Button>
       </header>
 
-      <div className="flex flex-wrap gap-1.5">
-        {filters.map((filter) => (
+      {awaiting > 0 ? (
+        <section
+          aria-labelledby="intake-banner-heading"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-secondary/40 p-3"
+        >
+          <h2 id="intake-banner-heading" className="sr-only">
+            {t("intake:portal.bannerTitle")}
+          </h2>
+          <p className="text-sm">
+            {t("intake:portal.banner", { count: awaiting })}
+          </p>
           <Button
-            key={filter}
-            type="button"
             size="sm"
-            variant={filter === status ? "secondary" : "ghost"}
-            className={cn(
-              "h-7 px-2 text-xs",
-              filter !== status && "text-muted-foreground",
-            )}
-            onClick={() => setStatus(filter)}
+            variant="ghost"
+            onClick={() => selectGroup("awaiting")}
           >
-            {filter === "all"
-              ? t("intake:portal.all")
-              : t(`intake:status.${filter}`)}
+            {t("intake:portal.bannerAction")}
           </Button>
-        ))}
-      </div>
+        </section>
+      ) : null}
 
       {requests.isLoading ? (
-        <div className="flex flex-col gap-2">
-          {Array.from({ length: 4 }, (_, index) => (
-            <Skeleton key={index} className="h-11 w-full" />
-          ))}
+        <div className="flex flex-col gap-4">
+          <IntakeSummary selected={group} onSelect={selectGroup} />
+          <div className="flex flex-col gap-2">
+            {Array.from({ length: 4 }, (_, index) => (
+              <Skeleton key={index} className="h-11 w-full" />
+            ))}
+          </div>
         </div>
       ) : requests.isError ? (
         <div className="flex flex-col items-start gap-2">
@@ -87,22 +120,65 @@ export function GuestPortalPage({
           </Button>
         </div>
       ) : (
-        <IntakeRequestList
-          items={requests.data?.items ?? []}
-          showProject={!projectId}
-          onRowClick={(request) => {
-            const targetProject = request.projectId ?? projectId;
-            if (!targetProject) return;
-            void navigate({
-              to: "/dashboard/workspace/$workspaceId/project/$projectId/requests/$requestId",
-              params: {
-                workspaceId,
-                projectId: targetProject,
-                requestId: request.id,
-              },
-            });
-          }}
-        />
+        <>
+          <IntakeSummary
+            counts={counts}
+            selected={group}
+            onSelect={selectGroup}
+          />
+
+          <div
+            className={cn(
+              "transition-opacity",
+              requests.isPlaceholderData && "opacity-60",
+            )}
+          >
+            <GuestRequestList
+              items={items}
+              showProject={!projectId}
+              emptyLabel={
+                group === "all"
+                  ? t("intake:list.empty")
+                  : t("intake:portal.emptyGroup")
+              }
+              onRowClick={(request) => {
+                const targetProject = request.projectId ?? projectId;
+                if (!targetProject) return;
+                void navigate({
+                  to: "/dashboard/workspace/$workspaceId/project/$projectId/requests/$requestId",
+                  params: {
+                    workspaceId,
+                    projectId: targetProject,
+                    requestId: request.id,
+                  },
+                });
+              }}
+            />
+          </div>
+
+          {!requests.isPlaceholderData && items.length < total ? (
+            <div className="flex flex-col items-center gap-2">
+              {extraPages.isError ? (
+                <p className="text-destructive-foreground text-sm">
+                  {t("intake:list.loadError")}
+                </p>
+              ) : null}
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={extraPages.isFetching}
+                onClick={() => {
+                  if (showAll) void extraPages.refetch();
+                  else setShowAll(true);
+                }}
+              >
+                {extraPages.isFetching
+                  ? t("intake:portal.showAllLoading")
+                  : t("intake:portal.showAll", { total })}
+              </Button>
+            </div>
+          ) : null}
+        </>
       )}
 
       <IntakeRequestFormModal

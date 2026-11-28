@@ -1,0 +1,78 @@
+{
+	"feature": "guest-request-tracking",
+	"profile": "full",
+	"branch": "feature/guest-request-tracking",
+	"user": "HOALT",
+	"approvers": [],
+	"required": ["G1", "G2", "G3", "G4"],
+	"phases": [
+		{
+			"id": "P1",
+			"name": "API counts, group filter, list order",
+			"status": "REVIEW_REQUIRED",
+			"depends_on": [],
+			"scope": [
+				"apps/api/src/intake/**",
+				"tests/api-integration/intake-list-and-detail.test.ts",
+				"apps/docs/openapi.json"
+			],
+			"starts": 1,
+			"rounds": 1,
+			"blocks": 0,
+			"base_sha": "32ba26385ed6d4d3d8abaeafa3f13e564ac4d95e",
+			"baseline_dirty": ["AGENTS.md", "REPO_MAP.md"],
+			"baseline_hashes": {
+				"AGENTS.md": "71ead8b44da7c4dffd3e588cd739384a16f632e3",
+				"REPO_MAP.md": "4183b2c36dcab35854ac91fe968671e479396d8d"
+			},
+			"commit": "5967b22f0503738e13a93fa97a165e1981547c19",
+			"blocked_reason": null,
+			"status_before_block": null
+		},
+		{
+			"id": "P2",
+			"name": "Guest portal summary, group filter, show all",
+			"status": "REVIEW_REQUIRED",
+			"depends_on": ["P1"],
+			"scope": [
+				"apps/web/src/components/intake/**",
+				"apps/web/src/fetchers/intake/**",
+				"apps/web/src/hooks/queries/intake/**",
+				"apps/web/src/routes/**",
+				"i18n/**"
+			],
+			"starts": 1,
+			"rounds": 1,
+			"blocks": 0,
+			"base_sha": "5967b22f0503738e13a93fa97a165e1981547c19",
+			"baseline_dirty": ["AGENTS.md", "REPO_MAP.md"],
+			"baseline_hashes": {
+				"AGENTS.md": "71ead8b44da7c4dffd3e588cd739384a16f632e3",
+				"REPO_MAP.md": "4183b2c36dcab35854ac91fe968671e479396d8d"
+			},
+			"commit": "5506af9e21874ce7aa0cc301ffd45ed591a0cf9c",
+			"blocked_reason": null,
+			"status_before_block": null
+		},
+		{
+			"id": "P3",
+			"name": "Guest detail stepper, activity copy, Need feedback loop",
+			"status": "REVIEW_REQUIRED",
+			"depends_on": [],
+			"scope": ["apps/web/src/components/intake/**", "i18n/**"],
+			"starts": 2,
+			"rounds": 2,
+			"blocks": 0,
+			"base_sha": "5506af9e21874ce7aa0cc301ffd45ed591a0cf9c",
+			"baseline_dirty": ["AGENTS.md", "REPO_MAP.md"],
+			"baseline_hashes": {
+				"AGENTS.md": "71ead8b44da7c4dffd3e588cd739384a16f632e3",
+				"REPO_MAP.md": "4183b2c36dcab35854ac91fe968671e479396d8d"
+			},
+			"commit": "5b6aee2a613b47b1a9764f10f13c135c163b06a2",
+			"blocked_reason": null,
+			"status_before_block": null
+		}
+	],
+	"updated_at": "2026-11-28T10:34:09.784Z"
+}

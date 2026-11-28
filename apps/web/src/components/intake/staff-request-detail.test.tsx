@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import {
   afterEach,
   beforeEach,
@@ -87,6 +87,10 @@ vi.mock("@/lib/toast", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
 }));
 
+vi.mock("@/lib/auth-client", () => ({
+  authClient: { useSession: () => ({ data: { user: { id: "staff-1" } } }) },
+}));
+
 vi.mock("@tanstack/react-router", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@tanstack/react-router")>()),
   useNavigate: () => vi.fn(),
@@ -161,6 +165,39 @@ describe("StaffRequestDetail", () => {
     request.status = "rejected";
     renderDetail();
     expect(screen.queryAllByRole("button").length).toBe(0);
+  });
+
+  it("delivers through a dialog whose note is optional", () => {
+    request.status = "in_progress";
+    renderDetail();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "intake:detail.action.delivered" }),
+    );
+
+    expect(transitionMutate).not.toHaveBeenCalled();
+    expect(screen.getByText("intake:staff.deliverTitle")).toBeTruthy();
+    const confirm = screen.getByRole("button", { name: "intake:note.confirm" });
+    expect(confirm).toHaveProperty("disabled", false);
+    fireEvent.click(confirm);
+    expect(transitionMutate).toHaveBeenCalledWith(
+      { requestId: "request-1", to: "delivered", note: undefined },
+      expect.anything(),
+    );
+  });
+
+  it("still requires a reason to reject", () => {
+    request.status = "new";
+    renderDetail();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "intake:detail.action.rejected" }),
+    );
+
+    expect(
+      screen.getByRole("button", { name: "intake:note.confirm" }),
+    ).toHaveProperty("disabled", true);
+    expect(transitionMutate).not.toHaveBeenCalled();
   });
 
   it("hides every transition from a viewer who can only read intake", () => {

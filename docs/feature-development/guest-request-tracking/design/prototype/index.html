@@ -1,0 +1,1735 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My requests: guest request tracking prototype</title>
+    <meta
+      name="description"
+      content="Prototype of the guest request summary, group filters and truthful progress stepper."
+    />
+    <style>
+      /* Hallmark · v2.0.0 · shape: app screen · scope: app · screen: guest request tracking · states: full, filtered, empty, loading, error, detail */
+      /* Hallmark · pre-emit critique: P4 H4 E4 S4 R5 V3 · weakest: V, this prototype borrows the app's existing shell; kept it because the flow, not a new look, is what needs approval */
+      /* Hallmark · prototype: design artifact, not production CSS */
+      /* Hallmark · dismissed 48 · the prototype is self-contained, so the palette is declared once in :root/.dark instead of importing apps/web tokens; values are copied from apps/web/src/index.css */
+      /* Hallmark · dismissed 7b · pure white light background mirrors production (--background: var(--color-white)) */
+      /* Hallmark · dismissed 24b · 6px gaps mirror the app's Tailwind scale on this screen; the prototype is not production CSS */
+      /* Hallmark · dismissed F4 · "Review" in the banner is btn-quiet: no background, no border; only "New request" is filled */
+      /* Hallmark · dismissed 74 · --info is copied from the app token, not a new swatch chosen here */
+      :root {
+        --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+        --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        --radius: 0.625rem;
+        --radius-md: 0.5rem;
+        --radius-lg: 0.75rem;
+        --bg: #f7f9fc;
+        --fg: #202327;
+        --muted: #6f7480;
+        --border: #00000014;
+        --accent: #0000000a;
+        --surface: #ffffff;
+        --surface-2: #f2f5fa;
+        --primary: #262626;
+        --primary-fg: #fafafa;
+        --ring: #a3a3a3;
+        --success: #10b981;
+        --success-fg: #047857;
+        --warning: #f59e0b;
+        --warning-fg: #b45309;
+        --info: #3b82f6;
+        --info-fg: #1d4ed8;
+        --danger: #ef4444;
+        --danger-fg: #b91c1c;
+        --tint-success: #10b9811f;
+        --tint-warning: #f59e0b1f;
+        --tint-info: #3b82f61f;
+        --tint-danger: #ef44441f;
+        --tint-neutral: #0000000a;
+        --skeleton: #f0f0f0;
+        --accent-brand: #1d4ed8;
+        --accent-brand-fg: #ffffff;
+      }
+      .dark {
+        --bg: #0f0f0f;
+        --fg: #f5f5f5;
+        --muted: #a3a3a3;
+        --border: #ffffff0f;
+        --accent: #ffffff0a;
+        --surface: #121212;
+        --surface-2: #171717;
+        --primary: #f5f5f5;
+        --primary-fg: #262626;
+        --ring: #737373;
+        --success: #34d399;
+        --success-fg: #6ee7b7;
+        --warning: #fbbf24;
+        --warning-fg: #fcd34d;
+        --info: #60a5fa;
+        --info-fg: #93c5fd;
+        --danger: #f87171;
+        --danger-fg: #fca5a5;
+        --tint-success: #34d39924;
+        --tint-warning: #fbbf2424;
+        --tint-info: #60a5fa24;
+        --tint-danger: #f8717124;
+        --tint-neutral: #ffffff0a;
+        --skeleton: #1f1f1f;
+        --accent-brand: #60a5fa;
+        --accent-brand-fg: #0b0d10;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        overflow-x: clip;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--font-sans);
+        font-size: 16px;
+        line-height: 1.5;
+      }
+
+      :focus-visible {
+        outline: 2px solid var(--ring);
+        outline-offset: 2px;
+      }
+
+      button,
+      select,
+      textarea {
+        font: inherit;
+      }
+
+      button {
+        position: relative;
+        cursor: pointer;
+      }
+
+      @media (pointer: coarse) {
+        button::before {
+          content: "";
+          position: absolute;
+          inset: -6px;
+        }
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+
+      .demo-bar {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 16px;
+        padding: 8px 16px;
+        background: var(--surface-2);
+        border-bottom: 1px solid var(--border);
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .demo-bar strong {
+        color: var(--fg);
+        font-weight: 600;
+      }
+
+      .demo-bar label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .demo-bar select {
+        height: 28px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background: var(--surface);
+        color: var(--fg);
+        padding: 0 6px;
+      }
+
+      .shell {
+        position: relative;
+        z-index: 1;
+        max-width: 60rem;
+        margin: 0 auto;
+        padding: 24px 16px 64px;
+      }
+
+      .atmosphere {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            60rem 40rem at 0% 0%,
+            color-mix(in oklab, var(--info) 18%, transparent),
+            transparent 70%
+          ),
+          radial-gradient(
+            50rem 36rem at 100% 0%,
+            color-mix(in oklab, var(--warning) 14%, transparent),
+            transparent 70%
+          ),
+          linear-gradient(
+            to bottom,
+            transparent 60%,
+            color-mix(in oklab, var(--info) 8%, transparent)
+          );
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .topbar .wordmark {
+        color: var(--fg);
+        font-weight: 600;
+      }
+
+      .page-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 24px 0 20px;
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+        overflow-wrap: break-word;
+        text-wrap: balance;
+      }
+
+      h1 {
+        font-size: 24px;
+        font-weight: 600;
+        line-height: 1.25;
+      }
+
+      h2 {
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      h3 {
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      p {
+        margin: 0;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        min-height: 36px;
+        padding: 0 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background: var(--surface);
+        color: var(--fg);
+        font-size: 13px;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      .btn:hover {
+        background: var(--accent);
+      }
+
+      .btn:active {
+        transform: translateY(1px);
+      }
+
+      .btn:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+
+      .btn-quiet {
+        border-color: transparent;
+        background: none;
+        color: var(--info-fg);
+        font-weight: 600;
+        padding: 0 4px;
+      }
+
+      .btn-quiet:hover {
+        background: var(--accent);
+      }
+
+      .btn-primary {
+        background: var(--accent-brand);
+        border-color: var(--accent-brand);
+        color: var(--accent-brand-fg);
+      }
+
+      .btn-primary:hover {
+        background: var(--primary);
+        opacity: 0.92;
+      }
+
+      .btn-sm {
+        min-height: 30px;
+        padding: 0 10px;
+        font-size: 12px;
+      }
+
+      .banner {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 16px;
+        margin-bottom: 16px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        background: var(--surface-2);
+      }
+
+      .banner p {
+        font-size: 13px;
+      }
+
+      .summary-card {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 16px;
+        padding: 16px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        background: color-mix(in oklab, var(--surface) 82%, transparent);
+        -webkit-backdrop-filter: blur(20px) saturate(135%);
+        backdrop-filter: blur(20px) saturate(135%);
+      }
+
+      .summary-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 4px 12px;
+      }
+
+      .summary-head h2 {
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .summary-head p {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .summary-body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .donut-wrap {
+        position: relative;
+        flex: 0 0 auto;
+        width: 96px;
+        height: 96px;
+      }
+
+      .donut-wrap svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      .donut-center {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-content: center;
+        gap: 1px;
+        text-align: center;
+      }
+
+      .donut-center strong {
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .donut-center span {
+        font-size: 10px;
+        color: var(--muted);
+      }
+
+      .seg-track {
+        stroke: var(--accent);
+      }
+
+      .seg-waiting {
+        stroke: var(--muted);
+      }
+
+      .seg-progress {
+        stroke: var(--warning-fg);
+      }
+
+      .seg-awaiting {
+        stroke: var(--info-fg);
+      }
+
+      .legend {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2px;
+        width: 100%;
+        min-width: 0;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .legend button {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        min-height: 32px;
+        padding: 4px 6px;
+        border: 0;
+        border-radius: var(--radius-md);
+        background: none;
+        color: var(--fg);
+        font-size: 12px;
+        text-align: left;
+      }
+
+      .legend button:hover {
+        background: var(--accent);
+      }
+
+      .legend button[aria-pressed="true"] {
+        background: var(--accent);
+        font-weight: 600;
+      }
+
+      .legend .swatch {
+        flex: 0 0 auto;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+
+      .swatch-waiting {
+        background: var(--muted);
+      }
+
+      .swatch-progress {
+        background: var(--warning-fg);
+      }
+
+      .swatch-awaiting {
+        background: var(--info-fg);
+      }
+
+      .legend .label {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .legend .count {
+        font-variant-numeric: tabular-nums;
+      }
+
+      .legend .pct {
+        width: 36px;
+        text-align: right;
+        color: var(--muted);
+        font-size: 11px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .legend .legend-all {
+        grid-column: 1 / -1;
+      }
+
+      .legend .legend-sep {
+        grid-column: 1 / -1;
+        height: 0;
+        margin: 4px 0;
+        border-top: 1px solid var(--border);
+      }
+
+      .list-filter {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 4px 8px 12px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .list-head {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        padding: 8px;
+        border-bottom: 1px solid var(--border);
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--muted);
+      }
+
+      .list-head .head-id {
+        display: none;
+      }
+
+      .list-foot {
+        display: flex;
+        justify-content: center;
+        padding: 12px 8px;
+      }
+
+      @media (min-width: 640px) {
+        .summary-body {
+          flex-direction: row;
+          align-items: center;
+        }
+
+        .legend {
+          flex: 1;
+          grid-template-columns: 1fr 1fr;
+          column-gap: 24px;
+        }
+      }
+
+      .list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .list li {
+        border-bottom: 1px solid var(--border);
+      }
+
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px 12px;
+        width: 100%;
+        padding: 12px 8px;
+        border: 0;
+        border-radius: var(--radius-md);
+        background: none;
+        color: var(--fg);
+        text-align: left;
+      }
+
+      .row:hover {
+        background: var(--accent);
+      }
+
+      .row-id {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .row-title {
+        flex: 1 1 14rem;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .row-project,
+      .row-time {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      @media (min-width: 640px) {
+        .list-head,
+        .row {
+          display: grid;
+          grid-template-columns: 4.5rem minmax(0, 1fr) 7rem 10.5rem 9rem;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .list-head {
+          padding: 8px;
+          border-bottom: 1px solid var(--border);
+        }
+
+        .list-head .head-id {
+          display: block;
+          font-size: 11px;
+          font-weight: 500;
+          color: var(--muted);
+        }
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        min-height: 22px;
+        padding: 0 8px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      .badge-outline {
+        background: var(--tint-neutral);
+        color: var(--fg);
+      }
+
+      .badge-success {
+        background: var(--tint-success);
+        border-color: var(--tint-success);
+        color: var(--success-fg);
+      }
+
+      .badge-warning {
+        background: var(--tint-warning);
+        border-color: var(--tint-warning);
+        color: var(--warning-fg);
+      }
+
+      .badge-info {
+        background: var(--tint-info);
+        border-color: var(--tint-info);
+        color: var(--info-fg);
+      }
+
+      .badge-danger {
+        background: var(--tint-danger);
+        border-color: var(--tint-danger);
+        color: var(--danger-fg);
+      }
+
+      .empty,
+      .error {
+        padding: 48px 16px;
+        text-align: center;
+      }
+
+      .empty p,
+      .error p {
+        max-width: 34rem;
+        margin: 6px auto 16px;
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      .error p {
+        color: var(--danger-fg);
+      }
+
+      .skeleton-card {
+        height: 192px;
+        margin-bottom: 16px;
+        border-radius: var(--radius-lg);
+        background: var(--skeleton);
+        opacity: 0.6;
+      }
+
+      .skeleton-row {
+        height: 48px;
+        border-bottom: 1px solid var(--border);
+        background: var(--skeleton);
+        opacity: 0.6;
+      }
+
+      .detail-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 16px;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .detail-back:hover {
+        color: var(--fg);
+      }
+
+      .detail-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 8px 16px;
+        margin-bottom: 24px;
+      }
+
+      .detail-head h1 {
+        font-size: 22px;
+      }
+
+      .detail-meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        margin-top: 6px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .section {
+        padding: 20px 0;
+        border-top: 1px solid var(--border);
+      }
+
+      .section > h2 {
+        margin-bottom: 12px;
+      }
+
+      .detail-copy {
+        max-width: 64ch;
+        font-size: 14px;
+        color: var(--fg);
+      }
+
+      .stepper {
+        display: flex;
+        gap: 8px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .step {
+        position: relative;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 8px;
+        min-width: 0;
+      }
+
+      .step:not(:last-child)::after {
+        content: "";
+        position: absolute;
+        top: 11px;
+        left: calc(50% + 12px);
+        right: calc(-50% + 4px);
+        height: 1px;
+        background: var(--border);
+      }
+
+      .step[data-state="done"]:not(:last-child)::after {
+        background: color-mix(in srgb, var(--success) 55%, transparent);
+      }
+
+      .step-marker {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        place-items: center;
+        width: 24px;
+        height: 24px;
+        border: 1px solid var(--border);
+        border-radius: 50%;
+        background: var(--surface-2);
+        color: var(--muted);
+        font-size: 11px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .step[data-state="done"] .step-marker {
+        background: var(--tint-success);
+        border: 1px solid color-mix(in srgb, var(--success) 50%, transparent);
+        color: var(--success-fg);
+        font-weight: 600;
+      }
+
+      .step[data-state="current"] .step-marker {
+        background: var(--accent-brand);
+        border: 1px solid var(--accent-brand);
+        color: var(--accent-brand-fg);
+        font-weight: 700;
+        box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-brand) 16%, transparent);
+      }
+
+      .step[data-state="rejected"] .step-marker {
+        background: var(--tint-danger);
+        border: 1px solid color-mix(in srgb, var(--danger) 50%, transparent);
+        color: var(--danger-fg);
+        font-weight: 600;
+      }
+
+      .step[data-state="rejected"] .step-label {
+        color: var(--danger-fg);
+        font-weight: 600;
+      }
+
+      .step-label {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .step[data-state="current"] .step-label {
+        color: var(--fg);
+        font-weight: 600;
+      }
+
+      .step[data-state="done"] .step-label {
+        color: var(--fg);
+      }
+
+      .step-note {
+        margin-top: 12px;
+        font-size: 12px;
+        color: var(--warning-fg);
+      }
+
+      .rejected-note {
+        margin-top: 12px;
+        font-size: 12px;
+        color: var(--danger-fg);
+      }
+
+      .activity {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .activity li {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 4px 8px;
+        font-size: 13px;
+      }
+
+      .activity .when {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 20px;
+      }
+
+      .note-form {
+        margin-top: 12px;
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background: var(--surface-2);
+      }
+
+      .note-form label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .note-form textarea {
+        width: 100%;
+        min-height: 72px;
+        padding: 8px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background: var(--surface);
+        color: var(--fg);
+        resize: vertical;
+      }
+
+      .note-form .actions {
+        margin-top: 8px;
+      }
+
+      .hint {
+        margin-top: 8px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      @media (max-width: 640px) {
+        .shell {
+          padding: 16px 12px 48px;
+        }
+
+        .stepper {
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .step {
+          flex-direction: row;
+          align-items: flex-start;
+          text-align: left;
+          gap: 10px;
+        }
+
+        .step:not(:last-child)::after {
+          top: 28px;
+          bottom: -12px;
+          left: 11px;
+          right: auto;
+          width: 1px;
+          height: auto;
+        }
+
+        .step-label {
+          padding-top: 2px;
+        }
+
+        .row-title {
+          flex-basis: 100%;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          transition: none !important;
+          animation: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="atmosphere" aria-hidden="true"></div>
+    <div class="demo-bar">
+      <strong>Prototype controls</strong>
+      <label>
+        List state
+        <select id="list-state">
+          <option value="full">Full</option>
+          <option value="loading">Loading</option>
+          <option value="empty">Empty</option>
+          <option value="error">Error</option>
+        </select>
+      </label>
+      <label>
+        Detail status
+        <select id="detail-status">
+          <option value="in_progress">In progress</option>
+          <option value="delivered">Delivered</option>
+          <option value="needs_revision">Needs revision</option>
+          <option value="rejected">Rejected</option>
+          <option value="confirmed">Confirmed</option>
+        </select>
+      </label>
+      <button type="button" class="btn btn-sm" id="theme-toggle" aria-pressed="false">
+        Dark mode
+      </button>
+      <button type="button" class="btn btn-sm" id="team-reply">
+        Team reply
+      </button>
+    </div>
+
+    <div class="shell">
+      <div class="topbar" aria-label="Breadcrumb">
+        <span class="wordmark">Kaneo</span>
+        <span>/</span>
+        <span id="crumb">My requests</span>
+      </div>
+
+      <main>
+        <section id="list-screen">
+          <div class="page-head">
+            <h1>My requests</h1>
+            <button type="button" class="btn btn-primary" id="new-request">
+              New request
+            </button>
+          </div>
+          <p class="hint" id="new-request-hint" hidden>
+            The existing New request form opens here.
+          </p>
+
+          <div id="list-full">
+            <div class="banner" id="banner">
+              <p id="banner-copy">1 request is ready for your confirmation</p>
+              <button type="button" class="btn btn-sm btn-quiet" id="banner-action">
+                Review
+              </button>
+            </div>
+
+            <section
+              class="summary-card"
+              id="summary"
+              aria-labelledby="summary-heading"
+            >
+              <header class="summary-head">
+                <h2 id="summary-heading">Overview</h2>
+                <p id="summary-hint"></p>
+              </header>
+              <div class="summary-body">
+                <div class="donut-wrap">
+                  <svg viewBox="0 0 100 100" aria-hidden="true" id="donut-svg"></svg>
+                  <div class="donut-center">
+                    <strong id="donut-total">0</strong>
+                    <span>active</span>
+                  </div>
+                </div>
+                <ul class="legend" id="legend"></ul>
+              </div>
+            </section>
+            <p class="sr-only" role="status" id="list-live"></p>
+            <div class="list-filter" id="list-filter" hidden>
+              <span id="list-filter-label"></span>
+              <button type="button" class="btn btn-sm" id="clear-filter">
+                Clear filter
+              </button>
+            </div>
+            <div class="list-head">
+              <span class="head-id">ID</span>
+              <span>Request</span>
+              <span>Project</span>
+              <span>Status</span>
+              <span>Received</span>
+            </div>
+            <ul class="list" id="request-list"></ul>
+            <div class="list-foot" id="list-foot" hidden>
+              <button type="button" class="btn" id="show-all">Show all requests</button>
+            </div>
+          </div>
+
+          <div id="list-loading" hidden>
+            <p class="sr-only" role="status">Loading requests</p>
+            <div class="skeleton-card" aria-hidden="true"></div>
+            <div aria-hidden="true">
+              <div class="skeleton-row"></div>
+              <div class="skeleton-row"></div>
+              <div class="skeleton-row"></div>
+              <div class="skeleton-row"></div>
+            </div>
+          </div>
+
+          <div class="empty" id="list-empty" hidden>
+            <h2>No requests yet</h2>
+            <p>Requests you send from this workspace will show up here.</p>
+            <button type="button" class="btn btn-primary" id="empty-new-request">
+              New request
+            </button>
+          </div>
+
+          <div class="error" id="list-error" hidden>
+            <h2>Could not load requests</h2>
+            <p>The request list did not load. Check your connection and try again.</p>
+            <button type="button" class="btn" id="retry">Try again</button>
+          </div>
+        </section>
+
+        <section id="detail-screen" hidden>
+          <button type="button" class="detail-back" id="back">
+            <span aria-hidden="true">←</span>
+            My requests
+          </button>
+
+          <div class="detail-head">
+            <div>
+              <h1 id="detail-title">Export the board as CSV</h1>
+              <div class="detail-meta">
+                <span class="row-id" id="detail-id">REQ-14</span>
+                <span id="detail-project">Launch</span>
+                <span id="detail-updated">Updated 2 hours ago</span>
+                <span id="detail-contact"></span>
+              </div>
+            </div>
+            <span class="badge" id="detail-badge">In progress</span>
+          </div>
+
+          <section class="section" aria-labelledby="progress-heading">
+            <h2 id="progress-heading">Progress</h2>
+            <ol class="stepper" id="stepper" aria-label="Request progress"></ol>
+            <p class="step-note" id="step-note" hidden></p>
+            <p class="rejected-note" id="rejected-note" hidden>
+              This request was rejected. The reason is in the activity below.
+            </p>
+          </section>
+
+          <section class="section" aria-labelledby="description-heading">
+            <h2 id="description-heading">Details</h2>
+            <p class="detail-copy">
+              Export the current board to a CSV file, including task title,
+              priority and due date, so the team can share progress outside
+              Kaneo.
+            </p>
+          </section>
+
+          <section class="section" aria-labelledby="activity-heading">
+            <h2 id="activity-heading">Activity</h2>
+            <ul class="activity" id="activity"></ul>
+          </section>
+
+          <div id="detail-actions"></div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const rows = [
+        {
+          id: "REQ-14",
+          title: "Export the board as CSV",
+          project: "Launch",
+          status: "in_progress",
+          receivedDays: 0,
+          updated: "2 hours ago",
+        },
+        {
+          id: "REQ-13",
+          title: "Add a dark mode toggle",
+          project: "Launch",
+          status: "delivered",
+          receivedDays: 1,
+          updated: "1 day ago",
+        },
+        {
+          id: "REQ-12",
+          title: "Bulk edit task assignees",
+          project: "Website",
+          status: "in_progress",
+          receivedDays: 2,
+          updated: "2 days ago",
+        },
+        {
+          id: "REQ-11",
+          title: "Import from Planka",
+          project: "Launch",
+          status: "triaged",
+          receivedDays: 3,
+          updated: "3 days ago",
+        },
+        {
+          id: "REQ-10",
+          title: "Slack digest for the team",
+          project: "Website",
+          status: "confirmed",
+          receivedDays: 3,
+          updated: "3 days ago",
+        },
+        {
+          id: "REQ-9",
+          title: "Custom fields on cards",
+          project: "Launch",
+          status: "rejected",
+          receivedDays: 10,
+          updated: "10 days ago",
+        },
+      ];
+
+      const statusLabel = {
+        new: "New",
+        triaged: "Waiting for review",
+        approved: "Approved",
+        in_progress: "In progress",
+        delivered: "Delivered",
+        needs_revision: "Needs revision",
+        confirmed: "Confirmed",
+        rejected: "Rejected",
+      };
+
+      const statusTone = {
+        new: "badge-outline",
+        triaged: "badge-outline",
+        approved: "badge-success",
+        in_progress: "badge-warning",
+        delivered: "badge-info",
+        needs_revision: "badge-warning",
+        confirmed: "badge-success",
+        rejected: "badge-danger",
+      };
+
+      const openSeries = [
+        { key: "waiting", label: "Waiting for review", seg: "waiting" },
+        { key: "in_progress", label: "In progress", seg: "progress" },
+        { key: "awaiting", label: "Awaiting your confirmation", seg: "awaiting" },
+      ];
+
+      const stepLabels = [
+        "Submitted",
+        "Received",
+        "In progress",
+        "Awaiting your confirmation",
+        "Completed",
+      ];
+
+      let selectedGroup = "all";
+      // Prototype simulates a page of 4 so the "Show all" state is visible; production uses 100.
+      const PAGE_SIZE = 4;
+      let visibleLimit = PAGE_SIZE;
+      let selectedRequest = rows[0];
+      let detailStatus = "in_progress";
+
+      const $ = (id) => document.getElementById(id);
+
+      function inGroup(row, group) {
+        if (group === "all") return true;
+        if (group === "waiting") return ["new", "triaged"].includes(row.status);
+        if (group === "in_progress")
+          return ["approved", "in_progress", "needs_revision"].includes(
+            row.status,
+          );
+        if (group === "awaiting") return row.status === "delivered";
+        return true;
+      }
+
+      function counts() {
+        return {
+          all: rows.filter((row) => inGroup(row, "all")).length,
+          waiting: rows.filter((row) => inGroup(row, "waiting")).length,
+          in_progress: rows.filter((row) => inGroup(row, "in_progress")).length,
+          awaiting: rows.filter((row) => inGroup(row, "awaiting")).length,
+        };
+      }
+
+      function badge(status) {
+        const el = document.createElement("span");
+        el.className = `badge ${statusTone[status] || "badge-outline"}`;
+        el.textContent = statusLabel[status] || status;
+        return el;
+      }
+
+      function legendRow(key, label, seg, value, total, showPct) {
+        const li = document.createElement("li");
+        const button = document.createElement("button");
+        button.type = "button";
+        button.dataset.group = key;
+        button.setAttribute("aria-pressed", String(key === selectedGroup));
+        button.setAttribute(
+          "aria-label",
+          `${label}: ${value} ${value === 1 ? "request" : "requests"}`,
+        );
+        button.addEventListener("click", () => {
+          selectedGroup = key;
+          visibleLimit = PAGE_SIZE;
+          renderSummary();
+          renderRows();
+        });
+        if (seg) {
+          const swatch = document.createElement("span");
+          swatch.className = `swatch swatch-${seg}`;
+          swatch.setAttribute("aria-hidden", "true");
+          button.append(swatch);
+        }
+        const name = document.createElement("span");
+        name.className = "label";
+        name.textContent = label;
+        const count = document.createElement("span");
+        count.className = "count";
+        count.textContent = String(value);
+        button.append(name, count);
+        if (showPct) {
+          const pct = document.createElement("span");
+          pct.className = "pct";
+          pct.textContent = `${total > 0 ? Math.round((value / total) * 100) : 0}%`;
+          button.append(pct);
+        }
+        li.append(button);
+        return li;
+      }
+
+      function legendSeparator() {
+        const li = document.createElement("li");
+        li.className = "legend-sep";
+        li.setAttribute("aria-hidden", "true");
+        return li;
+      }
+
+      function renderSummary() {
+        const c = counts();
+        const card = $("summary");
+        card.hidden = c.all === 0;
+        if (c.all === 0) return;
+
+        const active = c.waiting + c.in_progress + c.awaiting;
+        $("summary-hint").textContent = `${c.all} ${c.all === 1 ? "request" : "requests"}`;
+        $("donut-total").textContent = String(active);
+
+        const r = 42;
+        const circumference = 2 * Math.PI * r;
+        let offset = 0;
+        const segments = openSeries.map((item) => {
+          const length = active > 0 ? (c[item.key] / active) * circumference : 0;
+          const circle = `<circle cx="50" cy="50" r="${r}" fill="none" stroke-width="14" stroke-dasharray="${length} ${circumference - length}" stroke-dashoffset="${-offset}" transform="rotate(-90 50 50)" class="seg-${item.seg}"></circle>`;
+          offset += length;
+          return circle;
+        });
+        $("donut-svg").innerHTML =
+          `<circle cx="50" cy="50" r="${r}" fill="none" stroke-width="14" class="seg-track"></circle>` +
+          segments.join("");
+
+        const legend = $("legend");
+        legend.replaceChildren();
+        for (const item of openSeries) {
+          legend.append(
+            legendRow(item.key, item.label, item.seg, c[item.key], active, true),
+          );
+        }
+        legend.append(legendSeparator());
+        const all = legendRow("all", "All requests", null, c.all, c.all, false);
+        all.classList.add("legend-all");
+        legend.append(all);
+      }
+
+      function receivedLabel(row) {
+        if (row.receivedDays === 0) return "today";
+        if (row.receivedDays === 1) return "1 day ago";
+        return `${row.receivedDays} days ago`;
+      }
+
+      function renderRows() {
+        const list = $("request-list");
+        list.replaceChildren();
+        const isClosed = (row) => ["confirmed", "rejected"].includes(row.status);
+        const visible = rows
+          .filter((row) => inGroup(row, selectedGroup))
+          .sort(
+            (a, b) =>
+              Number(isClosed(a)) - Number(isClosed(b)) ||
+              b.receivedDays - a.receivedDays,
+          );
+
+        const filter = $("list-filter");
+        const groupActive = selectedGroup !== "all";
+        filter.hidden = !groupActive;
+        if (groupActive) {
+          const group = openSeries.find((item) => item.key === selectedGroup);
+          $("list-filter-label").textContent = `Showing: ${group ? group.label : selectedGroup}`;
+        }
+
+        if (visible.length === 0) {
+          const li = document.createElement("li");
+          const p = document.createElement("p");
+          p.className = "empty";
+          p.style.padding = "32px 8px";
+          p.textContent = "No requests in this group.";
+          li.append(p);
+          list.append(li);
+          $("list-foot").hidden = true;
+          return;
+        }
+
+        const foot = $("list-foot");
+        foot.hidden = visible.length <= visibleLimit;
+        if (!foot.hidden) {
+          $("show-all").textContent = `Show all ${visible.length} requests`;
+        }
+
+        for (const row of visible.slice(0, visibleLimit)) {
+          const li = document.createElement("li");
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "row";
+          button.setAttribute(
+            "aria-label",
+            `${row.id}: ${row.title}, ${row.project}, ${statusLabel[row.status]}, received ${receivedLabel(row)}`,
+          );
+
+          const id = document.createElement("span");
+          id.className = "row-id";
+          id.textContent = row.id;
+
+          const title = document.createElement("span");
+          title.className = "row-title";
+          title.textContent = row.title;
+
+          const project = document.createElement("span");
+          project.className = "row-project";
+          project.textContent = row.project;
+
+          const time = document.createElement("span");
+          time.className = "row-time";
+          time.textContent = receivedLabel(row);
+
+          button.append(id, title, project, badge(row.status), time);
+
+          button.addEventListener("click", () => openDetail(row));
+          li.append(button);
+          list.append(li);
+        }
+      }
+
+      function renderBanner() {
+        const c = counts();
+        const banner = $("banner");
+        if (c.awaiting > 0) {
+          banner.hidden = false;
+          $("banner-copy").textContent =
+            c.awaiting === 1
+              ? "1 request is ready for your confirmation"
+              : `${c.awaiting} requests are ready for your confirmation`;
+        } else {
+          banner.hidden = true;
+        }
+      }
+
+      function renderList() {
+        renderBanner();
+        renderSummary();
+        renderRows();
+      }
+
+      function stepStates(status) {
+        if (status === "rejected") {
+          return [
+            { label: stepLabels[0], state: "done" },
+            { label: stepLabels[1], state: "done" },
+            { label: "Rejected", state: "rejected" },
+          ];
+        }
+        if (status === "confirmed") {
+          return stepLabels.map((label) => ({ label, state: "done" }));
+        }
+        const index = {
+          new: 0,
+          triaged: 1,
+          approved: 1,
+          in_progress: 2,
+          needs_revision: 2,
+          delivered: 3,
+        }[status];
+        return stepLabels.map((label, i) => ({
+          label,
+          state: i < index ? "done" : i === index ? "current" : "upcoming",
+        }));
+      }
+
+      function renderStepper(status) {
+        const stepper = $("stepper");
+        stepper.replaceChildren();
+        const states = stepStates(status);
+        states.forEach((step, index) => {
+          const li = document.createElement("li");
+          li.className = "step";
+          li.dataset.state = step.state;
+          if (step.state === "current") li.setAttribute("aria-current", "step");
+          const marker = document.createElement("span");
+          marker.className = "step-marker";
+          marker.setAttribute("aria-hidden", "true");
+          marker.textContent = String(index + 1);
+          const label = document.createElement("span");
+          label.className = "step-label";
+          label.textContent = step.label;
+          li.append(marker, label);
+          stepper.append(li);
+        });
+
+        const note = $("step-note");
+        if (status === "needs_revision") {
+          note.hidden = false;
+          note.textContent = "You sent feedback";
+        } else {
+          note.hidden = true;
+          note.textContent = "";
+        }
+        $("rejected-note").hidden = status !== "rejected";
+      }
+
+      function renderActivity(status) {
+        const notes = selectedRequest.notes ?? [];
+        const items = [
+          { text: "You created this request", when: "3 days ago" },
+          { text: "Team started working on this request", when: "2 days ago" },
+        ];
+        for (const note of notes) {
+          items.push({
+            text:
+              note.kind === "feedback"
+                ? `You sent feedback: ${note.text}`
+                : `Team delivered this request again: ${note.text}`,
+            when: note.when,
+          });
+        }
+        const lastKind = notes.at(-1)?.kind;
+        if (status === "delivered" && lastKind !== "delivered") {
+          items.push({
+            text: "Team delivered this request for your review",
+            when: "1 day ago",
+          });
+        }
+        if (status === "needs_revision" && lastKind !== "feedback") {
+          items.push({ text: "You sent feedback", when: "1 day ago" });
+        }
+        if (status === "confirmed") {
+          items.push({ text: "You confirmed this request", when: "1 day ago" });
+        }
+        if (status === "rejected") {
+          items.push({
+            text: "Team rejected this request. Not enough detail to scope.",
+            when: "10 days ago",
+          });
+        }
+        const list = $("activity");
+        list.replaceChildren();
+        for (const item of items) {
+          const li = document.createElement("li");
+          const text = document.createElement("span");
+          text.textContent = item.text;
+          const when = document.createElement("span");
+          when.className = "when";
+          when.textContent = item.when;
+          li.append(text, when);
+          list.append(li);
+        }
+      }
+
+      function renderActions(status) {
+        const box = $("detail-actions");
+        box.replaceChildren();
+        if (status !== "delivered") return;
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        const confirm = document.createElement("button");
+        confirm.type = "button";
+        confirm.className = "btn btn-primary";
+        confirm.textContent = "Looks good, confirm";
+        confirm.addEventListener("click", () => {
+          selectedRequest.status = "confirmed";
+          selectedRequest.updated = "Just now";
+          detailStatus = "confirmed";
+          $("detail-status").value = "confirmed";
+          renderDetail();
+          renderList();
+          $("list-live").textContent = "Request confirmed.";
+        });
+
+        const revise = document.createElement("button");
+        revise.type = "button";
+        revise.className = "btn";
+        revise.textContent = "Need feedback";
+        revise.addEventListener("click", () => {
+          noteForm.hidden = false;
+          noteInput.focus();
+        });
+
+        actions.append(confirm, revise);
+        box.append(actions);
+
+        const noteForm = document.createElement("div");
+        noteForm.className = "note-form";
+        noteForm.hidden = true;
+        const label = document.createElement("label");
+        label.htmlFor = "revision-note";
+        label.textContent = "What feedback do you have?";
+        const noteInput = document.createElement("textarea");
+        noteInput.id = "revision-note";
+        noteInput.placeholder = "Tell the team what to improve";
+        const noteActions = document.createElement("div");
+        noteActions.className = "actions";
+        const send = document.createElement("button");
+        send.type = "button";
+        send.className = "btn btn-primary";
+        send.textContent = "Send";
+        send.addEventListener("click", () => {
+          const note = noteInput.value.trim();
+          if (!note) {
+            noteInput.focus();
+            return;
+          }
+          selectedRequest.notes ??= [];
+          selectedRequest.notes.push({
+            kind: "feedback",
+            text: note,
+            when: "Just now",
+          });
+          selectedRequest.status = "needs_revision";
+          selectedRequest.updated = "Just now";
+          detailStatus = "needs_revision";
+          $("detail-status").value = "needs_revision";
+          noteInput.value = "";
+          noteForm.hidden = true;
+          renderDetail();
+          renderList();
+          $("list-live").textContent =
+            "Feedback sent. The team will reply and deliver this request again.";
+        });
+        const cancel = document.createElement("button");
+        cancel.type = "button";
+        cancel.className = "btn";
+        cancel.textContent = "Cancel";
+        cancel.addEventListener("click", () => {
+          noteForm.hidden = true;
+        });
+        noteActions.append(send, cancel);
+        noteForm.append(label, noteInput, noteActions);
+        box.append(noteForm);
+      }
+
+      function renderDetail() {
+        const row = selectedRequest;
+        $("detail-title").textContent = row.title;
+        $("detail-id").textContent = row.id;
+        $("detail-project").textContent = row.project;
+        $("detail-updated").textContent = `Updated ${row.updated}`;
+        $("detail-contact").textContent = `Handled by the ${row.project} team`;
+        const badgeEl = $("detail-badge");
+        badgeEl.className = `badge ${statusTone[detailStatus] || "badge-outline"}`;
+        badgeEl.textContent = statusLabel[detailStatus] || detailStatus;
+        renderStepper(detailStatus);
+        renderActivity(detailStatus);
+        renderActions(detailStatus);
+      }
+
+      function openDetail(row) {
+        selectedRequest = row;
+        detailStatus = row.status;
+        $("detail-status").value = row.status;
+        $("crumb").textContent = row.id;
+        $("list-screen").hidden = true;
+        $("detail-screen").hidden = false;
+        renderDetail();
+        window.scrollTo(0, 0);
+      }
+
+      function closeDetail() {
+        $("crumb").textContent = "My requests";
+        $("detail-screen").hidden = true;
+        $("list-screen").hidden = false;
+        renderList();
+        window.scrollTo(0, 0);
+      }
+
+      $("back").addEventListener("click", closeDetail);
+
+      $("banner-action").addEventListener("click", () => {
+        selectedGroup = "awaiting";
+        visibleLimit = PAGE_SIZE;
+        renderSummary();
+        renderRows();
+      });
+
+      $("clear-filter").addEventListener("click", () => {
+        selectedGroup = "all";
+        visibleLimit = PAGE_SIZE;
+        renderSummary();
+        renderRows();
+      });
+
+      $("show-all").addEventListener("click", () => {
+        visibleLimit = Infinity;
+        renderRows();
+      });
+
+      $("list-state").addEventListener("change", (event) => {
+        const state = event.target.value;
+        $("list-full").hidden = state !== "full";
+        $("list-loading").hidden = state !== "loading";
+        $("list-empty").hidden = state !== "empty";
+        $("list-error").hidden = state !== "error";
+      });
+
+      $("detail-status").addEventListener("change", (event) => {
+        detailStatus = event.target.value;
+        renderDetail();
+      });
+
+      $("theme-toggle").addEventListener("click", (event) => {
+        const isDark = document.documentElement.classList.toggle("dark");
+        event.currentTarget.setAttribute("aria-pressed", String(isDark));
+      });
+
+      $("team-reply").addEventListener("click", () => {
+        selectedRequest.notes ??= [];
+        selectedRequest.notes.push({
+          kind: "delivered",
+          text: "Thanks for the feedback — we've updated the CSV export.",
+          when: "Just now",
+        });
+        selectedRequest.status = "delivered";
+        selectedRequest.updated = "Just now";
+        detailStatus = "delivered";
+        $("detail-status").value = "delivered";
+        renderDetail();
+        renderList();
+        $("list-live").textContent =
+          "Team replied and delivered the request again. Same request, no new one.";
+      });
+
+      $("new-request").addEventListener("click", () => {
+        const hint = $("new-request-hint");
+        hint.hidden = !hint.hidden;
+      });
+
+      $("empty-new-request").addEventListener("click", () => {
+        $("list-state").value = "full";
+        $("list-full").hidden = false;
+        $("list-empty").hidden = true;
+      });
+
+      $("retry").addEventListener("click", () => {
+        $("list-state").value = "full";
+        $("list-full").hidden = false;
+        $("list-error").hidden = true;
+        renderList();
+      });
+
+      renderList();
+      renderDetail();
+    </script>
+  </body>
+</html>

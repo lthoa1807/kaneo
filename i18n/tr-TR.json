@@ -5406,7 +5406,18 @@
 			},
 			"confirmedOn": "Confirmed on {{date}}",
 			"revisionDescription": "Tell us what needs to change. We will pick the request up again.",
-			"revisionTitle": "Request changes"
+			"revisionTitle": "Request changes",
+			"stepper": {
+				"awaiting": "Awaiting your confirmation",
+				"completed": "Completed",
+				"inProgress": "In progress",
+				"label": "Progress",
+				"received": "Received",
+				"rejected": "Rejected",
+				"rejectedNote": "This request was rejected",
+				"revisionNote": "You sent feedback",
+				"submitted": "Submitted"
+			}
 		},
 		"errors": {
 			"loadFailed": "Could not load this request",
@@ -5430,7 +5441,14 @@
 		"list": {
 			"empty": "No requests yet",
 			"loadError": "Could not load requests",
-			"retry": "Try again"
+			"retry": "Try again",
+			"columns": {
+				"id": "ID",
+				"project": "Project",
+				"received": "Received",
+				"request": "Request",
+				"status": "Status"
+			}
 		},
 		"note": {
 			"confirm": "Confirm",
@@ -5450,7 +5468,26 @@
 			"all": "All",
 			"nav": "My requests",
 			"newRequest": "New request",
-			"title": "My requests"
+			"title": "My requests",
+			"active": "active",
+			"banner_one": "{{count}} request is ready for your confirmation",
+			"banner_other": "{{count}} requests are ready for your confirmation",
+			"bannerAction": "Review",
+			"emptyGroup": "No requests in this group.",
+			"group": {
+				"all": "All requests",
+				"awaiting": "Awaiting your confirmation",
+				"in_progress": "In progress",
+				"waiting": "Waiting for review"
+			},
+			"overview": "Overview",
+			"overviewHint_one": "{{count}} request",
+			"overviewHint_other": "{{count}} requests",
+			"showAll": "Show all {{total}} requests",
+			"showAllLoading": "Loading…",
+			"bannerTitle": "Requests awaiting your confirmation",
+			"legendName_one": "{{label}}: {{count}} request",
+			"legendName_other": "{{label}}: {{count}} requests"
 		},
 		"staff": {
 			"attachDescription": "Create the task that fulfils this request. It stays linked to the request.",
@@ -5473,7 +5510,23 @@
 			"tab": "Intake",
 			"taskTitle": "Task title",
 			"title": "Intake requests",
-			"truncated": "Showing {{shown}} of {{total}} requests — filter by status to narrow"
+			"truncated": "Showing {{shown}} of {{total}} requests — filter by status to narrow",
+			"deliverDescription": "Add a reply for the guest. They will see it in the activity.",
+			"deliverTitle": "Deliver request"
+		},
+		"activity": {
+			"confirmed": "{{actor}} confirmed this request",
+			"created": "{{actor}} created this request",
+			"delivered": "{{actor}} delivered this request for your review",
+			"deliveredAgain": "{{actor}} delivered this request again: {{note}}",
+			"feedback": "{{actor}} sent feedback: {{note}}",
+			"received": "{{actor}} received this request",
+			"rejected": "{{actor}} rejected this request: {{note}}",
+			"started": "{{actor}} started working on this request",
+			"team": "Team",
+			"you": "You",
+			"deliveredAgainNoNote": "{{actor}} delivered this request again",
+			"deliveredWithNote": "{{actor}} delivered this request for your review: {{note}}"
 		}
 	},
 	"dashboard": {
